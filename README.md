@@ -1,7 +1,7 @@
 # seafile-server-community_debian-jessie-amd64
 This script installs the community edition of the Seafile Server on a Debian Jessie (64bit).
 
-It's meant to run on a system with minimal pre-installation. No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
+It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.com/watch?v=BCwz9oSSt8g). No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
 
 Never run the script on a production server. It's more or less a one trick pony and can seriously damage productions systems. So run it only one time and delete it afterwards. 
 
@@ -32,7 +32,7 @@ time bash seafile-server-community_debian-jessie-amd64
 ### After running the installer
 
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if ran again.
-2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation. As a bare minimum you most definitely will want to change the listening IP to a valid DNS name...
+2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation. As a bare minimum you most definitely will want to change the listening IP to a valid DNS name. Run "seafile-server-change-address" as root
 
 
 ### Bugs, suggestions, you name it...
