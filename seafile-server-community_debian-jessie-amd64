@@ -140,7 +140,7 @@ server {
           proxy_read_timeout  36000s;
       }
       location /media {
-          root /opt/seafile/haiwen/seafile-server-latest/seahub;
+          root /opt/seafile/seafile-server-latest/seahub;
       }
      location /seafdav {
         fastcgi_pass    127.0.0.1:8080;
@@ -211,7 +211,7 @@ cat > /etc/init.d/seafile-server <<'EOF'
 user=seafile
 
 # Change the value of "seafile_dir" to your path of seafile installation
-seafile_dir=/opt/seafile/haiwen
+seafile_dir=/opt/seafile
 script_path=${seafile_dir}/seafile-server-latest
 seafile_init_log=${seafile_dir}/logs/seafile.init.log
 seahub_init_log=${seafile_dir}/logs/seahub.init.log
@@ -259,12 +259,12 @@ update-rc.d seafile-server defaults
 # Seafile
 # -------------------------------------------
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
-mkdir -p /opt/seafile/haiwen/installed
-cd /opt/seafile/haiwen/
+mkdir -p /opt/seafile/installed
+cd /opt/seafile/
 curl -OL https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
 tar xzf seafile-server_latest_x86-64.tar.gz
 
-SEAFILE_VERSION=$(basename /opt/seafile/haiwen/seafile-server-* | awk -F'-' ' { print $3  }')
+SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
 
 mv seafile-server_latest_x86-64.tar.gz installed/seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz
 
@@ -290,20 +290,20 @@ mysql -e "create user 'seafile'@'localhost' identified by '$SQLSEAFILEPW';"
 mysql -e "GRANT ALL PRIVILEGES ON \`ccnet-db\`.* to \`seafile\`;"
 mysql -e "GRANT ALL PRIVILEGES ON \`seafile-db\`.* to \`seafile\`;"
 mysql -e "GRANT ALL PRIVILEGES ON \`seahub-db\`.* to \`seafile\`;"
-mysql seahub-db < /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
 # -------------------------------------------
-# Go to /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}
+# Go to /opt/seafile/seafile-server-${SEAFILE_VERSION}
 # -------------------------------------------
-cd /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/
+cd /opt/seafile/seafile-server-${SEAFILE_VERSION}/
 
 
 # -------------------------------------------
 # Vars - Don't touch these unless you really know what you are doing!
 # -------------------------------------------
 SCRIPT=$(readlink -f "$0")
-INSTALLPATH=/opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/
+INSTALLPATH=/opt/seafile/seafile-server-${SEAFILE_VERSION}/
 TOPDIR=$(dirname "${INSTALLPATH}")
 SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
