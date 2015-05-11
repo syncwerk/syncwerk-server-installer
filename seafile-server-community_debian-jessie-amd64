@@ -73,6 +73,12 @@ apt-get update && apt-get dist-upgrade -y
 
 
 # -------------------------------------------
+# Ensure aptitude is installed
+# -------------------------------------------
+apt-get install aptitude -y
+
+
+# -------------------------------------------
 # Additional requirements
 # -------------------------------------------
 aptitude install aptitude sudo python-setuptools python-simplejson python-imaging python-mysqldb \
