@@ -580,9 +580,8 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
 
 
 
-  About
+  Contribute
   -----------------------------------------------------------------
-
   Please contact alexander.jackson@seafile.com.de
   for bugs or suggestions about this installer. Thank you!
 
