@@ -532,18 +532,14 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
   Next you should manually complete the following steps
   -----------------------------------------------------------------
 
-  1) seahub_settings.py:  Change IP within FILE_SERVER_ROOT variable to DNS
+  1) Run seafile-server-change-address to add your Seafile servers DNS name
 
-  2) ccnet.conf:          Change IP within SERVICE_URL variable to DNS
-
-  3) Restart server with: service seafile-server restart
-
-  4) If this server is behind a firewall, you need to ensure that
+  2) If this server is behind a firewall, you need to ensure that
      tcp port 443 for the NGINX reverse proxy is open. Optionally
      you may also open tcp port 80 which redirects all unencrypted
      http traffic to the encrypted https port.
 
-  5) Seahub tries to send emails via the local server. Install and
+  3) Seahub tries to send emails via the local server. Install and
      configure Postfix for this to work.
 
 
@@ -589,6 +585,13 @@ EOF
 
 chmod 600 ${seafile_dir}/aio_seafile-server.log
 chown -R ${SEAFILE_USER}.nogroup ${seafile_dir}/aio_seafile-server.log
+
+
+# -------------------------------------------
+# Install seafile-server-change-address script
+# -------------------------------------------
+https://gist.githubusercontent.com/alexanderjackson/7e6fd01187327ffd8518/raw/2a87ea94ec8906f8e1847236711eef27ba1d2bb8/seafile-server-change-address -O /usr/local/sbin/seafile-server-change-address
+chmod 600 /usr/local/sbin/seafile-server-change-address
 
 clear
 
