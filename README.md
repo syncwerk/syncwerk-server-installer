@@ -22,7 +22,7 @@ time bash seafile-server-community_debian-jessie-amd64
 ### The installer does
 1. Update and upgrade Debian
 2. Install NGINX from http://nginx.org/packages/mainline/debian/
-3. Create Seafile init skript and add it to system start-up
+3. Create Seafile init script and add it to system start-up
 4. Create unprivilieged system user "Seafile" with home directory "/opt/seafile"
 5. Download and extract latest Seafile server sources from https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
 6. Create "seafile" database user and actual Seafile databases (DB-Credentials in ~/.my.cnf)
