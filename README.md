@@ -1,11 +1,15 @@
 # seafile-server-community_debian-jessie-amd64
-This script installs the community edition of the Seafile Server on a Debian Jessie (64bit).
+This script installs the Seafile Server Community Edition on a Debian Jessie (64bit).
 
 It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.com/watch?v=BCwz9oSSt8g). No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
 
-Never run the script on a production server. It's more or less a one trick pony and can seriously damage productions systems. So run it only one time and delete it afterwards. 
+Never run the script on a production server. It's more or less a one trick pony and can seriously damage productions systems. So run it only one time and delete it afterwards. As a precaution I have added a few check to abort installation if the unprivileged Seafile user or Seafile installation directory exist.
+
+
+### Seafile updates/upgrades
 
 You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile. 
+
 
 ### How to run
 <pre>
