@@ -23,7 +23,7 @@ time bash seafile-server-community_debian-jessie-amd64
 5. Download and extract latest Seafile server sources from https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
 6. Create "seafile" database user and actual Seafile databases (DB-Credentials in ~/.my.cnf)
 7. Create various Seafile files
-8. Enable SeafDAV, Memcached and MySQL/MariaDB
+8. Enable SeafDAV, Memcached and MariaDB
 9. Setup Seafile to listen to IP (hostname -i) instead of DNS (Switch this to DNS before live deployment)
 10. Create Seafile admin with individual password
 11. Display setup infos and what to do next.
