@@ -1,5 +1,5 @@
 # seafile-server-community_debian-jessie-amd64
-This script installs the Seafile Open Source Server on a Debian Jessie (64bit). It's meant to run on a system with minimal pre-installation. No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
+This script installs the community edition of the Seafile Server on a Debian Jessie (64bit). It's meant to run on a system with minimal pre-installation. No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
 
 Never run the script on a production server. It's more or less a one trick pony and can seriously damage productions systems. So run it only one time and delete it afterwards. 
 
