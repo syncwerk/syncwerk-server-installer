@@ -2,7 +2,7 @@
 
 
 ### What's it for?
-Installing the Seafile Server Community Edition on a Debian Jessie (64bit) in a standard and more secure manner then the out of the box setup scripts offer. 
+Installing the [Seafile Server Community Edition](http://seafile.com/en/home/) on a [Debian Jessie](https://www.debian.org/releases/stable/) (64bit) in a standard and more secure manner then the out of the box setup scripts offer. 
 
 
 ### Why?
