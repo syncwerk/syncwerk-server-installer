@@ -1,12 +1,25 @@
 #!/bin/bash
 #set -x
 # -------------------------------------------
-# All-In-One Seafile Server installer for Debian Jessie (64bit)
+# Vars
+# -------------------------------------------
+SEAFILE_ADMIN=admin@seafile.local
+SEAFILE_USER=seafile
+SERVER_NAME=$(hostname -s)
+IP_OR_DOMAIN=$(hostname -i)
+HOSTNAME=$(hostname -i)
+FILESERVER_PORT=8082
+SERVER_PORT=10001
+SEAFILE_SERVER_PORT=12001
+
+
+# -------------------------------------------
+# Seafile Server Community Edition on Debian Jessie (64bit)
 # -------------------------------------------
 clear
 cat <<EOF
 
-  All-In-One Seafile Server installer for Debian Jessie (64bit)
+  This script installs the community edition of the Seafile Server on a Debian Jessie (64bit)
   - Newest Seafile server version, MariaDB, Memcached, NGINX -
   -----------------------------------------------------------------
 
@@ -25,6 +38,32 @@ cat <<EOF
 EOF
 read dummy
 clear
+
+
+# -------------------------------------------
+# Ensure we are running the installer as root
+# -------------------------------------------
+if [[ $EUID -ne 0 ]]; then
+  echo "  Aborting because you are not root" ; exit 1
+fi
+
+
+# -------------------------------------------
+# Abort if user seafile exists
+# -------------------------------------------
+if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ;
+then
+  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
+fi
+
+
+# -------------------------------------------
+# Abort if directory /opt/seafile/ exists
+# -------------------------------------------
+if [[ -d "/opt/seafile/" ]] ;
+then
+  echo "  Aborting because directory /opt/seafile/ already exist" ; exit 1
+fi
 
 
 # -------------------------------------------
@@ -213,7 +252,7 @@ update-rc.d seafile-server defaults
 # -------------------------------------------
 # Seafile
 # -------------------------------------------
-adduser --system --gecos "seafile" seafile --home /opt/seafile
+adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
 mkdir -p /opt/seafile/haiwen/installed
 cd /opt/seafile/haiwen/
 curl -OL https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
@@ -236,7 +275,7 @@ password=$SQLSEAFILEPW
 EOF
 
 chmod 600 /opt/seafile/.my.cnf
-chown -R seafile.nogroup /opt/seafile/
+chown -R ${SEAFILE_USER}.nogroup /opt/seafile/
 
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
@@ -255,37 +294,20 @@ cd /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/
 
 
 # -------------------------------------------
-# Define Seafile admin credentials.
-# -------------------------------------------
-SEAFILE_ADMIN=admin@seafile.local
-SEAFILE_ADMIN_PW=$(pwgen)
-
-
-# -------------------------------------------
 # Vars - Don't touch these unless you really know what you are doing!
 # -------------------------------------------
 SCRIPT=$(readlink -f "$0")
-#INSTALLPATH=$(dirname "${SCRIPT}")
 INSTALLPATH=/opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/
 TOPDIR=$(dirname "${INSTALLPATH}")
+SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
+SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
 DEFAULT_CCNET_CONF_DIR=${TOPDIR}/ccnet
 DEFAULT_SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 DEFAULT_CONF_DIR=${TOPDIR}/conf
-SERVER_NAME=$(hostname -s)
-IP_OR_DOMAIN=$(hostname -i)
-HOSTNAME=$(hostname -i)
-SERVER_PORT=10001
 SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
-SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
-SEAFILE_SERVER_PORT=12001
-FILESERVER_PORT=8082
-SEAFILESQLPW=$(grep password /opt/seafile/.my.cnf | awk -F'=' {'print $2'})
-export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
 DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
-SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
-key=$(python "${SEAHUB_SECRET_KEYGEN}")
 CCNET_INIT=${INSTALLPATH}/seafile/bin/ccnet-init
 SEAF_SERVER_INIT=${INSTALLPATH}/seafile/bin/seaf-server-init
 MEDIA_DIR=${INSTALLPATH}/seahub/media
@@ -297,6 +319,7 @@ SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
 # -------------------------------------------
 # Create ccnet conf
 # -------------------------------------------
+export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
   --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${IP_OR_DOMAIN}"
 
@@ -333,6 +356,7 @@ EOF
 # -------------------------------------------
 # generate seahub_settings.py
 # -------------------------------------------
+key=$(python "${SEAHUB_SECRET_KEYGEN}")
 echo "SECRET_KEY = \"${key}\"" > "${DEST_SETTINGS_PY}"
 
 
@@ -367,6 +391,8 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
+SEAFILESQLPW=$(grep password /opt/seafile/.my.cnf | awk -F'=' {'print $2'})
+
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
 
 [Database]
@@ -441,6 +467,7 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
+SEAFILE_ADMIN_PW=$(pwgen)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
 
@@ -463,7 +490,7 @@ mv ${INSTALLPATH}/check_init_admin.py.backup ${INSTALLPATH}/check_init_admin.py
 # -------------------------------------------
 # Fix permissions
 # -------------------------------------------
-chown seafile.nogroup -R /opt/seafile/
+chown ${SEAFILE_USER}.nogroup -R /opt/seafile/
 
 
 # -------------------------------------------
@@ -556,7 +583,7 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
 EOF
 
 chmod 600 ${seafile_dir}/aio_seafile-server.log
-chown -R seafile.nogroup ${seafile_dir}/aio_seafile-server.log
+chown -R ${SEAFILE_USER}.nogroup ${seafile_dir}/aio_seafile-server.log
 
 clear
 
