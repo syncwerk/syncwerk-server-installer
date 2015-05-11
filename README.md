@@ -8,8 +8,8 @@ You will have to handle Seafile updates/upgrades manually after the initial inst
 ### How to run
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/All-In-One-Seafile-Server-Installer/master/aio_seafile-server_x86-64.sh
-time bash aio_seafile-server_x86-64.sh
+wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-community_debian-jessie-amd64/master/seafile-server-community_debian-jessie-amd64
+time bash seafile-server-community_debian-jessie-amd64
 </pre>
 
 
