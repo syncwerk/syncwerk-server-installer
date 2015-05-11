@@ -19,7 +19,7 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 
 ### Which components are used?
 1. [Newest Seafile Server Community Edition](https://download.seafile.com.de/)
-2. NGINX
+2. [NGINX](http://nginx.org/packages/mainline/debian/)
 3. MariaDB
 4. Memcached
 
@@ -56,12 +56,10 @@ Never run the script on a production server. It's more or less a one trick pony 
 
 
 ### How do I update Seafile?
-
 You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile. 
 
 
 ### What do I have to do after the installer has finished?
-
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if ran again.
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation. As a bare minimum you most definitely will want to change the listening IP to a valid DNS name. Run "seafile-server-change-address" as root to change the DNS name...
 3. Install a firewall. TCP-Port 443 needs to be reachable. Optionally you can open TCP-Port 80 which redirects to HTTPS
