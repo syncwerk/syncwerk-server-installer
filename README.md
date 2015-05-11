@@ -6,7 +6,7 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 Never run the script on a production server. It's more or less a one trick pony and can seriously damage productions systems. So run it only one time and delete it afterwards. As a precaution I have added a few check to abort installation if the unprivileged Seafile user or Seafile installation directory exist.
 
 
-### Seafile updates/upgrades
+### Updates
 
 You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile. 
 
