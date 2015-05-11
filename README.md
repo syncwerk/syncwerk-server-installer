@@ -1,6 +1,5 @@
 # seafile-server-community_debian-jessie-amd64
-This script installs the community edition of the Seafile Server on a Debian Jessie (64bit)
-(Newest Seafile server version, MariaDB, Memcached, NGINX)
+This script installs the community edition of the Seafile Server on a Debian Jessie (64bit).
 
 It's meant to run on a system with minimal pre-installation. No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
 
