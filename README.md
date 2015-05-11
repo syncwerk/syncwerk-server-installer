@@ -36,4 +36,4 @@ time bash seafile-server-community_debian-jessie-amd64
 
 
 ### Bugs, suggestions, you name it...
-Please contact me at alexander.jackson@seafile.com.de
+Please contact me at alexander.jackson@seafile.com.de or create an [Issue](https://github.com/alexanderjackson/seafile-server-community_debian-jessie-amd64/issues/new).
