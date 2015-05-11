@@ -6,7 +6,7 @@ Installing the [Seafile Server Community Edition](http://seafile.com/en/home/) o
 
 
 ### Why?
-There are to many ways to misconfigure a manualy Seafile server installation. The script is derived from our refence installation for [Seafile Server Professional](https://wiki.seafile.com.de/doku.php?id=debian_7_wheezy_64bit). It helps us standardarising the installation procedure and allows us the debug errors within these installations more easily.
+There are to many ways to misconfigure a manualy Seafile server installation. The script is derived from our refence installation for [Seafile Server Professional](https://wiki.seafile.com.de/doku.php?id=debian_7_wheezy_64bit). It helps us to standardize the installation procedure and allows debugging errors in these installations more easily.
 
 
 ### How long does the installation take?
