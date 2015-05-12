@@ -25,8 +25,10 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 
 
 ### Which special features are enabled by default?
-1. Forced SSL on Port 80
-2. [SeafDAV](http://manual.seafile.com/extension/webdav.html)) WebDAV implementation
+1. HTTPS-Proxy on port 443
+2. Forced redirect from port 80 to port 443
+2. Seahub with FastCGI
+3. [SeafDAV](http://manual.seafile.com/extension/webdav.html) with FastCGI
 
 
 ### What does the installer do?
