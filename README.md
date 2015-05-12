@@ -29,16 +29,18 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 2. Forced redirect from port 80 to port 443
 2. Seahub with FastCGI
 3. [SeafDAV](http://manual.seafile.com/extension/webdav.html) with FastCGI
+4. Memcached
+5. Seafile autostart
 
 
 ### What does the installer do?
 1. Update and upgrade Debian
 2. Install NGINX from http://nginx.org/packages/mainline/debian/
-3. Create Seafile init script and add it to system start-up
-4. Create unprivilieged system user "Seafile" with home directory "/opt/seafile"
+3. Create Seafile init script and add it to systemd startup
+4. Create unprivilieged system user "seafile" with home directory "/opt/seafile"
 5. Download and extract latest Seafile server sources from https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
-6. Create "seafile" database user and actual Seafile databases (DB-Credentials in ~/.my.cnf)
-7. Create various Seafile files
+6. Create "seafile" database user and Seafile databases (DB-Credentials in ~/.my.cnf)
+7. Initialize various Seafile files
 8. Enable SeafDAV, Memcached and MariaDB
 9. Setup Seafile to listen to IP (hostname -i) instead of DNS (Switch this to DNS before live deployment)
 10. Create Seafile admin with individual password
@@ -64,7 +66,7 @@ You will have to handle Seafile updates/upgrades manually after the initial inst
 ### What do I have to do after the installer has finished?
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if ran again.
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation. As a bare minimum you most definitely will want to change the listening IP to a valid DNS name. Run "seafile-server-change-address" as root to change the DNS name...
-3. Install a firewall. TCP-Port 443 needs to be reachable. Optionally you can open TCP-Port 80 which redirects to HTTPS
+3. Install a firewall. TCP-Port 443 needs to be accessible. Optionally you can open TCP-Port 80 which redirects to HTTPS
 
 
 ### Where can I submit bugs or add suggestions?
