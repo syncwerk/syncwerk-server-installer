@@ -212,6 +212,7 @@ user=seafile
 
 # Change the value of "seafile_dir" to your path of seafile installation
 seafile_dir=/opt/seafile
+mkdir -p ${seafile_dir}/logs
 script_path=${seafile_dir}/seafile-server-latest
 seafile_init_log=${seafile_dir}/logs/seafile.init.log
 seahub_init_log=${seafile_dir}/logs/seahub.init.log
@@ -590,7 +591,7 @@ chown -R ${SEAFILE_USER}.nogroup ${seafile_dir}/aio_seafile-server.log
 # -------------------------------------------
 # Install seafile-server-change-address script
 # -------------------------------------------
-https://gist.githubusercontent.com/alexanderjackson/7e6fd01187327ffd8518/raw/2a87ea94ec8906f8e1847236711eef27ba1d2bb8/seafile-server-change-address -O /usr/local/sbin/seafile-server-change-address
+wget https://gist.githubusercontent.com/alexanderjackson/7e6fd01187327ffd8518/raw/2a87ea94ec8906f8e1847236711eef27ba1d2bb8/seafile-server-change-address -O /usr/local/sbin/seafile-server-change-address
 chmod 600 /usr/local/sbin/seafile-server-change-address
 
 clear
