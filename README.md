@@ -59,7 +59,9 @@ time bash seafile-server-community_debian-jessie-amd64
 
 
 ### Caution!
-Never run the script on a production server. It's more or less a one trick pony and can seriously damage productions systems. So run it only one time and delete it afterwards. As a precaution I have added a few simple checks to abort installation if the unprivileged Seafile user or Seafile installation directory pre-exist:
+Never run the script on a production server. It's more or less a one trick pony and can seriously damage production systems. So run it only one time and delete it afterwards. 
+
+As a precaution I have added a few simple checks to abort installation if the unprivileged Seafile user or Seafile installation directory pre-exist:
 1. Check if you're running this script as root. If not, abort.
 2. Check if the user "seafile" exists. If yes, abort.
 3. Check if the directory "/opt/seafile" exists. If yes, abort.
