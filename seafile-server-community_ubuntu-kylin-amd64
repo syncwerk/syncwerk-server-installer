@@ -69,20 +69,25 @@ fi
 # -------------------------------------------
 # Update System
 # -------------------------------------------
-apt-get update && apt-get dist-upgrade -y
+aptitude update && aptitude dist-upgrade -y
 
+
+# -------------------------------------------
+# Ensure aptitude is installed
+# -------------------------------------------
+apt-get install aptitude -y
 
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
+aptitude install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 openjdk-7-jre memcached python-memcache pwgen curl openssl -y
 
 
 # -------------------------------------------
 # NGINX
 # -------------------------------------------
-apt-get install nginx-full -y
+aptitude install nginx-full -y
 
 rm /etc/nginx/conf.d/*
 
@@ -162,7 +167,7 @@ service nginx restart
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
-Ubuntu_FRONTEND=noninteractive apt-get install mariadb-server -y
+Ubuntu_FRONTEND=noninteractive aptitude install mariadb-server -y
 
 SQLROOTPW=$(pwgen)
 
