@@ -174,7 +174,7 @@ service nginx restart
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
-Ubuntu_FRONTEND=noninteractive aptitude install mariadb-server -y
+DEBIAN_FRONTEND=noninteractive aptitude install mariadb-server -y
 
 SQLROOTPW=$(pwgen)
 
