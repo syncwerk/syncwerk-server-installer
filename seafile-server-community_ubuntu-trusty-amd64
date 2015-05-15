@@ -14,12 +14,12 @@ SEAFILE_SERVER_PORT=12001
 
 
 # -------------------------------------------
-# Seafile Server Community Edition on Ubuntu Kylin (64bit)
+# Seafile Server Community Edition on Ubuntu Trusty (64bit)
 # -------------------------------------------
 clear
 cat <<EOF
 
-  This script installs the community edition of the Seafile Server on a Ubuntu Kylin (64bit)
+  This script installs the community edition of the Seafile Server on a Ubuntu Trusty (64bit)
   - Newest Seafile server version, MariaDB, Memcached, NGINX -
   -----------------------------------------------------------------
 
