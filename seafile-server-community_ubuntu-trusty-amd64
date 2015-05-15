@@ -211,7 +211,6 @@ user=seafile
 
 # Change the value of "seafile_dir" to your path of seafile installation
 seafile_dir=/opt/seafile
-mkdir -p ${seafile_dir}/logs
 script_path=${seafile_dir}/seafile-server-latest
 seafile_init_log=${seafile_dir}/logs/seafile.init.log
 seahub_init_log=${seafile_dir}/logs/seahub.init.log
@@ -367,11 +366,17 @@ echo "SECRET_KEY = \"${key}\"" > "${DEST_SETTINGS_PY}"
 
 
 # -------------------------------------------
-# prepare avatar folder
+# prepare avatar directory
 # -------------------------------------------
 mkdir -p "${TOPDIR}/seahub-data"
 mv "${ORIG_AVATAR_DIR}" "${DEST_AVATAR_DIR}"
 ln -s ../../../seahub-data/avatars ${MEDIA_DIR}
+
+
+# -------------------------------------------
+# create logs directory
+# -------------------------------------------
+mkdir -p "${TOPDIR}/logs"
 
 
 # -------------------------------------------
