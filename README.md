@@ -81,4 +81,4 @@ BTW Ideas on how to automate upgrades are very welcome!
 
 
 ### Where can I submit bugs or add suggestions?
-Contact me at alexander.jackson@seafile.com.de or create an [Issue](https://github.com/alexanderjackson/seafile-server-community_debian-jessie-amd64/issues/new) on Github.
+Contact me at alexander.jackson@seafile.com.de or create an [Issue](https://github.com/alexanderjackson/seafile-server-community_debian-jessie-amd64/issues/new) on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
