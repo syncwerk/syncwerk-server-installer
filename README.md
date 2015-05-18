@@ -1,8 +1,8 @@
-# seafile-server-community_debian-jessie-amd64
-This installer script offers a quick and easy way to set up the [Seafile Server Community Edition](http://seafile.com/en/home/) on [Debian Jessie](https://www.debian.org/releases/stable/) (64bit), using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server.
+# seafile-server-installer
+These installer scripts offer a quick and easy way to set up the [Seafile Server Community Edition](http://seafile.com/en/home/), using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server.
 
 ### What's it for?
-Installing the [Seafile Server Community Edition](http://seafile.com/en/home/) on [Debian Jessie](https://www.debian.org/releases/stable/) (64bit) in a standard and more secure manner then the out of the box setup scripts offer. Instead of SQLite we're using MariaDB and instead of Gunicorn we're using NGINX.
+Installing the [Seafile Server Community Edition](http://seafile.com/en/home/) on Debian or Ubuntu (64bit) in a standard and more secure manner then the out of the box setup scripts offer. Instead of SQLite we're using MariaDB and instead of Gunicorn we're using NGINX.
 
 
 ### Why?
@@ -15,7 +15,7 @@ The installation time will vary depending on your internet connection speed and 
 
 
 ### Operating system
-It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.com/watch?v=BCwz9oSSt8g). No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
+It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.com/watch?v=BCwz9oSSt8g) or [Ubuntu Trusty minimal installation](https://www.youtube.com/watch?v=qdCbWOHwBL4). No desktop environment or other weird stuff like hosting panels (Plesk, ISPConfig, etc.)...
 
 
 ### Which components are used?
@@ -50,11 +50,19 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 
 
 ### How do I run it?
-Just run the following lines as root:
+
+For Debian Jessie run the following lines as root:
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ce_debian-jessie-amd64
 time bash seafile-ce_debian-jessie-amd64
+</pre>
+
+For Ubuntu Trusty run the following lines as root:
+<pre>
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-server-community_ubuntu-trusty-amd64
+time bash seafile-server-community_ubuntu-trusty-amd64
 </pre>
 
 
