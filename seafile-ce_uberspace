@@ -71,7 +71,7 @@ RewriteRule ^(.*)$ /fcgi-bin/seahub.fcgi/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:A
 EOF
 
 # Set seahub port
-eval sed -i 's/$FILESERVER_PORT/${$FILESERVER_PORT}/' ~/html/.htaccess
+eval sed -i 's/FILESERVER_PORT/${$FILESERVER_PORT}/' ~/html/.htaccess
 
 sleep 60
 
