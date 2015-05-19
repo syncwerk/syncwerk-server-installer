@@ -7,6 +7,7 @@ SEAFILE_ADMIN=admin@seafile.local
 SEAFILE_USER=seafile
 SERVER_NAME=$(hostname -s | cut -c -16)
 HOSTNAME=$(hostname -f)
+WHOAMI=$(whoami)
 
 
 # -------------------------------------------
@@ -93,7 +94,6 @@ mv seafile-server_latest_x86-64.tar.gz installed/seafile-server_${SEAFILE_VERSIO
 # Seafile DB
 # -------------------------------------------
 MYSQL=$(which mysql)
-WHOAMI=$(whoami)
 DB_CCNET=${WHOAMI}_ccnet
 DB_SEAFILE=${WHOAMI}_seafile
 DB_SEAHUB=${WHOAMI}_seahub
