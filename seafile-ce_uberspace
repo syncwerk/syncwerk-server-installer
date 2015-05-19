@@ -60,10 +60,10 @@ RewriteEngine on
 # Redirect to https
 RewriteCond %{HTTPS} !=on
 RewriteCond %{ENV:HTTPS} !=on
-RewriteRule ^(.*)$ https://haiwen.markab.uberspace.de/$1 [L,R=301]
+RewriteRule ^(.*)$ https://WHOAMI.HOSTNAME/$1 [L,R=301]
 
 # Port of seafile httpserver (compare ~/haiwen/seafile-data/seafile.conf)
-RewriteRule ^seafhttp/(.*)$ http://localhost:$FILESERVER_PORT/$1 [QSA,P,L]
+RewriteRule ^seafhttp/(.*)$ http://localhost:FILESERVER_PORT/$1 [QSA,P,L]
 
 RewriteRule ^/(seafmedia.*)$ /$1 [QSA,L,PT]
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -71,7 +71,9 @@ RewriteRule ^(.*)$ /fcgi-bin/seahub.fcgi/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:A
 EOF
 
 # Set seahub port
-eval sed -i 's/FILESERVER_PORT/${$FILESERVER_PORT}/' ~/html/.htaccess
+eval sed -i 's/WHOAMI/${WHOAMI}/' ~/html/.htaccess
+eval sed -i 's/HOSTNAME/${HOSTNAME}/' ~/html/.htaccess
+eval sed -i 's/FILESERVER_PORT/${FILESERVER_PORT}/' ~/html/.htaccess
 
 sleep 60
 
@@ -364,8 +366,7 @@ eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH
 # -------------------------------------------
 ${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh start
 ${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh start ${SEAHUB_PORT}
-#${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh stop
-#${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh stop
+${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh stop
 
 
 # -------------------------------------------
