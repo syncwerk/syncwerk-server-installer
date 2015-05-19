@@ -1,0 +1,12 @@
+#!/bin/bash
+set -x
+seafile stop
+
+rm -r ${HOME}/seafile/
+
+mysql -e 'drop database haiwen_ccnet;'
+mysql -e 'drop database haiwen_seafile;'
+mysql -e 'drop database haiwen_seahub;'
+
+echo done
+exit 0
