@@ -53,33 +53,6 @@ rm -rf Imaging-1.1.7
 
 
 # -------------------------------------------
-# Apache htaccess
-# -------------------------------------------
-cat > ~/html/.htaccess <<"EOF"
-RewriteEngine on
-
-# Redirect to https
-RewriteCond %{HTTPS} !=on
-RewriteCond %{ENV:HTTPS} !=on
-RewriteRule ^(.*)$ https://WHOAMI.HOSTNAME/$1 [L,R=301]
-
-# Port of seafile httpserver (compare ~/haiwen/seafile-data/seafile.conf)
-RewriteRule ^seafhttp/(.*)$ http://localhost:FILESERVER_PORT/$1 [QSA,P,L]
-
-RewriteRule ^/(seafmedia.*)$ /$1 [QSA,L,PT]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ /fcgi-bin/seahub.fcgi/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-EOF
-
-# Set seahub port
-eval sed -i 's/WHOAMI/${WHOAMI}/' ~/html/.htaccess
-eval sed -i 's/HOSTNAME/${HOSTNAME}/' ~/html/.htaccess
-eval sed -i 's/FILESERVER_PORT/${FILESERVER_PORT}/' ~/html/.htaccess
-
-sleep 60
-
-
-# -------------------------------------------
 # Setup Seafile
 # -------------------------------------------
 mkdir -p ~/seafile/installed/
@@ -143,6 +116,31 @@ read SEAHUB_PORT FILESERVER_PORT SERVER_PORT SEAFILE_SERVER_PORT SEAFDAV_PORT< $
 
 # Delete port list
 rm ${PORT_LIST}
+
+
+# -------------------------------------------
+# Apache htaccess
+# -------------------------------------------
+cat > ~/html/.htaccess <<"EOF"
+RewriteEngine on
+
+# Redirect to https
+RewriteCond %{HTTPS} !=on
+RewriteCond %{ENV:HTTPS} !=on
+RewriteRule ^(.*)$ https://WHOAMI.HOSTNAME/$1 [L,R=301]
+
+# Port of seafile httpserver (compare ~/haiwen/seafile-data/seafile.conf)
+RewriteRule ^seafhttp/(.*)$ http://localhost:FILESERVER_PORT/$1 [QSA,P,L]
+
+RewriteRule ^/(seafmedia.*)$ /$1 [QSA,L,PT]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ /fcgi-bin/seahub.fcgi/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+EOF
+
+# Set seahub port
+eval sed -i 's/WHOAMI/${WHOAMI}/' ~/html/.htaccess
+eval sed -i 's/HOSTNAME/${HOSTNAME}/' ~/html/.htaccess
+eval sed -i 's/FILESERVER_PORT/${FILESERVER_PORT}/' ~/html/.htaccess
 
 
 # -------------------------------------------
