@@ -94,5 +94,9 @@ BTW Ideas on how to automate upgrades are very welcome!
 3. Install a firewall. TCP-Port 443 needs to be accessible. Optionally you can open TCP-Port 80 which redirects to HTTPS
 
 
+### License
+GNU Affero General Public License(http://www.gnu.org/licenses/agpl-3.0.html)
+
+
 ### Where can I submit bugs or add suggestions?
 Contact me at alexander.jackson@seafile.com.de or create an [Issue](https://github.com/alexanderjackson/seafile-server-community_debian-jessie-amd64/issues/new) on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
