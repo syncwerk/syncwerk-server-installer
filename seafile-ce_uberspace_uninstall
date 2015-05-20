@@ -21,8 +21,8 @@ EOF
 read dummy
 clear
 
-# Stop seafile if management script exists
-[ -f seafile ] && seafile stop ${SILENCER}
+# Kill anything Seafile related
+ps aux | grep sea | grep -v grep | awk '{ print $2 }' | while read line; do kill $line ; done
 
 # remove Seafile related directories and files
 eval rm -r ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ${SILENCER}
