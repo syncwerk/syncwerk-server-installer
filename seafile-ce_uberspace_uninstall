@@ -25,7 +25,7 @@ clear
 ps aux | grep sea | grep -v grep | grep -v uninstall | awk '{ print $2 }' | while read line; do kill $line ; done
 
 # remove Seafile related directories and files
-eval rm -r ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ${SILENCER}
+eval rm -r ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ~/html/.htaccess ${SILENCER}
 
 # Drop databases
 for i in haiwen_ccnet haiwen_seafile haiwen_seahub; do
