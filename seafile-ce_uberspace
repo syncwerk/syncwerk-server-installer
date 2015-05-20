@@ -7,7 +7,7 @@ SEAFILE_ADMIN=admin@seafile.local
 SEAFILE_USER=seafile
 WHOAMI=$(whoami)
 HOSTNAME=$(hostname -f)
-SERVER_NAME=$(echo ${WHOAMI}-$(hostname -s) | cut -c -16)
+SERVER_NAME=$(echo ${WHOAMI}$(hostname -s) | cut -c -16)
 
 
 # -------------------------------------------
