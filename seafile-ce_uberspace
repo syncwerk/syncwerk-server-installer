@@ -393,7 +393,7 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
-SEAFILE_ADMIN_PW=CHANGEME
+SEAFILE_ADMIN_PW=$(SEAFILE_ADMIN_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | base64 -w 0 | rev | cut -b 2- | rev)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
 
@@ -415,11 +415,11 @@ mv ${INSTALLPATH}/check_init_admin.py.backup ${INSTALLPATH}/check_init_admin.py
 # -------------------------------------------
 # Final report
 # -------------------------------------------
-cat > ~/seafile-ce_uberspace.log <<EOF
+cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   Your Seafile server is installed
   -----------------------------------------------------------------
   Server Name:         ${SERVER_NAME}
-  Server Address:      https://${HOSTNAME}
+  Server Address:      https://${WHOAMI}.${HOSTNAME}
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
   Seafile Data Dir:    ${SEAFILE_DATA_DIR}
@@ -430,7 +430,7 @@ cat > ~/seafile-ce_uberspace.log <<EOF
   SEAFILE_SERVER_PORT: $SEAFILE_SERVER_PORT
   SEAFDAV_PORT:        $SEAFDAV_PORT
 
-  This report is also saved to ${seafile_dir}/aio_seafile-server.log
+  This report is also saved to ~/seafile/seafile-ce_uberspace.log
   Next you should manually complete the following steps
   -----------------------------------------------------------------
   1) Seahub tries to send emails via the local server. Install and
@@ -450,6 +450,8 @@ cat > ~/seafile-ce_uberspace.log <<EOF
   for bugs or suggestions about this installer. Thank you!
 EOF
 
-chmod 600 ~/seafile-ce_uberspace.log
+chmod 600 ~/seafile/seafile-ce_uberspace.log
 
-cat ~/seafile-ce_uberspace.log
+cat ~/seafile/seafile-ce_uberspace.log
+
+echo "Is catting the credentials safe?"
