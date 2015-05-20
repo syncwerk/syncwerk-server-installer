@@ -452,6 +452,4 @@ EOF
 
 chmod 600 ~/seafile/seafile-ce_uberspace.log
 
-cat ~/seafile/seafile-ce_uberspace.log
-
-echo "Is catting the credentials safe?"
+less ~/seafile/seafile-ce_uberspace.log
