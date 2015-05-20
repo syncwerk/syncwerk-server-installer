@@ -51,6 +51,13 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 
 ### How do I run it?
 
+For Debian Wheezy run the following lines as root:
+<pre>
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ce_debian-wheezy-amd64
+time bash seafile-ce_debian-wheezy-amd64
+</pre>
+
 For Debian Jessie run the following lines as root:
 <pre>
 cd /tmp
