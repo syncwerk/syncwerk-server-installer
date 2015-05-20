@@ -67,7 +67,8 @@ time bash seafile-server-community_ubuntu-trusty-amd64
 
 BETA: For Uberspace run the following line as user:
 <pre>
-wget -O - https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ceuberspace | bash
+wget https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ce_uberspace 
+time bash seafile-ce_uberspace
 </pre>
  
  
