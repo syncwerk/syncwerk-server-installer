@@ -1,5 +1,7 @@
 #!/bin/bash
 #set -x
+# Vars
+SILENCER='> /dev/null 2>&1'
 
 # -------------------------------------------
 # Seafile Server Community Edition on Uberspace
@@ -19,16 +21,16 @@ EOF
 read dummy
 clear
 
-
-SILENCER='> /dev/null 2>&1'
-
+# Stop seafile if management script exists
 [ -f seafile ] && seafile stop ${SILENCER}
 
+# remove Seafile related directories and files
 eval rm -r ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ${SILENCER}
 
+# Drop databases
 for i in haiwen_ccnet haiwen_seafile haiwen_seahub; do
   mysql -e "DROP DATABASE IF EXISTS \`${i}\`;"
 done
 
+# Confirm removal
 echo Seafile is uninstalled now...
-exit 0
