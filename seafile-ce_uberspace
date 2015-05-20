@@ -433,8 +433,8 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   This report is also saved to ~/seafile/seafile-ce_uberspace.log
   Next you should manually complete the following steps
   -----------------------------------------------------------------
-  1) Seahub tries to send emails via the local server. Install and
-     configure Postfix for this to work.
+  1) Setup mail in ~/seafile/seahub_settings.py
+  
   Optional steps
   -----------------------------------------------------------------
   1) Check seahub_settings.py and customize it to fit your needs. Consult
