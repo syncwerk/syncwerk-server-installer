@@ -135,7 +135,7 @@ RewriteRule ^seafhttp/(.*)$ http://localhost:FILESERVER_PORT/$1 [QSA,P,L]
 
 RewriteRule ^/(seafmedia.*)$ /$1 [QSA,L,PT]
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ /fcgi-bin/seahub.fcgi/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteRule ^(.*)$ /fcgi-bin/seahub/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 EOF
 
 # Set seahub port
@@ -143,6 +143,43 @@ eval sed -i 's/WHOAMI/${WHOAMI}/' ~/html/.htaccess
 eval sed -i 's/HOSTNAME/${HOSTNAME}/' ~/html/.htaccess
 eval sed -i 's/FILESERVER_PORT/${FILESERVER_PORT}/' ~/html/.htaccess
 
+
+# -------------------------------------------
+# Create Seahub FastCGI script
+# -------------------------------------------
+cat > ~/fcgi-bin/seahub <<EOF
+#!/usr/bin/env python2.7
+import sys, os, site
+
+# directory of seafile installation
+seafile_directory = '${HOME}/seafile'
+
+# Add a custom Python path.
+sys.path.insert(0, seafile_directory + '/seafile-server-latest/seahub')
+
+# Set environment variables (compare ~/haiwen/seafile-server-latest/seahub.sh)
+os.environ['CCNET_CONF_DIR'] = seafile_directory + '/ccnet'
+os.environ['SEAHUB_LOG_DIR'] = seafile_directory + '/logs'
+os.environ['SEAFILE_CONF_DIR'] = seafile_directory + '/seafile-data'
+
+# Load required python modules (compare ~/seafile-server-latest/seahub.sh)
+site.addsitedir(seafile_directory + '/seafile-server-latest/seafile/lib/python2.6/site-packages')
+site.addsitedir(seafile_directory + '/seafile-server-latest/seafile/lib64/python2.6/site-packages')
+site.addsitedir(seafile_directory + '/seafile-server-latest/seahub/thirdpart')
+site.addsitedir(seafile_directory + '/seafile-server-latest/seafile/lib/python2.7/site-packages')
+site.addsitedir(seafile_directory + '/seafile-server-latest/seafile/lib64/python2.7/site-packages')
+
+# Switch to the directory of your project.
+os.chdir(seafile_directory + '/seafile-server-latest/seahub')
+
+# Set the DJANGO_SETTINGS_MODULE environment variable.
+os.environ['DJANGO_SETTINGS_MODULE'] = 'seahub.settings'
+
+from django.core.servers.fastcgi import runfastcgi
+runfastcgi(method='threaded', daemonize='false')
+EOF
+
+chmod 755 ~/fcgi-bin/seahub
 
 # -------------------------------------------
 # Seafile start script
