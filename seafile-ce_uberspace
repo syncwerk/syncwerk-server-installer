@@ -5,9 +5,9 @@ set -x
 # -------------------------------------------
 SEAFILE_ADMIN=admin@seafile.local
 SEAFILE_USER=seafile
-SERVER_NAME=$(hostname -s | cut -c -16)
-HOSTNAME=$(hostname -f)
 WHOAMI=$(whoami)
+HOSTNAME=$(hostname -f)
+SERVER_NAME=$(echo ${WHOAMI}.${HOSTNAME} | cut -c -16)
 
 
 # -------------------------------------------
