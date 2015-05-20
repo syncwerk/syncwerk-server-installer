@@ -361,6 +361,14 @@ eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH
 
 
 # -------------------------------------------
+# Attempt to fix the the not creation of mysql db
+# -------------------------------------------
+eval sed -i 's/ccnet-db/${WHOAMI}_ccnet/' seafile/seafile-server-latest/setup-seafile-mysql.py
+eval sed -i 's/seafile-db/${WHOAMI}_seafile/' seafile/seafile-server-latest/setup-seafile-mysql.py
+eval sed -i 's/seahub-db/${WHOAMI}_seahub/' seafile/seafile-server-latest/setup-seafile-mysql.py
+
+
+# -------------------------------------------
 # Start and stop Seafile eco system. This generates the initial admin user.
 # -------------------------------------------
 ${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh start
