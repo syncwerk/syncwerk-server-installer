@@ -22,7 +22,7 @@ read dummy
 clear
 
 # Kill anything Seafile related
-ps aux | grep sea | grep -v grep | awk '{ print $2 }' | while read line; do kill $line ; done
+ps aux | grep sea | grep -v grep | grep -v uninstall | awk '{ print $2 }' | while read line; do kill $line ; done
 
 # remove Seafile related directories and files
 eval rm -r ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ${SILENCER}
