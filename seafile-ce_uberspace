@@ -77,6 +77,7 @@ for i in ${DB_CCNET} ${DB_SEAFILE} ${DB_SEAHUB} ; do
   ${MYSQL} -e "CREATE DATABASE IF NOT EXISTS \`${i}\` character set = '${DB_CHARSET}';" ;
 done
 
+mysql ${DB_SEAHUB} < ~/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 # -------------------------------------------
 # Get free ports
@@ -358,14 +359,6 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 SEAFILE_ADMIN_PW=CHANGEME
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
-
-
-# -------------------------------------------
-# Attempt to fix the the not creation of mysql db
-# -------------------------------------------
-eval sed -i 's/ccnet-db/${WHOAMI}_ccnet/' ${INSTALLPATH}/setup-seafile-mysql.py
-eval sed -i 's/seafile-db/${WHOAMI}_seafile/' ${INSTALLPATH}/setup-seafile-mysql.py
-eval sed -i 's/seahub-db/${WHOAMI}_seahub/' ${INSTALLPATH}/setup-seafile-mysql.py
 
 
 # -------------------------------------------
