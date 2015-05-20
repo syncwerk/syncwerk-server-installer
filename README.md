@@ -65,7 +65,12 @@ wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/s
 time bash seafile-server-community_ubuntu-trusty-amd64
 </pre>
 
-
+BETA: For Uberspace run the following line as user:
+<pre>
+wget -O - https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ceuberspace | bash
+</pre>
+ 
+ 
 ### Caution!
 Never run the script on a production server. It's more or less a one trick pony and can seriously damage production systems. So run it only one time and delete it afterwards. 
 
