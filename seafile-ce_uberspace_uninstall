@@ -1,12 +1,34 @@
 #!/bin/bash
-set -x
-seafile stop
+#set -x
 
-rm -r ${HOME}/seafile/
+# -------------------------------------------
+# Seafile Server Community Edition on Uberspace
+# -------------------------------------------
+clear
+cat <<EOF
+  This script deletes Seafile Server on Uberspace
+  -----------------------------------------------------------------
+  Make 100% sure you saved the content from your
+  libraries before proceeding with the full removal.
 
-mysql -e 'drop database haiwen_ccnet;'
-mysql -e 'drop database haiwen_seafile;'
-mysql -e 'drop database haiwen_seahub;'
+  For questions or suggestions please contact me at
+  alexander.jackson@seafile.com.de
+  -----------------------------------------------------------------
+  Hit return to uninstall Seafile or CTRL-C to abort.
+EOF
+read dummy
+clear
 
-echo done
+
+SILENCER='> /dev/null 2>&1'
+
+[ -f seafile ] && seafile stop ${SILENCER}
+
+eval rm -r ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ${SILENCER}
+
+for i in haiwen_ccnet haiwen_seafile haiwen_seahub; do
+  mysql -e "DROP DATABASE IF EXISTS \`${i}\`;"
+done
+
+echo Seafile is uninstalled now...
 exit 0
