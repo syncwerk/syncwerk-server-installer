@@ -444,10 +444,11 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   -----------------------------------------------------------------
   For free community support visit:   https://forum.seafile-server.org
   For paid commercial support visit:  https://seafile.com.de
+  
   Contribute
   -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.com.de
-  for bugs or suggestions about this installer. Thank you!
+  Contact alexander.jackson@seafile.com.de for bugs or suggestions about this installer.
+  
 EOF
 
 chmod 600 ~/seafile/seafile-ce_uberspace.log
