@@ -58,7 +58,14 @@ wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/s
 time bash seafile-ce_debian-wheezy-amd64
 </pre>
 
-For **Debian Jessie** run the following lines as root:
+For **Debian Jessie (32bit)** run the following lines as root:
+<pre>
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ce_debian-jessie-i386
+time bash seafile-ce_debian-jessie-i386
+</pre>
+
+For **Debian Jessie (64bit)** run the following lines as root:
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ce_debian-jessie-amd64
