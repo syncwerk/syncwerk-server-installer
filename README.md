@@ -51,7 +51,7 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 
 ### How do I run it?
 
-For **Debian Wheezy** run the following lines as root:
+For **Debian Wheezy (64bit)** run the following lines as root:
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-ce_debian-wheezy-amd64
@@ -72,7 +72,7 @@ wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/s
 time bash seafile-ce_debian-jessie-amd64
 </pre>
 
-For **Ubuntu Trusty** run the following lines as root:
+For **Ubuntu Trusty (64bit)** run the following lines as root:
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/alexanderjackson/seafile-server-installer/master/seafile-server-community_ubuntu-trusty-amd64
