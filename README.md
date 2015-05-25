@@ -121,8 +121,6 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ### Where can I submit bugs or add suggestions?
 Contact me at alexander.jackson@seafile.de or create an [Issue](https://github.com/SeafileDE/seafile-server-community_debian-jessie-amd64/issues/new) on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
