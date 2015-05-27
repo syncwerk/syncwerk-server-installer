@@ -247,15 +247,16 @@ http {
         client_header_timeout 12;
         keepalive_timeout 15;
         send_timeout 10;
-        gzip on;
-        gzip_vary on;
-        gzip_proxied expired no-cache no-store private auth any;
-        gzip_comp_level 9;
-        gzip_min_length 10240;
-        gzip_buffers 16 8k;
-        gzip_http_version 1.1;
-        gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml font/woff2;
-        gzip_disable "MSIE [1-6].";
+        # Fully disabled gzip compression to mitigate Django BREACH attack: https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
+        gzip off;
+        #gzip_vary on;
+        #gzip_proxied expired no-cache no-store private auth any;
+        #gzip_comp_level 9;
+        #gzip_min_length 10240;
+        #gzip_buffers 16 8k;
+        #gzip_http_version 1.1;
+        #gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml font/woff2;
+        #gzip_disable "MSIE [1-6].";
         include /etc/nginx/conf.d/*.conf;
         include /etc/nginx/sites-enabled/*;
         map $scheme $php_https { default off; https on; }
