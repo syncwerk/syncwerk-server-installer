@@ -52,7 +52,7 @@ cat <<EOF
   data!
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.com.de
+  alexander.jackson@seafile.de
 
   -----------------------------------------------------------------
 
@@ -321,7 +321,7 @@ cat > /etc/init.d/seafile-server <<'EOF'
 # Description:       Start Seafile server
 ### END INIT INFO
 
-# Author: Alexander Jackson <alexander.jackson@seafile.com.de>
+# Author: Alexander Jackson <alexander.jackson@seafile.de>
 #
 
 # Change the value of "user" to your linux user name
@@ -798,7 +798,7 @@ cat > ${SEAFILE_DIR}/seafile-pro-installer.log<<EOF
 
   Contribute
   -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.com.de
+  Please contact alexander.jackson@seafile.de
   for bugs or suggestions about this installer. Thank you!
 
 EOF
