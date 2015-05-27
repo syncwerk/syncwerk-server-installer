@@ -33,7 +33,7 @@ cat <<EOF
   libraries before proceeding with the full removal.
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.com.de
+  alexander.jackson@seafile.de
   -----------------------------------------------------------------
   Hit return to uninstall Seafile or CTRL-C to abort.
 EOF
