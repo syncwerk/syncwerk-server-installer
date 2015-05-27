@@ -119,18 +119,8 @@ rm /etc/nginx/conf.d/*
 
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
 server {
-      listen       80;
+      listen 80;
       server_name  "";
-      return 301 https://$http_host$request_uri?;
-}
-
-server {
-      listen 443 spdy;
-      server_name  "";
-
-      ssl on;
-      ssl_certificate /etc/nginx/ssl/seafile.crt;
-      ssl_certificate_key /etc/nginx/ssl/seafile.key;
 
       location / {
           fastcgi_pass    127.0.0.1:8000;
@@ -144,8 +134,6 @@ server {
           fastcgi_param   SERVER_ADDR         $server_addr;
           fastcgi_param   SERVER_PORT         $server_port;
           fastcgi_param   SERVER_NAME         $server_name;
-          fastcgi_param   HTTPS               on;
-          fastcgi_param   HTTP_SCHEME         https;
 
           access_log      /var/log/nginx/seahub.access.log;
           error_log       /var/log/nginx/seahub.error.log;
@@ -172,7 +160,6 @@ server {
         fastcgi_param   SERVER_ADDR         $server_addr;
         fastcgi_param   SERVER_PORT         $server_port;
         fastcgi_param   SERVER_NAME         $server_name;
-        fastcgi_param   HTTPS               on;
 
         client_max_body_size 0;
 
@@ -181,11 +168,6 @@ server {
     }
   }
 EOF
-
-mkdir /etc/nginx/ssl
-
-openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -batch
 
 service nginx restart
 
@@ -348,7 +330,7 @@ LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CON
   --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${IP_OR_DOMAIN}"
 
 # Fix service url
-eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${IP_OR_DOMAIN}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
+eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = http:\/\/${IP_OR_DOMAIN}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
 
 
 # -------------------------------------------
@@ -470,7 +452,7 @@ EMAIL_PORT                          = '25'
 DEFAULT_FROM_EMAIL                  = 'seafile@${IP_OR_DOMAIN}'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
 TIME_ZONE                           = 'Asia/Beijing'
-SITE_BASE                           = 'https://${IP_OR_DOMAIN}'
+SITE_BASE                           = 'http://${IP_OR_DOMAIN}'
 SITE_NAME                           = 'Seafile Server'
 SITE_TITLE                          = 'Seafile Server'
 SITE_ROOT                           = '/'
@@ -484,7 +466,7 @@ FILE_PREVIEW_MAX_SIZE               = 30 * 1024 * 1024
 SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
-FILE_SERVER_ROOT                    = 'https://${IP_OR_DOMAIN}/seafhttp'
+FILE_SERVER_ROOT                    = 'http://${IP_OR_DOMAIN}/seafhttp'
 EOF
 
 
@@ -539,7 +521,7 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
   -----------------------------------------------------------------
 
   Server Name:         ${SERVER_NAME}
-  Server Address:      https://${IP_OR_DOMAIN}
+  Server Address:      http://${IP_OR_DOMAIN}
 
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
@@ -559,9 +541,7 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
   1) Run seafile-server-change-address to add your Seafile servers DNS name
 
   2) If this server is behind a firewall, you need to ensure that
-     tcp port 443 for the NGINX reverse proxy is open. Optionally
-     you may also open tcp port 80 which redirects all unencrypted
-     http traffic to the encrypted https port.
+     tcp port 80 is open.
 
   3) Seahub tries to send emails via the local server. Install and
      configure Postfix for this to work.
