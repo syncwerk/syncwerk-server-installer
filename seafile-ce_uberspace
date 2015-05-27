@@ -41,7 +41,7 @@ cat <<EOF
   probably will go terrible wrong and you will loose valuable
   data!
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.com.de
+  alexander.jackson@seafile.de
   -----------------------------------------------------------------
   Hit return to proceed or CTRL-C to abort.
 EOF
@@ -208,7 +208,7 @@ cat > ~/bin/seafile <<'ENDOFILE'
 # Short-Description: Seafile server
 # Description:       Start Seafile server
 ### END INIT INFO
-# Author: Alexander Jackson <alexander.jackson@seafile.com.de>
+# Author: Alexander Jackson <alexander.jackson@seafile.de>
 #
 # Change the value of "seafile_dir" to your path of seafile installation
 seafile_dir=~/seafile
@@ -466,7 +466,7 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   
   Contribute
   -----------------------------------------------------------------
-  Contact alexander.jackson@seafile.com.de for bugs or suggestions about this installer.
+  Contact alexander.jackson@seafile.de for bugs or suggestions about this installer.
   
 EOF
 
