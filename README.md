@@ -75,7 +75,7 @@ time bash seafile-ce_debian-jessie-amd64
 For **Ubuntu Trusty (64bit)** run the following lines as root:
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-server-community_ubuntu-trusty-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_ubuntu-trusty-amd64
 time bash seafile-server-community_ubuntu-trusty-amd64
 </pre>
 
