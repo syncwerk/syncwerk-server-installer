@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+# Uncomment to debug
 #set -x
+
+
 # -------------------------------------------
 # Vars
 # -------------------------------------------
@@ -302,13 +304,20 @@ EOF
 chmod 600 /opt/seafile/.my.cnf
 chown -R ${SEAFILE_USER}.nogroup /opt/seafile/
 
+# Create databases
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-mysql -e "create user 'seafile'@'localhost' identified by '$SQLSEAFILEPW';"
-mysql -e "GRANT ALL PRIVILEGES ON \`ccnet-db\`.* to \`seafile\`;"
-mysql -e "GRANT ALL PRIVILEGES ON \`seafile-db\`.* to \`seafile\`;"
-mysql -e "GRANT ALL PRIVILEGES ON \`seahub-db\`.* to \`seafile\`;"
+
+# Create user
+mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SQLSEAFILEPW';"
+
+# Grant privileges on databases to user
+mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
+
+# Import Seahub database structure
 mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
