@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+# Uncomment to debug
 #set -x
+
+
 # -------------------------------------------
 # Vars
 # -------------------------------------------
@@ -98,7 +100,6 @@ cat << EOF
 EOF
 
 cat ${CERT_DIR}/${DOMAIN}.csr
-
 
 
 # -------------------------------------------
