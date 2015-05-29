@@ -285,7 +285,7 @@ mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
 
 # Import Seahub database structure
-mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+mysql seahub-db < /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
 # -------------------------------------------
