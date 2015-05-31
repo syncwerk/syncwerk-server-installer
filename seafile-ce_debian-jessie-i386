@@ -188,7 +188,7 @@ EOF
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -batch
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
 
 service nginx restart
 

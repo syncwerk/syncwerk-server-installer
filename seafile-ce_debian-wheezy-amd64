@@ -136,13 +136,13 @@ EOF
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -batch
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
 
 service nginx restart
 
 
 # -------------------------------------------
-# Additional requirements
+# Additional requirements 
 # -------------------------------------------
 aptitude install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 openjdk-7-jre memcached python-memcache pwgen curl -y
@@ -285,7 +285,7 @@ mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
 
 # Import Seahub database structure
-mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+mysql seahub-db < /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
 # -------------------------------------------
