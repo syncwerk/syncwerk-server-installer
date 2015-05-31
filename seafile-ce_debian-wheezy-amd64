@@ -142,7 +142,7 @@ service nginx restart
 
 
 # -------------------------------------------
-# Additional requirements
+# Additional requirements 
 # -------------------------------------------
 aptitude install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 openjdk-7-jre memcached python-memcache pwgen curl -y
