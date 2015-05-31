@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+# Uncomment to debug
 #set -x
+
+
 # -------------------------------------------
 # All-In-One Seafile Server installer for Debian Wheezy (64bit)
 # -------------------------------------------
@@ -35,7 +37,7 @@ cat <<EOF
   data!
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.com.de
+  alexander.jackson@seafile.de
 
   -----------------------------------------------------------------
 
@@ -134,13 +136,13 @@ EOF
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -batch
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
 
 service nginx restart
 
 
 # -------------------------------------------
-# Additional requirements
+# Additional requirements 
 # -------------------------------------------
 aptitude install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 openjdk-7-jre memcached python-memcache pwgen curl -y
@@ -190,7 +192,7 @@ cat > /etc/init.d/seafile-server <<'EOF'
 # Description:       Start Seafile server
 ### END INIT INFO
 
-# Author: Alexander Jackson <alexander.jackson@seafile.com.de>
+# Author: Alexander Jackson <alexander.jackson@seafile.de>
 #
 
 # Change the value of "user" to your linux user name
@@ -269,13 +271,20 @@ EOF
 chmod 600 /opt/seafile/.my.cnf
 chown -R seafile.nogroup /opt/seafile/
 
+# Create databases
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-mysql -e "create user 'seafile'@'localhost' identified by '$SQLSEAFILEPW';"
-mysql -e "GRANT ALL PRIVILEGES ON \`ccnet-db\`.* to \`seafile\`;"
-mysql -e "GRANT ALL PRIVILEGES ON \`seafile-db\`.* to \`seafile\`;"
-mysql -e "GRANT ALL PRIVILEGES ON \`seahub-db\`.* to \`seafile\`;"
+
+# Create user
+mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SQLSEAFILEPW';"
+
+# Grant privileges on databases to user
+mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
+
+# Import Seahub database structure
 mysql seahub-db < /opt/seafile/haiwen/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
@@ -587,7 +596,7 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
   About
   -----------------------------------------------------------------
 
-  Please contact alexander.jackson@seafile.com.de
+  Please contact alexander.jackson@seafile.de
   for bugs or suggestions about this installer. Thank you!
 
 EOF

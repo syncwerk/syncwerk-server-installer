@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+# Uncomment to debug
 #set -x
+
+
 # -------------------------------------------
 # Vars
 # -------------------------------------------
@@ -52,7 +54,7 @@ cat <<EOF
   data!
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.com.de
+  alexander.jackson@seafile.de
 
   -----------------------------------------------------------------
 
@@ -211,7 +213,7 @@ EOF
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -batch
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
 
 
 # -------------------------------------------
@@ -247,15 +249,16 @@ http {
         client_header_timeout 12;
         keepalive_timeout 15;
         send_timeout 10;
-        gzip on;
-        gzip_vary on;
-        gzip_proxied expired no-cache no-store private auth any;
-        gzip_comp_level 9;
-        gzip_min_length 10240;
-        gzip_buffers 16 8k;
-        gzip_http_version 1.1;
-        gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml font/woff2;
-        gzip_disable "MSIE [1-6].";
+        # Fully disabled gzip compression to mitigate Django BREACH attack: https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
+        gzip off;
+        #gzip_vary on;
+        #gzip_proxied expired no-cache no-store private auth any;
+        #gzip_comp_level 9;
+        #gzip_min_length 10240;
+        #gzip_buffers 16 8k;
+        #gzip_http_version 1.1;
+        #gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml font/woff2;
+        #gzip_disable "MSIE [1-6].";
         include /etc/nginx/conf.d/*.conf;
         include /etc/nginx/sites-enabled/*;
         map $scheme $php_https { default off; https on; }
@@ -321,7 +324,7 @@ cat > /etc/init.d/seafile-server <<'EOF'
 # Description:       Start Seafile server
 ### END INIT INFO
 
-# Author: Alexander Jackson <alexander.jackson@seafile.com.de>
+# Author: Alexander Jackson <alexander.jackson@seafile.de>
 #
 
 # Change the value of "user" to your linux user name
@@ -482,14 +485,21 @@ EOF
 chmod 600 /opt/seafile/.my.cnf
 chown -R ${SEAFILE_USER}.nogroup /opt/seafile/
 
+# Create databases
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-mysql -e "create user 'seafile'@'localhost' identified by '$SQLSEAFILEPW';"
-mysql -e "GRANT ALL PRIVILEGES ON \`ccnet-db\`.* to \`seafile\`;"
-mysql -e "GRANT ALL PRIVILEGES ON \`seafile-db\`.* to \`seafile\`;"
-mysql -e "GRANT ALL PRIVILEGES ON \`seahub-db\`.* to \`seafile\`;"
-mysql seahub-db < /opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+
+# Create user
+mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SQLSEAFILEPW';"
+
+# Grant privileges on databases to user
+mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
+
+# Import Seahub database structure
+mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
 # -------------------------------------------
@@ -798,7 +808,7 @@ cat > ${SEAFILE_DIR}/seafile-pro-installer.log<<EOF
 
   Contribute
   -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.com.de
+  Please contact alexander.jackson@seafile.de
   for bugs or suggestions about this installer. Thank you!
 
 EOF

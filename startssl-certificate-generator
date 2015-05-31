@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+# Uncomment to debug
 #set -x
+
+
 # -------------------------------------------
 # Vars
 # -------------------------------------------
@@ -40,7 +42,7 @@ cat << EOF
   don't need to do anything else to issue class1 certs.
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.com.de
+  alexander.jackson@seafile.de
 
   -----------------------------------------------------------------
   Hit return to proceed or CTRL-C to abort.
@@ -98,7 +100,6 @@ cat << EOF
 EOF
 
 cat ${CERT_DIR}/${DOMAIN}.csr
-
 
 
 # -------------------------------------------
