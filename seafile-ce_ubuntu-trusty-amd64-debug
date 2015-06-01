@@ -19,8 +19,10 @@
 #
 # Uncomment to debug
 set -x
-uname -a
 (
+uname -a
+cat /etc/debian_version
+
 # -------------------------------------------
 # Vars
 # -------------------------------------------
