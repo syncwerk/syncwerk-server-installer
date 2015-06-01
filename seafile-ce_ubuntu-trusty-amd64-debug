@@ -19,7 +19,7 @@
 #
 # Uncomment to debug
 set -x
-
+uname -a
 (
 # -------------------------------------------
 # Vars
