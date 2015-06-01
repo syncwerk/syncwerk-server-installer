@@ -53,7 +53,6 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 Except for the Uberspace installer all installers need to run as root. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers.
 
 For **Debian Wheezy (64bit)** run the following lines as root
--
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-wheezy-amd64
@@ -61,7 +60,6 @@ time bash seafile-ce_debian-wheezy-amd64
 </pre>
 
 For **Debian Jessie (32bit)** run the following lines as root:
--
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-jessie-i386
@@ -69,7 +67,6 @@ time bash seafile-ce_debian-jessie-i386
 </pre>
 
 For **Debian Jessie (64bit)** run the following lines as root:
--
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-jessie-amd64
@@ -77,7 +74,6 @@ time bash seafile-ce_debian-jessie-amd64
 </pre>
 
 For **Ubuntu Trusty (64bit)** run the following lines as root:
--
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_ubuntu-trusty-amd64
@@ -85,7 +81,6 @@ time bash seafile-ce_ubuntu-trusty-amd64
 </pre>
 
 BETA: For **Uberspace** run the following line as user:
--
 <pre>
 wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_uberspace 
 time bash seafile-ce_uberspace
