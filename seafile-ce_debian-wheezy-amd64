@@ -25,11 +25,10 @@
 # -------------------------------------------
 # Vars
 # -------------------------------------------
-SEAFILE_ADMIN=admin@seafile.local
-SEAFILE_USER=seafile
 SERVER_NAME=$(hostname -s | cut -c -16)
-IP_ADDRESS=$(hostname -i)
 HOSTNAME=$(hostname -f)
+SEAFILE_ADMIN=admin@${HOSTNAME}
+SEAFILE_USER=seafile
 FILESERVER_PORT=8082
 SERVER_PORT=10001
 SEAFILE_SERVER_PORT=12001
@@ -267,7 +266,7 @@ EOF
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=${HOSTNAME}"
 
 
 # -------------------------------------------
@@ -517,10 +516,10 @@ SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
 # -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
-  --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${IP_ADDRESS}"
+  --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${HOSTNAME}"
 
 # Fix service url
-eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${IP_ADDRESS}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
+eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
 
 
 # -------------------------------------------
@@ -642,7 +641,7 @@ EMAIL_PORT                          = '25'
 DEFAULT_FROM_EMAIL                  = 'noreply@${HOSTNAME}'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
 TIME_ZONE                           = 'Europe/Berlin'
-SITE_BASE                           = 'https://${IP_ADDRESS}'
+SITE_BASE                           = 'https://${HOSTNAME}'
 SITE_NAME                           = 'Seafile Server'
 SITE_TITLE                          = 'Seafile Server'
 SITE_ROOT                           = '/'
@@ -656,7 +655,7 @@ FILE_PREVIEW_MAX_SIZE               = 30 * 1024 * 1024
 SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
-FILE_SERVER_ROOT                    = 'https://${IP_ADDRESS}/seafhttp'
+FILE_SERVER_ROOT                    = 'https://${HOSTNAME}/seafhttp'
 EOF
 
 
@@ -711,7 +710,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   -----------------------------------------------------------------
 
   Server Name:         ${SERVER_NAME}
-  Server Address:      https://${IP_ADDRESS}
+  Server Address:      https://${HOSTNAME}
 
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
@@ -727,26 +726,26 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   Next you should manually complete the following steps
   -----------------------------------------------------------------
 
-  1) Run seafile-server-change-address to add your Seafile servers DNS name
-
-  2) If this server is behind a firewall, you need to ensure that
+  1) If this server is behind a firewall, you need to ensure that
      tcp port 443 for the NGINX reverse proxy is open. Optionally
      you may also open tcp port 80 which redirects all unencrypted
      http traffic to the encrypted https port.
 
-  3) Seahub tries to send emails via the local server. Install and
+  2) Seahub tries to send emails via the local server. Install and
      configure Postfix for this to work.
 
 
   Optional steps
   -----------------------------------------------------------------
 
-  1) Check seahub_settings.py and customize it to fit your needs. Consult
+  1) Run seafile-server-change-address to add your Seafile servers DNS name
+  
+  2) Check seahub_settings.py and customize it to fit your needs. Consult
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
-  2) Setup NGINX with official SSL certificate.
+  3) Setup NGINX with official SSL certificate.
 
-  3) Harden system with port knocking, fail2ban, etc.
+  4) Harden system with port knocking, fail2ban, etc.
 
   5) Enable unattended installation of security updates. Check
      https://wiki.debian.org/UnattendedUpgrades for details.
