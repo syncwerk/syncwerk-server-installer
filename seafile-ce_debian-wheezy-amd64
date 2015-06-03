@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to run in verbose mode
-#set -x
+set -x
 
 
 # -------------------------------------------
@@ -723,9 +723,6 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
   Switch to Seafile system account with: su - ${SEAFILE_USER} -s /bin/bash
 
-  This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
-
-
 
   Next you should manually complete the following steps
   -----------------------------------------------------------------
@@ -739,8 +736,6 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
   3) Seahub tries to send emails via the local server. Install and
      configure Postfix for this to work.
-
-
 
 
   Optional steps
@@ -757,9 +752,6 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
      https://wiki.debian.org/UnattendedUpgrades for details.
 
   6) Implement a backup routine for your Seafile server.
-
-
-
 
 
   Seafile support options
@@ -781,6 +773,8 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   Please contact alexander.jackson@seafile.de
   for bugs or suggestions about this installer. Thank you!
 
+
+  This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
 EOF
 
 chmod 600 ${SEAFILE_DIR}/$(basename ${0})_report.log
