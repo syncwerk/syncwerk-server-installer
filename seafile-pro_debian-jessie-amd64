@@ -149,7 +149,7 @@ cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
 server {
       listen       80;
       server_name  "";
-      return 301 https://$http_host$request_uri?;
+      return 301 https://$http_host$request_uri;
 }
 
 server {
