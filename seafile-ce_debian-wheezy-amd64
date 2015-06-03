@@ -883,6 +883,7 @@ service seafile-server restart
 # -------------------------------------------
 # Outro
 # -------------------------------------------
+clear
 cat <<EOF
 
   Deutsch
