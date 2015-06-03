@@ -33,6 +33,7 @@ FILESERVER_PORT=8082
 SERVER_PORT=10001
 SEAFILE_SERVER_PORT=12001
 SEAFILE_DIR=/opt/seafile
+export DEBIAN_FRONTEND=noninteractive
 
 
 # -------------------------------------------
@@ -180,6 +181,45 @@ fi
 # -------------------------------------------
 apt-get update 
 apt-get dist-upgrade -y
+
+
+# -------------------------------------------
+# Postfix
+# -------------------------------------------
+debconf-set-selections << EOF
+postfix postfix/root_address    string
+postfix postfix/rfc1035_violation       boolean false
+postfix postfix/mydomain_warning        boolean
+postfix postfix/mynetworks      string  127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+postfix postfix/mailname        string  $(hostname -f)
+postfix postfix/tlsmgr_upgrade_warning  boolean
+postfix postfix/recipient_delim string  +
+postfix postfix/main_mailer_type        select  Internet Site
+postfix postfix/destinations    string  $(hostname -f), localhost.$(hostname -d), localhost,
+postfix postfix/retry_upgrade_warning   boolean
+# Install postfix despite an unsupported kernel?
+postfix postfix/kernel_version_warning  boolean
+postfix postfix/not_configured  error
+postfix postfix/sqlite_warning  boolean
+postfix postfix/mailbox_limit   string  0
+postfix postfix/relayhost       string
+postfix postfix/procmail        boolean false
+postfix postfix/bad_recipient_delimiter error
+postfix postfix/protocols       select  all
+postfix postfix/chattr  boolean false
+EOF
+
+apt-get install postfix -y
+
+
+# -------------------------------------------
+# Unattended upgrades
+# -------------------------------------------
+debconf-set-selections <<EOF
+unattended-upgrades     unattended-upgrades/enable_auto_updates boolean true
+EOF
+ 
+apt-get install unattended-upgrades -y
 
 
 # -------------------------------------------
@@ -357,7 +397,7 @@ apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
 apt-get update 
 apt-get upgrade -y
 
-DEBIAN_FRONTEND=noninteractive apt-get install mariadb-server -y
+apt-get install mariadb-server -y
 
 SQLROOTPW=$(pwgen)
 
@@ -910,6 +950,7 @@ chmod 500 /usr/local/sbin/seafile-server-change-address
 print-system-infos
 
 cat ${SEAFILE_DIR}/$(basename ${0})_report.log
+
 
 # -------------------------------------------
 # Done!
