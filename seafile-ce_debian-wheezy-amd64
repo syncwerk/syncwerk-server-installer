@@ -707,7 +707,7 @@ service seafile-server start
 # -------------------------------------------
 cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
-  Your Seafile server is installed
+  Your Seafile server
   -----------------------------------------------------------------
 
   Server Name:         ${SERVER_NAME}
