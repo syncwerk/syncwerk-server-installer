@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to run in verbose mode
-set -x
+#set -x
 
 
 # -------------------------------------------
@@ -775,6 +775,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
 
   This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
+  
 EOF
 
 chmod 600 ${SEAFILE_DIR}/$(basename ${0})_report.log
