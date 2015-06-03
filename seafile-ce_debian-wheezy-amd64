@@ -184,6 +184,25 @@ apt-get dist-upgrade -y
 
 
 # -------------------------------------------
+# ensure correct time is set
+# -------------------------------------------
+ntpd -gq
+
+
+# -------------------------------------------
+# Security programs
+# -------------------------------------------
+apt-get install ufw fail2ban -y
+
+
+# -------------------------------------------
+# Activate firewall
+# -------------------------------------------
+for i in ssh http https ; do ufw allow $i ; done
+yes | ufw enable
+
+
+# -------------------------------------------
 # Postfix
 # -------------------------------------------
 debconf-set-selections << EOF
@@ -775,14 +794,14 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
      you may also open tcp port 80 which redirects all unencrypted
      http traffic to the encrypted https port.
 
-  2) Seahub tries to send emails via the local server. Install and
-     configure Postfix for this to work.
+  2) Seahub tries to send emails via the local Postfix mail server.
+     Make sure Postfix is setup correctly for your environment.
 
 
   Optional steps
   -----------------------------------------------------------------
 
-  1) Run seafile-server-change-address to add your Seafile servers DNS name
+  1) Run seafile-server-change-address to change your Seafile servers DNS name.
   
   2) Check seahub_settings.py and customize it to fit your needs. Consult
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
@@ -791,10 +810,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
   4) Harden system with port knocking, fail2ban, etc.
 
-  5) Enable unattended installation of security updates. Check
-     https://wiki.debian.org/UnattendedUpgrades for details.
-
-  6) Implement a backup routine for your Seafile server.
+  5) Implement a backup routine for your Seafile server.
 
 
   Seafile support options
