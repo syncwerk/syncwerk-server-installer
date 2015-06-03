@@ -787,7 +787,7 @@ chown -R ${SEAFILE_USER}.nogroup ${SEAFILE_DIR}/$(basename ${0})_report.log
 # -------------------------------------------
 cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
 #/bin/bash
-set -x
+#set -x
 # -------------------------------------------
 # Save at /usr/local/sbin/seafile-server-change-address and set permissions with
 # chmod 500 /usr/local/sbin/seafile-server-change-address
@@ -865,6 +865,7 @@ read dummy
 # -------------------------------------------
 # Aendere Adressen in seahub_settings.py und ccnet.conf
 # -------------------------------------------
+echo Applying changes
 sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
 sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
 sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
@@ -875,6 +876,7 @@ sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_DIR}/ccnet/
 # -------------------------------------------
 # Starte Seafile neu
 # -------------------------------------------
+echo restarting Seafile server
 service seafile-server restart
 
 
