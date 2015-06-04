@@ -73,6 +73,13 @@ wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-
 time bash seafile-ce_debian-jessie-amd64
 </pre>
 
+BETA: For **Debian Unified (64bit)** run the following lines as root
+<pre>
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian
+time bash seafile-ce_debian
+</pre>
+
 For **Ubuntu Trusty (64bit)** run the following lines as root:
 <pre>
 sudo su
