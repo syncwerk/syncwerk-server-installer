@@ -326,6 +326,10 @@ server {
 }
 EOF
 
+
+# -------------------------------------------
+# Create self-signed certificate for NGINX
+# -------------------------------------------
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
