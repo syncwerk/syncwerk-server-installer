@@ -185,10 +185,45 @@ server {
   }
 EOF
 
+
+# -------------------------------------------
+# Create self-signed certificate for NGINX
+# -------------------------------------------
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
+
+cat > /etc/nginx/ssl/seafile.cnf << EOF
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_ca
+prompt = no
+
+[req_distinguished_name]
+countryName = DE
+stateOrProvinceName = Bayern
+localityName = Wiesentheid
+organizationName = Seafile
+organizationalUnitName = Seahub
+emailAddress = postmaster@$(hostname -d)
+# Must be last for Seafile client to validate...
+commonName = $(hostname -f)
+
+[v3_ca]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+basicConstraints = CA:TRUE
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+DNS.2 = $(hostname -f)
+DNS.3 = $(hostname -s)
+IP.1 = 127.0.0.1
+IP.2 = $(hostname -i)
+EOF
+
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf
 
 service nginx restart
 
