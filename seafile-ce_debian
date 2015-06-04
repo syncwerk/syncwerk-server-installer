@@ -36,11 +36,12 @@ SEAFILE_DIR=/opt/seafile
 export DEBIAN_FRONTEND=noninteractive
 OS=$(lsb_release -c | awk '{ print $2 }')
 
+# 32-bit support not implemented yet
 if [ $(getconf LONG_BIT) = "64" ]
 then
-    echo "I'm 64-bit"
+    echo "Running 64-bit kernel"
 else
-    echo "I'm 32-bit"
+    echo "Running 32-bit kernel"
 fi
 
 
