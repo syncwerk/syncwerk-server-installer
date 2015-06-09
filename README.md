@@ -1,5 +1,5 @@
 # seafile-server-installer
-These installer scripts offer a quick and easy way to set up the [Seafile Server Community Edition](http://seafile.com/en/home/), using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server.
+These installers offer a quick and easy way to set up the [Seafile Server Community Edition](http://seafile.com/en/home/), using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server.
 
 ### What's it for?
 Installing the [Seafile Server Community Edition](http://seafile.com/en/home/) on Debian or Ubuntu (64bit) in a standard and more secure manner then the out of the box setup scripts offer. Instead of SQLite we're using MariaDB and instead of Gunicorn we're using NGINX.
