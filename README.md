@@ -103,6 +103,7 @@ time bash seafile-ce_uberspace
 
 ALPHA: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
 <pre>
+cd /tmp
 wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-db-fixer
 time bash seafile-db-fixer
 </pre>
