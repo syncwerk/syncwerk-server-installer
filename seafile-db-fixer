@@ -30,7 +30,7 @@ SEAFILE_SQLITE_DB=$(find ${SEAFILE_PATH} -type f -name seafile.db -print)
 SEAFILE_MYSQL_DB=seafile-db
 
 if [ -z "${SEAFILE_SQLITE_DB}" ]; then
-    echo "seafile.db not found"
+    echo "seafile.db not found. There is nothing to fix. Aborting..."
 else
     # Shutdown Seafile Server
     service seafile-server stop
