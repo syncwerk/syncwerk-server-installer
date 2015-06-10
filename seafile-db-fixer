@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to run in verbose mode
-set -x
+#set -x
 
 
 # -------------------------------------------
@@ -88,7 +88,7 @@ cat <<EOF
 
    If you feel luky import SQL-Dump with
 
-       mysql -u${SEAFILESQLPW} -p${SEAFILESQLPW} ${SEAFILE_MYSQL_DB} < ${SEAFILE_PATH}/seafile-db.sql
+       mysql -u${SEAFILESQLUSER} -p${SEAFILESQLPW} ${SEAFILE_MYSQL_DB} < ${SEAFILE_PATH}/seafile-db.sql
 
    and restart Seafile with
 
