@@ -795,10 +795,10 @@ eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH
 # -------------------------------------------
 # Start and stop Seafile eco system. This generates the initial admin user.
 # -------------------------------------------
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh start
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh start
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh stop
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh stop
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seafile.sh start
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seahub.sh start
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seahub.sh stop
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seafile.sh stop
 
 
 # -------------------------------------------
