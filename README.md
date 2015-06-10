@@ -99,7 +99,14 @@ BETA: For **Uberspace** run the following line as user:
 wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_uberspace 
 time bash seafile-ce_uberspace
 </pre>
- 
+
+
+ALPHA: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
+<pre>
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-db-fixer
+time bash seafile-db-fixer
+</pre>
+
  
 ### Caution!
 Never run the script on a production server. It's more or less a one trick pony and can seriously damage production systems. So run it only one time and delete it afterwards. 
