@@ -94,7 +94,11 @@ cat <<EOF
 
        service seafile-server start
 
-   Delete ${SEAFILE_PATH}/seafile-db.sql and ${SEAFILE_SQLITE_DB} if everything went well...
+   Delete ${SEAFILE_PATH}/seafile-db.sql and ${SEAFILE_SQLITE_DB} with
+
+       rm ${SEAFILE_PATH}/seafile-db.sql ${SEAFILE_SQLITE_DB}
+
+   if everything went well...
 
 EOF
 fi
