@@ -33,7 +33,7 @@ if [ -z "${SEAFILE_SQLITE_DB}" ]; then
     echo "seafile.db not found"
 else
     # Shutdown Seafile Server
-    #service seafile-server stop
+    service seafile-server stop
 
     # Change path to ${SEAFILE_PATH}
     cd ${SEAFILE_PATH}
