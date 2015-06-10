@@ -362,6 +362,22 @@ EOF
 
 
 # -------------------------------------------
+# Configuring seafile.conf
+# -------------------------------------------
+cat >> ${TOPDIR}/seafile-data/seafile.conf <<EOF
+
+[database]
+type = mysql
+host = 127.0.0.1
+port = 3306
+user = ${WHOAMI}
+password = ${SEAFILESQLPW}
+db_name = ${DB_SEAFILE}
+connection_charset = utf8
+EOF
+
+
+# -------------------------------------------
 # Configuring seahub_settings.py
 # -------------------------------------------
 cat >> ${DEST_SETTINGS_PY} <<EOF
