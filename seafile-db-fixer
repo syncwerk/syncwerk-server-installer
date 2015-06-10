@@ -81,18 +81,17 @@ db_name = ${SEAFILE_MYSQL_DB}
 connection_charset = utf8
 EOF
 
-ls ${SEAFILE_PATH}/seafile-data/seafile.conf
-cat ${SEAFILE_PATH}/seafile-data/seafile.conf
-
 cat <<EOF
 
    If you feel luky import SQL-Dump with
 
        mysql -u${SEAFILESQLUSER} -p${SEAFILESQLPW} ${SEAFILE_MYSQL_DB} < ${SEAFILE_PATH}/seafile-db.sql
 
+
    and restart Seafile with
 
        service seafile-server start
+
 
    Delete ${SEAFILE_PATH}/seafile-db.sql and ${SEAFILE_SQLITE_DB} with
 
