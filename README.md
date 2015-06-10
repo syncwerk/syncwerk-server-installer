@@ -102,6 +102,8 @@ time bash seafile-ce_uberspace
 
 
 ALPHA: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
+This is only needed if your seafile-db was mistakenly created as SQLite database by one of the installers here. To find out if you are affeceted, just run `find / -type f -name seafile.db -print`. If it finds the file we suggest converting your installation. You can use this script, but be cautios. It is not very well tested and could seriously brake things. Make a backup before running seafile-db-fixer... If you want to fix the problem manually, consult http://manual.seafile.com/deploy/migrate_from_sqlite_to_mysql.html for instructions. 
+
 <pre>
 cd /tmp
 wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-db-fixer
