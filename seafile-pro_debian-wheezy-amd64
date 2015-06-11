@@ -889,7 +889,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   -----------------------------------------------------------------
 
   For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.com.de
+  For paid commercial support visit:  https://seafile.de
 
 
   Debug infos
