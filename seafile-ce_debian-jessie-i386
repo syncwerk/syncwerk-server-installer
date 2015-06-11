@@ -317,7 +317,7 @@ update-rc.d seafile-server defaults
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
-curl -OL https://download.seafile.com.de/seafile-server_latest_i386.tar.gz
+curl -OL https://download.seafile.de/seafile-server_latest_i386.tar.gz
 tar xzf seafile-server_latest_i386.tar.gz
 
 SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
@@ -656,7 +656,7 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
   -----------------------------------------------------------------
 
   For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.com.de
+  For paid commercial support visit:  https://seafile.de
 
 
 
