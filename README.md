@@ -61,28 +61,28 @@ Except for the Uberspace installer all installers need to run as root. Running t
 For **Debian Wheezy (64bit)** run the following lines as root
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-wheezy-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-wheezy-amd64
 time bash seafile-ce_debian-wheezy-amd64
 </pre>
 
 For **Debian Jessie (32bit)** run the following lines as root:
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-jessie-i386
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-jessie-i386
 time bash seafile-ce_debian-jessie-i386
 </pre>
 
 For **Debian Jessie (64bit)** run the following lines as root:
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-jessie-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-jessie-amd64
 time bash seafile-ce_debian-jessie-amd64
 </pre>
 
 BETA: For **Debian Unified (64bit)** run the following lines as root
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian
 time bash seafile-ce_debian
 </pre>
 
@@ -90,13 +90,13 @@ For **Ubuntu Trusty (64bit)** run the following lines as root:
 <pre>
 sudo su
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_ubuntu-trusty-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/ubuntu/seafile-ce_ubuntu-trusty-amd64
 time bash seafile-ce_ubuntu-trusty-amd64
 </pre>
 
 BETA: For **Uberspace** run the following line as user:
 <pre>
-wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_uberspace 
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/uberspace/seafile-ce_uberspace 
 time bash seafile-ce_uberspace
 </pre>
 
@@ -106,7 +106,7 @@ This is only needed if your seafile-db was mistakenly created as SQLite database
 
 <pre>
 cd /tmp
-wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-db-fixer
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/misc/seafile-db-fixer
 time bash seafile-db-fixer
 </pre>
  
@@ -148,4 +148,4 @@ GNU Affero General Public License for more details.
 
 
 ### Where can I submit bugs or add suggestions?
-Contact me at alexander.jackson@seafile.de or create an [Issue](https://github.com/SeafileDE/seafile-server-community_debian-jessie-amd64/issues/new) on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
+Please create an issue on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
