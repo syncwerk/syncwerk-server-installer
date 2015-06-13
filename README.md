@@ -1,5 +1,11 @@
 # seafile-server-installer
-These installer scripts offer a quick and easy way to set up the [Seafile Server Community Edition](http://seafile.com/en/home/), using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server.
+## Seafile Server Community Edition
+These installers offer a quick and easy way to set up the Seafile Server Community Edition, using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server. 
+
+## (New) Seafile Server Professional Edition
+Alternatively there is one installer for [Seafile Professional on Debian Jessie (64bit)](https://github.com/SeafileDE/seafile-server-installer/blob/master/seafile-pro_debian-jessie-amd64) available. You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. 
+
+Seafile Professional is free for up to 3 users. Submit your full address to free-3@seafile.de to obtain a free license.
 
 ### What's it for?
 Installing the [Seafile Server Community Edition](http://seafile.com/en/home/) on Debian or Ubuntu (64bit) in a standard and more secure manner then the out of the box setup scripts offer. Instead of SQLite we're using MariaDB and instead of Gunicorn we're using NGINX.
@@ -55,36 +61,53 @@ Except for the Uberspace installer all installers need to run as root. Running t
 For **Debian Wheezy (64bit)** run the following lines as root
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-wheezy-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-wheezy-amd64
 time bash seafile-ce_debian-wheezy-amd64
 </pre>
 
 For **Debian Jessie (32bit)** run the following lines as root:
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-jessie-i386
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-jessie-i386
 time bash seafile-ce_debian-jessie-i386
 </pre>
 
 For **Debian Jessie (64bit)** run the following lines as root:
 <pre>
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_debian-jessie-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-jessie-amd64
 time bash seafile-ce_debian-jessie-amd64
+</pre>
+
+BETA: For **Debian Unified (64bit)** run the following lines as root
+<pre>
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian
+time bash seafile-ce_debian
 </pre>
 
 For **Ubuntu Trusty (64bit)** run the following lines as root:
 <pre>
 sudo su
 cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_ubuntu-trusty-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/ubuntu/seafile-ce_ubuntu-trusty-amd64
 time bash seafile-ce_ubuntu-trusty-amd64
 </pre>
 
 BETA: For **Uberspace** run the following line as user:
 <pre>
-wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile-ce_uberspace 
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/uberspace/seafile-ce_uberspace 
 time bash seafile-ce_uberspace
+</pre>
+
+ALPHA: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
+
+This is only needed if your seafile-db was mistakenly created as SQLite database by one of the installers here. To find out if you are affeceted, just run `find / -type f -name seafile.db -print`. If it finds the file we suggest converting your installation. You can use this script, but be cautios. **It is not very well tested and could seriously brake things.** Make a backup before running seafile-db-fixer... If you want to fix the problem manually, consult http://manual.seafile.com/deploy/migrate_from_sqlite_to_mysql.html for general instructions. 
+
+<pre>
+cd /tmp
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/misc/seafile-db-fixer
+time bash seafile-db-fixer
 </pre>
  
  
@@ -125,4 +148,4 @@ GNU Affero General Public License for more details.
 
 
 ### Where can I submit bugs or add suggestions?
-Contact me at alexander.jackson@seafile.de or create an [Issue](https://github.com/SeafileDE/seafile-server-community_debian-jessie-amd64/issues/new) on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
+Please create an issue on Github. Or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).

@@ -1,7 +1,7 @@
 #!/bin/bash
 (
 #
-# seafile-server-installer/seafile-ce_debian-wheezy-amd64
+# seafile-server-installer/seafile-pro_debian-wheezy-amd64
 #
 # Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
 #
@@ -33,6 +33,11 @@ FILESERVER_PORT=8082
 SERVER_PORT=10001
 SEAFILE_SERVER_PORT=12001
 SEAFILE_DIR=/opt/seafile
+SEAFILE_TIME_ZONE="Europe/Berlin"
+# Don't touch the following variable, unless you know what you are doing
+SEAFILE_VERSION=4.2.0
+SEAFILE_EDITION=pro-server
+SEAFILE_SOURCE=/usr/src/seafile/seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
 export DEBIAN_FRONTEND=noninteractive
 
 
@@ -117,14 +122,14 @@ cat /etc/passwd
 }
 
 
-# -------------------------------------------
-# Seafile Server Community Edition on Debian Wheezy (64bit)
+## -------------------------------------------
+# Seafile Server Professional Edition on Debian Wheezy (64bit)
 # -------------------------------------------
 clear
 cat <<EOF
 
-  Install Seafile Server Community Edition on Debian Wheezy (64bit)
-  - Newest Seafile server version, NGINX, MariaDB, Memcached -
+  Install Seafile Professional Server on a Debian Wheezy (64bit)
+  - Newest Seafile Professional server, MariaDB, Memcached, NGINX -
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
@@ -246,10 +251,10 @@ dpkg-reconfigure unattended-upgrades
 
 
 # -------------------------------------------
-# Seafile CE requirements
+# Seafile Professional requirements
 # -------------------------------------------
 apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
-openjdk-7-jre memcached python-memcache pwgen curl openssl -y
+openjdk-7-jre memcached python-memcache pwgen curl openssl libreoffice python-uno poppler-utils -y
 
 
 # -------------------------------------------
@@ -469,6 +474,7 @@ EOF
 
 chmod 600 /root/.my.cnf
 
+
 # -------------------------------------------
 # Seafile init script
 # -------------------------------------------
@@ -541,12 +547,10 @@ update-rc.d seafile-server defaults
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
-curl -OL https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
-tar xzf seafile-server_latest_x86-64.tar.gz
+cp ${SEAFILE_SOURCE} ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
+tar xzf ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
 
-SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
-
-mv seafile-server_latest_x86-64.tar.gz installed/seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz
+mv ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz installed/seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
 
 
 # -------------------------------------------
@@ -577,20 +581,20 @@ mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
 
 # Import Seahub database structure
-mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+mysql seahub-db < /opt/seafile/seafile-pro-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
 # -------------------------------------------
-# Go to /opt/seafile/seafile-server-${SEAFILE_VERSION}
+# Go to /opt/seafile/seafile-pro-server-${SEAFILE_VERSION}
 # -------------------------------------------
-cd /opt/seafile/seafile-server-${SEAFILE_VERSION}/
+cd /opt/seafile/seafile-pro-server-${SEAFILE_VERSION}/
 
 
 # -------------------------------------------
 # Vars - Don't touch these unless you really know what you are doing!
 # -------------------------------------------
 SCRIPT=$(readlink -f "$0")
-INSTALLPATH=/opt/seafile/seafile-server-${SEAFILE_VERSION}/
+INSTALLPATH=/opt/seafile/seafile-pro-server-${SEAFILE_VERSION}/
 TOPDIR=$(dirname "${INSTALLPATH}")
 SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
@@ -688,6 +692,13 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 
 
 # -------------------------------------------
+# Setup professional features
+# -------------------------------------------
+PRO_PY=${INSTALLPATH}/pro/pro.py
+$PYTHON ${PRO_PY} setup
+
+
+# -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
 SEAFILESQLPW=$(grep password /opt/seafile/.my.cnf | awk -F'=' {'print $2'})
@@ -702,6 +713,22 @@ USER = seafile
 PASSWD = $SEAFILESQLPW
 DB = ccnet-db
 CONNECTION_CHARSET = utf8
+EOF
+
+
+# -------------------------------------------
+# Configuring seafile.conf
+# -------------------------------------------
+cat >> ${TOPDIR}/seafile-data/seafile.conf <<EOF
+
+[database]
+type = mysql
+host = 127.0.0.1
+port = 3306
+user = seafile
+password = $SEAFILESQLPW
+db_name = seafile-db
+connection_charset = utf8
 EOF
 
 
@@ -738,7 +765,7 @@ EMAIL_HOST_PASSWORD                 = ''
 EMAIL_PORT                          = '25'
 DEFAULT_FROM_EMAIL                  = 'noreply@${HOSTNAME}'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
-TIME_ZONE                           = 'Europe/Berlin'
+TIME_ZONE                           = '${SEAFILE_TIME_ZONE}'
 SITE_BASE                           = 'https://${HOSTNAME}'
 SITE_NAME                           = 'Seafile Server'
 SITE_TITLE                          = 'Seafile Server'
@@ -754,6 +781,16 @@ SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
 FILE_SERVER_ROOT                    = 'https://${HOSTNAME}/seafhttp'
+REPO_PASSWORD_MIN_LENGTH            = 8
+USER_PASSWORD_MIN_LENGTH            = 6
+USER_PASSWORD_STRENGTH_LEVEL        = 3
+USER_STRONG_PASSWORD_REQUIRED       = True
+ENABLE_MAKE_GROUP_PUBLIC            = False
+ENABLE_THUMBNAIL                    = True
+THUMBNAIL_ROOT                      = '${TOPDIR}/seahub-data/thumbnail/thumb/'
+THUMBNAIL_EXTENSION                 = 'png'
+THUMBNAIL_DEFAULT_SIZE              = '24'
+PREVIEW_DEFAULT_SIZE                = '100'
 EOF
 
 
@@ -774,10 +811,10 @@ eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH
 # -------------------------------------------
 # Start and stop Seafile eco system. This generates the initial admin user.
 # -------------------------------------------
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh start
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh start
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seahub.sh stop
-${TOPDIR}/seafile-server-${SEAFILE_VERSION}/seafile.sh stop
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seafile.sh start
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seahub.sh start
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seahub.sh stop
+${TOPDIR}/seafile-pro-server-${SEAFILE_VERSION}/seafile.sh stop
 
 
 # -------------------------------------------
@@ -852,7 +889,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   -----------------------------------------------------------------
 
   For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.com.de
+  For paid commercial support visit:  https://seafile.de
 
 
   Debug infos
