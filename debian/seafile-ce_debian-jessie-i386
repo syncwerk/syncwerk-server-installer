@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# seafile-server-installer/seafile-ce_debian-jessie-amd64
+# seafile-server-installer/seafile-ce_debian-jessie-i386
 #
 # Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
 #
@@ -35,12 +35,12 @@ SEAFILE_SERVER_PORT=12001
 
 
 # -------------------------------------------
-# Seafile Server Community Edition on Debian Jessie (64bit)
+# Seafile Server Community Edition on Debian Jessie (32bit)
 # -------------------------------------------
 clear
 cat <<EOF
 
-  This script installs the community edition of the Seafile Server on a Debian Jessie (64bit)
+  This script installs the community edition of the Seafile Server on a Debian Jessie (32bit)
   - Newest Seafile server version, MariaDB, Memcached, NGINX -
   -----------------------------------------------------------------
 
@@ -72,19 +72,19 @@ fi
 # -------------------------------------------
 # Abort if user seafile exists
 # -------------------------------------------
-if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ;
-then
-  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
-fi
+#if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ;
+#then
+#  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
+#fi
 
 
 # -------------------------------------------
 # Abort if directory /opt/seafile/ exists
 # -------------------------------------------
-if [[ -d "/opt/seafile/" ]] ;
-then
-  echo "  Aborting because directory /opt/seafile/ already exist" ; exit 1
-fi
+#if [[ -d "/opt/seafile/" ]] ;
+#then
+#  echo "  Aborting because directory /opt/seafile/ already exist" ; exit 1
+#fi
 
 
 # -------------------------------------------
@@ -185,10 +185,45 @@ server {
   }
 EOF
 
+
+# -------------------------------------------
+# Create self-signed certificate for NGINX
+# -------------------------------------------
 mkdir /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -subj "/O=Seafile/CN=$(hostname -f)/CN=$(hostname -s)/CN=$(hostname -i)/subjectAltName=DNS.1=$(hostname -f), DNS.2=$(hostname -s), DNS.3=$(hostname -i)"
+
+cat > /etc/nginx/ssl/seafile.cnf << EOF
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_ca
+prompt = no
+
+[req_distinguished_name]
+countryName = DE
+stateOrProvinceName = Bayern
+localityName = Wiesentheid
+organizationName = Seafile
+organizationalUnitName = Seahub
+emailAddress = postmaster@$(hostname -d)
+# Must be last for Seafile client to validate...
+commonName = $(hostname -f)
+
+[v3_ca]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+basicConstraints = CA:TRUE
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+DNS.2 = $(hostname -f)
+DNS.3 = $(hostname -s)
+IP.1 = 127.0.0.1
+IP.2 = $(hostname -i)
+EOF
+
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf
 
 service nginx restart
 
@@ -196,19 +231,19 @@ service nginx restart
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
-DEBIAN_FRONTEND=noninteractive aptitude install mariadb-server -y
+#DEBIAN_FRONTEND=noninteractive aptitude install mariadb-server -y
 
-SQLROOTPW=$(pwgen)
+#SQLROOTPW=$(pwgen)
 
-mysqladmin -u root password $SQLROOTPW
+#mysqladmin -u root password $SQLROOTPW
 
-cat > /root/.my.cnf <<EOF
-[client]
-user=root
-password=$SQLROOTPW
-EOF
+#cat > /root/.my.cnf <<EOF
+#[client]
+#user=root
+#password=$SQLROOTPW
+#EOF
 
-chmod 600 /root/.my.cnf
+#chmod 600 /root/.my.cnf
 
 # -------------------------------------------
 # Seafile init script
@@ -282,12 +317,12 @@ update-rc.d seafile-server defaults
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
-curl -OL https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
-tar xzf seafile-server_latest_x86-64.tar.gz
+curl -OL https://download.seafile.de/seafile-server_latest_i386.tar.gz
+tar xzf seafile-server_latest_i386.tar.gz
 
 SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
 
-mv seafile-server_latest_x86-64.tar.gz installed/seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz
+mv seafile-server_4.1.2_i386.tar.gz installed/seafile-server_${SEAFILE_VERSION}_i386.tar.gz
 
 
 # -------------------------------------------
@@ -443,6 +478,22 @@ USER = seafile
 PASSWD = $SEAFILESQLPW
 DB = ccnet-db
 CONNECTION_CHARSET = utf8
+EOF
+
+
+# -------------------------------------------
+# Configuring seafile.conf
+# -------------------------------------------
+cat >> ${TOPDIR}/seafile-data/seafile.conf <<EOF
+
+[database]
+type = mysql
+host = 127.0.0.1
+port = 3306
+user = seafile
+password = $SEAFILESQLPW
+db_name = seafile-db
+connection_charset = utf8
 EOF
 
 
@@ -605,7 +656,7 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
   -----------------------------------------------------------------
 
   For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.com.de
+  For paid commercial support visit:  https://seafile.de
 
 
 
