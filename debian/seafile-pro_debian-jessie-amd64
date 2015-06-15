@@ -248,7 +248,7 @@ IP.1 = 127.0.0.1
 IP.2 = $(hostname -i)
 EOF
 
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf
+openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf -sha256
 
 
 # -------------------------------------------
