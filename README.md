@@ -3,7 +3,7 @@
 These installers offer a quick and easy way to set up the Seafile Server Community Edition, using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server. 
 
 ## (New) Seafile Server Professional Edition
-Alternatively there is one installer for [Seafile Professional on Debian Jessie (64bit)](https://github.com/SeafileDE/seafile-server-installer/blob/master/seafile-pro_debian-jessie-amd64) available. You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. 
+Alternatively there is one installer for [Seafile Professional on Debian Jessie (64bit)](https://github.com/SeafileDE/seafile-server-installer/blob/master/debian/seafile-pro_debian-jessie-amd64) available. You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. 
 
 Seafile Professional is free for up to 3 users. Submit your full address to free-3@seafile.de to obtain a free license.
 
