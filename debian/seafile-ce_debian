@@ -35,15 +35,13 @@ SEAFILE_SERVER_PORT=12001
 SEAFILE_DIR=/opt/seafile
 export DEBIAN_FRONTEND=noninteractive
 OS=$(lsb_release -c | awk '{ print $2 }')
-
-# 32-bit support not implemented yet
+# Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
-then
-    echo "Running 64-bit kernel"
-else
-    echo "Running 32-bit kernel"
+  then
+    ARCH=x86-64
+  else
+    ARCH=i386
 fi
-
 
 # -------------------------------------------
 # Functions
@@ -65,6 +63,11 @@ echo
 echo Content of /etc/hosts
 echo -----------------------------------------------------------------
 cat /etc/hosts
+echo
+echo
+echo Architecture
+echo -----------------------------------------------------------------
+echo ${ARCH}
 echo
 echo
 echo Active Kernel
@@ -119,7 +122,7 @@ echo Process List
 echo -----------------------------------------------------------------
 ps axu
 echo
-echo 
+echo
 echo Local user accounts
 echo -----------------------------------------------------------------
 cat /etc/passwd
@@ -127,12 +130,14 @@ cat /etc/passwd
 
 
 # -------------------------------------------
-# Seafile Server Community Edition on Debian (64bit)
+# Seafile Server Community Edition on Debian
 # -------------------------------------------
 clear
 cat <<EOF
 
-  Install Seafile Server Community Edition on Debian (64bit)
+  Install Seafile Server Community Edition on Debian 7 and
+  Debian 8. 32 bit and 64bit versions.
+
   - Newest Seafile server version, NGINX, MariaDB, Memcached -
   -----------------------------------------------------------------
 
@@ -196,7 +201,7 @@ fi
 # -------------------------------------------
 # Update System
 # -------------------------------------------
-apt-get update 
+apt-get update
 apt-get dist-upgrade -y
 
 
@@ -256,7 +261,7 @@ dpkg-reconfigure postfix
 debconf-set-selections <<EOF
 unattended-upgrades     unattended-upgrades/enable_auto_updates boolean true
 EOF
- 
+
 apt-get install unattended-upgrades -y
 
 dpkg-reconfigure unattended-upgrades
@@ -287,60 +292,66 @@ rm /etc/nginx/conf.d/*
 
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
 server {
-    listen       80;
-    server_name  "";
-    return 301 https://$http_host$request_uri;
+  listen       80;
+  server_name  "";
+  return 301 https://$http_host$request_uri;
 }
+
 server {
-    listen 443 spdy;
-    server_name  "";
-    ssl on;
-    ssl_certificate /etc/nginx/ssl/seafile.crt;
-    ssl_certificate_key /etc/nginx/ssl/seafile.key;
-    location / {
-        fastcgi_pass    127.0.0.1:8000;
-        fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
-        fastcgi_param   PATH_INFO           $fastcgi_script_name;
-        fastcgi_param   SERVER_PROTOCOL     $server_protocol;
-        fastcgi_param   QUERY_STRING        $query_string;
-        fastcgi_param   REQUEST_METHOD      $request_method;
-        fastcgi_param   CONTENT_TYPE        $content_type;
-        fastcgi_param   CONTENT_LENGTH      $content_length;
-        fastcgi_param   SERVER_ADDR         $server_addr;
-        fastcgi_param   SERVER_PORT         $server_port;
-        fastcgi_param   SERVER_NAME         $server_name;
-        fastcgi_param   HTTPS               on;
-        fastcgi_param   HTTP_SCHEME         https;
-        access_log      /var/log/nginx/seahub.access.log;
-        error_log       /var/log/nginx/seahub.error.log;
-    }
-    location /seafhttp {
-        rewrite ^/seafhttp(.*)$ $1 break;
-        proxy_pass http://127.0.0.1:8082;
-        client_max_body_size 0;
-        proxy_connect_timeout  36000s;
-        proxy_read_timeout  36000s;
-    }
-    location /media {
-        root /opt/seafile/seafile-server-latest/seahub;
-    }
-    location /seafdav {
-        fastcgi_pass    127.0.0.1:8080;
-        fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
-        fastcgi_param   PATH_INFO           $fastcgi_script_name;
-        fastcgi_param   SERVER_PROTOCOL     $server_protocol;
-        fastcgi_param   QUERY_STRING        $query_string;
-        fastcgi_param   REQUEST_METHOD      $request_method;
-        fastcgi_param   CONTENT_TYPE        $content_type;
-        fastcgi_param   CONTENT_LENGTH      $content_length;
-        fastcgi_param   SERVER_ADDR         $server_addr;
-        fastcgi_param   SERVER_PORT         $server_port;
-        fastcgi_param   SERVER_NAME         $server_name;
-        fastcgi_param   HTTPS               on;
-        client_max_body_size 0;
-        access_log      /var/log/nginx/seafdav.access.log;
-        error_log       /var/log/nginx/seafdav.error.log;
-    }
+  listen 443 spdy;
+  server_name  "";
+
+  ssl on;
+  ssl_certificate /etc/nginx/ssl/seafile.crt;
+  ssl_certificate_key /etc/nginx/ssl/seafile.key;
+
+  location / {
+    fastcgi_pass    127.0.0.1:8000;
+    fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
+    fastcgi_param   PATH_INFO           $fastcgi_script_name;
+    fastcgi_param   SERVER_PROTOCOL     $server_protocol;
+    fastcgi_param   QUERY_STRING        $query_string;
+    fastcgi_param   REQUEST_METHOD      $request_method;
+    fastcgi_param   CONTENT_TYPE        $content_type;
+    fastcgi_param   CONTENT_LENGTH      $content_length;
+    fastcgi_param   SERVER_ADDR         $server_addr;
+    fastcgi_param   SERVER_PORT         $server_port;
+    fastcgi_param   SERVER_NAME         $server_name;
+    fastcgi_param   HTTPS               on;
+    fastcgi_param   HTTP_SCHEME         https;
+    access_log      /var/log/nginx/seahub.access.log;
+    error_log       /var/log/nginx/seahub.error.log;
+  }
+
+  location /seafhttp {
+    rewrite ^/seafhttp(.*)$ $1 break;
+    proxy_pass http://127.0.0.1:8082;
+    client_max_body_size 0;
+    proxy_connect_timeout  36000s;
+    proxy_read_timeout  36000s;
+  }
+
+  location /media {
+    root /opt/seafile/seafile-server-latest/seahub;
+  }
+
+  location /seafdav {
+    fastcgi_pass    127.0.0.1:8080;
+    fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
+    fastcgi_param   PATH_INFO           $fastcgi_script_name;
+    fastcgi_param   SERVER_PROTOCOL     $server_protocol;
+    fastcgi_param   QUERY_STRING        $query_string;
+    fastcgi_param   REQUEST_METHOD      $request_method;
+    fastcgi_param   CONTENT_TYPE        $content_type;
+    fastcgi_param   CONTENT_LENGTH      $content_length;
+    fastcgi_param   SERVER_ADDR         $server_addr;
+    fastcgi_param   SERVER_PORT         $server_port;
+    fastcgi_param   SERVER_NAME         $server_name;
+    fastcgi_param   HTTPS               on;
+    client_max_body_size 0;
+    access_log      /var/log/nginx/seafdav.access.log;
+    error_log       /var/log/nginx/seafdav.error.log;
+  }
 }
 EOF
 
@@ -393,44 +404,52 @@ cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
 cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
 user nginx nginx;
 worker_processes 4;
+
 events {
-    worker_connections 8096;
-    multi_accept on;
-    use epoll;
+  worker_connections 8096;
+  multi_accept on;
+  use epoll;
 }
+
 pid /var/run/nginx.pid;
 worker_rlimit_nofile 40000;
+
 http {
-    server_tokens off;
-    server_names_hash_bucket_size 128;
-    client_max_body_size 50M;
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-    '$status $body_bytes_sent "$http_referer" '
-    '"$http_user_agent" "$http_x_forwarded_for"';
-    access_log /var/log/nginx/access.log main;
-    error_log /var/log/nginx/error.log warn;
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    client_body_timeout 12;
-    client_header_timeout 12;
-    keepalive_timeout 15;
-    send_timeout 10;
-    # Fully disabled gzip compression to mitigate Django BREACH attack: https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
-    gzip off;
-    #gzip_vary on;
-    #gzip_proxied expired no-cache no-store private auth any;
-    #gzip_comp_level 9;
-    #gzip_min_length 10240;
-    #gzip_buffers 16 8k;
-    #gzip_http_version 1.1;
-    #gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml font/woff2;
-    #gzip_disable "MSIE [1-6].";
-    include /etc/nginx/conf.d/*.conf;
-    map $scheme $php_https { default off; https on; }
-    include perfect-forward-secrecy.conf;
+  server_tokens off;
+  server_names_hash_bucket_size 128;
+  client_max_body_size 50M;
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
+  log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+  '$status $body_bytes_sent "$http_referer" '
+  '"$http_user_agent" "$http_x_forwarded_for"';
+  access_log /var/log/nginx/access.log main;
+  error_log /var/log/nginx/error.log warn;
+  sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
+  client_body_timeout 12;
+  client_header_timeout 12;
+  keepalive_timeout 15;
+  send_timeout 10;
+  # Fully disabled gzip compression to mitigate Django BREACH attack: https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
+  gzip off;
+  #gzip_vary on;
+  #gzip_proxied expired no-cache no-store private auth any;
+  #gzip_comp_level 9;
+  #gzip_min_length 10240;
+  #gzip_buffers 16 8k;
+  #gzip_http_version 1.1;
+  #gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml font/woff2;
+  #gzip_disable "MSIE [1-6].";
+  include /etc/nginx/conf.d/*.conf;
+
+  map $scheme $php_https {
+    default off;
+    https on;
+  }
+
+  include perfect-forward-secrecy.conf;
 }
 ENDOFFILE
 
@@ -470,7 +489,7 @@ deb-src http://mirror.netcologne.de/mariadb/repo/10.0/debian wheezy main
 EOF
 
 apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
-apt-get update 
+apt-get update
 apt-get upgrade -y
 fi
 
@@ -478,12 +497,12 @@ apt-get install mariadb-server -y
 
 SQLROOTPW=$(pwgen 14)
 
-mysqladmin -u root password $SQLROOTPW
+mysqladmin -u root password ${SQLROOTPW}
 
 cat > /root/.my.cnf <<EOF
 [client]
 user=root
-password=$SQLROOTPW
+password=${SQLROOTPW}
 EOF
 
 chmod 600 /root/.my.cnf
@@ -521,32 +540,32 @@ fastcgi=true
 fastcgi_port=8000
 
 case "$1" in
-    start)
-        sudo -u ${user} ${script_path}/seafile.sh start >> ${seafile_init_log}
-        if [  $fastcgi = true ];
-            then
-                sudo -u ${user} ${script_path}/seahub.sh start-fastcgi ${fastcgi_port} >> ${seahub_init_log}
-            else
-                sudo -u ${user} ${script_path}/seahub.sh start >> ${seahub_init_log}
-            fi
-        ;;
-    restart)
-        sudo -u ${user} ${script_path}/seafile.sh restart >> ${seafile_init_log}
-        if [  $fastcgi = true ];
-            then
-                sudo -u ${user} ${script_path}/seahub.sh restart-fastcgi ${fastcgi_port} >> ${seahub_init_log}
-            else
-                sudo -u ${user} ${script_path}/seahub.sh restart >> ${seahub_init_log}
-            fi
-        ;;
-    stop)
-        sudo -u ${user} ${script_path}/seafile.sh $1 >> ${seafile_init_log}
-        sudo -u ${user} ${script_path}/seahub.sh $1 >> ${seahub_init_log}
-        ;;
-    *)
-        echo "Usage: /etc/init.d/seafile-server {start|stop|restart}"
-        exit 1
-        ;;
+  start)
+    sudo -u ${user} ${script_path}/seafile.sh start >> ${seafile_init_log}
+    if [  $fastcgi = true ];
+      then
+        sudo -u ${user} ${script_path}/seahub.sh start-fastcgi ${fastcgi_port} >> ${seahub_init_log}
+      else
+        sudo -u ${user} ${script_path}/seahub.sh start >> ${seahub_init_log}
+      fi
+    ;;
+  restart)
+    sudo -u ${user} ${script_path}/seafile.sh restart >> ${seafile_init_log}
+    if [  $fastcgi = true ];
+      then
+        sudo -u ${user} ${script_path}/seahub.sh restart-fastcgi ${fastcgi_port} >> ${seahub_init_log}
+      else
+        sudo -u ${user} ${script_path}/seahub.sh restart >> ${seahub_init_log}
+      fi
+    ;;
+  stop)
+    sudo -u ${user} ${script_path}/seafile.sh $1 >> ${seafile_init_log}
+    sudo -u ${user} ${script_path}/seahub.sh $1 >> ${seahub_init_log}
+    ;;
+  *)
+    echo "Usage: /etc/init.d/seafile-server {start|stop|restart}"
+    exit 1
+    ;;
 esac
 EOF
 
@@ -558,14 +577,14 @@ update-rc.d seafile-server defaults
 # Seafile
 # -------------------------------------------
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
+
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
-curl -OL https://download.seafile.de/seafile-server_latest_x86-64.tar.gz
-tar xzf seafile-server_latest_x86-64.tar.gz
 
+curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+tar xzf seafile-server_latest_${ARCH}.tar.gz
 SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
-
-mv seafile-server_latest_x86-64.tar.gz installed/seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz
+mv seafile-server_latest_${ARCH}.tar.gz installed/seafile-server_${SEAFILE_VERSION}_${ARCH}.tar.gz
 
 
 # -------------------------------------------
@@ -872,7 +891,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   -----------------------------------------------------------------
 
   1) Run seafile-server-change-address to change your Seafile servers DNS name.
-  
+
   2) Check seahub_settings.py and customize it to fit your needs. Consult
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
@@ -893,7 +912,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   Debug infos
   -----------------------------------------------------------------
   If the installation fails for any reason, review
-  /root/$(basename ${0})_installation.log 
+  /root/$(basename ${0})_installation.log
   or send us the log by mail to $(basename ${0})@seafile.de
 
 
@@ -904,7 +923,7 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
 
   This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
-  
+
 EOF
 
 chmod 600 ${SEAFILE_DIR}/$(basename ${0})_report.log
