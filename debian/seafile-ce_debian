@@ -167,7 +167,7 @@ print-system-infos
 # -------------------------------------------
 # Ensure we are running the installer on supported Debian
 # -------------------------------------------
-if [[ $OS != jessie && $OS != wheezy ]]; then
+if [[ ${OS} != jessie && ${OS} != wheezy ]] ; then
     echo "  Aborting because OS not supported" ; exit 1
 fi
 
@@ -175,7 +175,7 @@ fi
 # -------------------------------------------
 # Ensure we are running the installer as root
 # -------------------------------------------
-if [[ $EUID -ne 0 ]]; then
+if [[ ${EUID} -ne 0 ]] ; then
   echo "  Aborting because you are not root" ; exit 1
 fi
 
@@ -475,13 +475,20 @@ EOF
 CPUS=$(cat /proc/cpuinfo | grep processor | wc | awk '{ print $1 }')
 eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.conf"
 
-service nginx restart
+if [ ${OS} = "wheezy" ]
+  then
+    service nginx restart
+  else
+    systemctl restart nginx
+fi
+
+
 
 
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
-if [[ $OS == wheezy ]]; then
+if [[ ${OS} == wheezy ]]; then
 cat > /etc/apt/sources.list.d/mariadb.list <<EOF
 # MariaDB Repository
 deb http://mirror.netcologne.de/mariadb/repo/10.0/debian wheezy main
@@ -850,8 +857,13 @@ chown ${SEAFILE_USER}.nogroup -R /opt/seafile/
 # Start seafile server
 # -------------------------------------------
 echo "Starting productive Seafile server"
-service seafile-server start
 
+if [ ${OS} = "wheezy" ]
+  then
+    service seafile-server start
+  else
+    systemctl restart seafile-server
+fi
 
 # -------------------------------------------
 # Final report
@@ -947,7 +959,7 @@ cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
 # -------------------------------------------
 HOSTNAME=$(hostname -f)
 SEAFILE_DIR=/opt/seafile
-
+OS=$(lsb_release -c | awk '{ print $2 }')
 
 # -------------------------------------------
 # Intro
@@ -1025,7 +1037,13 @@ sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_DIR}/ccnet/
 # Starte Seafile neu
 # -------------------------------------------
 echo restarting Seafile server
-service seafile-server restart
+
+if [ ${OS} = "wheezy" ]
+  then
+    service seafile-server start
+  else
+    systemctl restart seafile-server
+fi
 
 
 # -------------------------------------------
