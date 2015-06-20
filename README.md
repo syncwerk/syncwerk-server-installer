@@ -1,9 +1,9 @@
 # seafile-server-installer
 ## Seafile Server Community Edition
-These installers offer a quick and easy way to set up the Seafile Server Community Edition, using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server. 
+These installers offer a quick and easy way to set up the Seafile Server Community Edition, using MariaDB, Memcached and NGINX as a Reverse Proxy in under 5 minutes. We're also adding an init script that starts Seafile when booting the server.
 
 ## (New) Seafile Server Professional Edition
-Alternatively there is one installer for [Seafile Professional on Debian Jessie (64bit)](https://github.com/SeafileDE/seafile-server-installer/blob/master/debian/seafile-pro_debian-jessie-amd64) available. You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. 
+Alternatively there is one installer for [Seafile Professional on Debian Jessie (64bit)](https://github.com/SeafileDE/seafile-server-installer/blob/master/debian/seafile-pro_debian-jessie-amd64) available. You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation.
 
 Seafile Professional is free for up to 3 users. Submit your full address to free-3@seafile.de to obtain a free license.
 
@@ -25,7 +25,7 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 
 
 ### Which components are used?
-1. [Newest Seafile Server Community Edition](https://download.seafile.com.de/)
+1. [Newest Seafile Server Community Edition](https://download.seafile.de/)
 2. [NGINX](http://nginx.org/packages/mainline/debian/)
 3. MariaDB
 4. Memcached
@@ -43,9 +43,9 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 ### What does the installer do?
 1. Update and upgrade Debian
 2. Install NGINX from http://nginx.org/packages/mainline/debian/
-3. Create Seafile init script and add it to systemd startup
+3. Create Seafile init script and add it to startup
 4. Create unprivilieged system user "seafile" with home directory "/opt/seafile"
-5. Download and extract latest Seafile server sources from https://download.seafile.com.de/seafile-server_latest_x86-64.tar.gz
+5. Download and extract latest Seafile server sources from https://download.seafile.de/seafile-server_latest_x86-64.tar.gz
 6. Create "seafile" database user and Seafile databases (DB-Credentials in ~/.my.cnf)
 7. Initialize various Seafile files
 8. Enable SeafDAV, Memcached and MariaDB
@@ -58,28 +58,7 @@ It's meant to run on a [Debian Jessie minimal installation](https://www.youtube.
 ### How do I run it?
 Except for the Uberspace installer all installers need to run as root. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers.
 
-For **Debian Wheezy (64bit)** run the following lines as root
-<pre>
-cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-wheezy-amd64
-time bash seafile-ce_debian-wheezy-amd64
-</pre>
-
-For **Debian Jessie (32bit)** run the following lines as root:
-<pre>
-cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-jessie-i386
-time bash seafile-ce_debian-jessie-i386
-</pre>
-
-For **Debian Jessie (64bit)** run the following lines as root:
-<pre>
-cd /tmp
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian-jessie-amd64
-time bash seafile-ce_debian-jessie-amd64
-</pre>
-
-BETA: For **Debian Unified (64bit)** run the following lines as root
+For **Debian Wheezy and Jessie (32bit and 64bit)** run the following lines as root
 <pre>
 cd /tmp
 wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian
@@ -94,25 +73,25 @@ wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-
 time bash seafile-ce_ubuntu-trusty-amd64
 </pre>
 
-BETA: For **Uberspace** run the following line as user:
+For **Uberspace** run the following line as user:
 <pre>
-wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/uberspace/seafile-ce_uberspace 
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/uberspace/seafile-ce_uberspace
 time bash seafile-ce_uberspace
 </pre>
 
-ALPHA: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
+Alpha: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
 
-This is only needed if your seafile-db was mistakenly created as SQLite database by one of the installers here. To find out if you are affeceted, just run `find / -type f -name seafile.db -print`. If it finds the file we suggest converting your installation. You can use this script, but be cautios. **It is not very well tested and could seriously brake things.** Make a backup before running seafile-db-fixer... If you want to fix the problem manually, consult http://manual.seafile.com/deploy/migrate_from_sqlite_to_mysql.html for general instructions. 
+This is only needed if your seafile-db was mistakenly created as SQLite database by one of the older installers. Only installations till end of May 2015 should be affected. To find out if you are affected, just run `find / -type f -name seafile.db -print`. If it finds the file we suggest converting your installation. You can use this script, but be cautios. **It is not very well tested and could seriously brake things.** Make a backup before running seafile-db-fixer... If you want to fix the problem manually, consult http://manual.seafile.com/deploy/migrate_from_sqlite_to_mysql.html for general instructions.
 
 <pre>
 cd /tmp
 wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/misc/seafile-db-fixer
 time bash seafile-db-fixer
 </pre>
- 
- 
+
+
 ### Caution!
-Never run the script on a production server. It's more or less a one trick pony and can seriously damage production systems. So run it only one time and delete it afterwards. 
+Never run these scripts on a production server. It's more or less a one trick pony and can seriously damage production systems. So run it only one time and delete it afterwards.
 
 As a precaution I have added a few simple checks to abort installation if the unprivileged Seafile user or Seafile installation directory pre-exist:
 
