@@ -454,7 +454,7 @@ mv ${INSTALLPATH}/check_init_admin.py.backup ${INSTALLPATH}/check_init_admin.py
 # -------------------------------------------
 # Final report
 # -------------------------------------------
-cat > ~/seafile/$(basename ${0}).log <<EOF
+cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   Your Seafile server is installed
   -----------------------------------------------------------------
   Server Name:         ${SERVER_NAME}
@@ -490,12 +490,12 @@ cat > ~/seafile/$(basename ${0}).log <<EOF
 
 EOF
 
-chmod 600 ~/seafile/$(basename ${0}).log
+chmod 600 ~/seafile/seafile-ce_uberspace.log
 
 # -------------------------------------------
 # Done!
 # -------------------------------------------
-) 2>&1 | tee ~/seafile/$(basename ${0})_installation.log
-chmod 600 ~/seafile/$(basename ${0})_installation.log
+) 2>&1 | tee ~/seafile/seafile-ce_uberspace_installation_debug.log
+chmod 600 ~/seafile/seafile-ce_uberspace_installation_debug.log
 
-less ~/seafile/$(basename ${0}).log
+less ~/seafile/seafile-ce_uberspace.log
