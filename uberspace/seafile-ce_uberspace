@@ -1,4 +1,5 @@
 #!/bin/bash
+(
 #
 # seafile-server-installer/seafile-ce_uberspace
 #
@@ -18,16 +19,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to debug
-#set -x
+set -x
 
 
 # -------------------------------------------
 # Vars
 # -------------------------------------------
-SEAFILE_ADMIN=admin@seafile.local
-SEAFILE_USER=seafile
 WHOAMI=$(whoami)
 HOSTNAME=$(hostname -f)
+SEAFILE_ADMIN=admin@${WHOAMI}.${HOSTNAME}
+SEAFILE_USER=seafile
 SERVER_NAME=$(echo ${WHOAMI}$(hostname -s) | cut -c -16)
 
 
@@ -36,7 +37,8 @@ SERVER_NAME=$(echo ${WHOAMI}$(hostname -s) | cut -c -16)
 # -------------------------------------------
 clear
 cat <<EOF
-  This script installs the community edition of the Seafile Server on Uberspace
+  This script installs the community edition of the
+  Seafile Server on Uberspace
   -----------------------------------------------------------------
   This installer is meant to run on a fresh Uberspace.
   If you run it on a production server things can and
@@ -102,7 +104,7 @@ mysql ${DB_SEAHUB} < ~/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysq
 
 # -------------------------------------------
 # Get free ports
-# ------------------------------------------- 
+# -------------------------------------------
 START_PORT=61100
 END_PORT=65535
 INCREMENT=1
@@ -399,7 +401,7 @@ EMAIL_HOST                          = 'localhost'
 EMAIL_HOST_USER                     = ''
 EMAIL_HOST_PASSWORD                 = ''
 EMAIL_PORT                          = '25'
-DEFAULT_FROM_EMAIL                  = 'seafile@${HOSTNAME}'
+DEFAULT_FROM_EMAIL                  = 'seafile@${WHOAMI}.${HOSTNAME}'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
 TIME_ZONE                           = 'Europe/Berlin'
 SITE_BASE                           = 'https://${WHOAMI}.${HOSTNAME}'
@@ -452,7 +454,7 @@ mv ${INSTALLPATH}/check_init_admin.py.backup ${INSTALLPATH}/check_init_admin.py
 # -------------------------------------------
 # Final report
 # -------------------------------------------
-cat > ~/seafile/seafile-ce_uberspace.log <<EOF
+cat > ~/seafile/$(basename ${0}).log <<EOF
   Your Seafile server is installed
   -----------------------------------------------------------------
   Server Name:         ${SERVER_NAME}
@@ -460,7 +462,7 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
   Seafile Data Dir:    ${SEAFILE_DATA_DIR}
-  
+
   SEAHUB_PORT:         $SEAHUB_PORT
   FILESERVER_PORT:     $FILESERVER_PORT
   SERVER_PORT:         $SERVER_PORT
@@ -471,7 +473,7 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   Next you should manually complete the following steps
   -----------------------------------------------------------------
   1) Setup mail in ~/seafile/seahub_settings.py
-  
+
   Optional steps
   -----------------------------------------------------------------
   1) Check seahub_settings.py and customize it to fit your needs. Consult
@@ -481,13 +483,19 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   -----------------------------------------------------------------
   For free community support visit:   https://forum.seafile-server.org
   For paid commercial support visit:  https://seafile.de
-  
+
   Contribute
   -----------------------------------------------------------------
   Contact alexander.jackson@seafile.de for bugs or suggestions about this installer.
-  
+
 EOF
 
-chmod 600 ~/seafile/seafile-ce_uberspace.log
+chmod 600 ~/seafile/$(basename ${0}).log
 
-less ~/seafile/seafile-ce_uberspace.log
+# -------------------------------------------
+# Done!
+# -------------------------------------------
+) 2>&1 | tee ~/seafile/$(basename ${0})_installation.log
+chmod 600 ~/seafile/$(basename ${0})_installation.log
+
+less ~/seafile/$(basename ${0}).log
