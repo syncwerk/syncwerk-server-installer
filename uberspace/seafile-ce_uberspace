@@ -349,7 +349,7 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
-SEAFILESQLPW=$(grep -A10000  "\[client\]" .my.cnf | grep -m1 password | awk -F'=' {'print $2'} | awk -F' ' {'print $1'})
+SEAFILESQLPW=$(grep -A10000  "\[client\]" ${HOME}/.my.cnf | grep -m1 password | awk -F'=' {'print $2'} | awk -F' ' {'print $1'})
 
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
 [Database]
