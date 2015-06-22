@@ -495,7 +495,7 @@ chmod 600 ~/seafile/seafile-ce_uberspace.log
 # -------------------------------------------
 # Done!
 # -------------------------------------------
-) 2>&1 | tee ~/seafile/seafile-ce_uberspace_installation_debug.log
-chmod 600 ~/seafile/seafile-ce_uberspace_installation_debug.log
+) 2>&1 | tee ~/seafile-ce_uberspace_installation_debug.log
+chmod 600 ~/seafile-ce_uberspace_installation_debug.log
 
 less ~/seafile/seafile-ce_uberspace.log
