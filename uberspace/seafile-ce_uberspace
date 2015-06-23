@@ -426,13 +426,14 @@ DATABASES = {
         }
     }
 }
-EMAIL_USE_TLS                       = False
+EMAIL_USE_TLS                       = True
 EMAIL_HOST                          = 'localhost'
-EMAIL_HOST_USER                     = ''
-EMAIL_HOST_PASSWORD                 = ''
-EMAIL_PORT                          = '25'
-DEFAULT_FROM_EMAIL                  = 'seafile@${WHOAMI}.${HOSTNAME}'
-SERVER_EMAIL                        = '\${EMAIL_HOST_USER}'
+EMAIL_HOST_USER                     = 'seafile@${WHOAMI}.${HOSTNAME}'
+EMAIL_HOST_PASSWORD                 = 'seafile'
+EMAIL_PORT                          = '587'
+DEFAULT_FROM_EMAIL                  = 'EMAIL_HOST_USER'
+SERVER_EMAIL                        = 'EMAIL_HOST_USER'
+REPLACE_FROM_EMAIL                  = True
 TIME_ZONE                           = 'Europe/Berlin'
 SITE_BASE                           = 'https://${WHOAMI}.${HOSTNAME}'
 SITE_NAME                           = 'Seafile Server'
@@ -449,8 +450,28 @@ SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
 FILE_SERVER_ROOT                    = 'https://${WHOAMI}.${HOSTNAME}/seafhttp'
-DEBUG = True
+DEBUG = False
 EOF
+
+
+# -------------------------------------------
+# Creating local EMAIL_HOST_USER mail account
+# -------------------------------------------
+EMAIL_HOST_USER_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | sha1sum | cut -b -14)
+# Set up virtual domain for first usage
+vsetup
+# Info
+cat <<EOF
+
+  Creating local EMAIL_HOST_USER. Use ${EMAIL_HOST_USER_PW} as the users password.
+  if you choose to use a different password, you must change it acordingly
+  in ~/seafile/seahub_settings.py and restart seafile with 'seafile restart'
+
+EOF
+# Delete pre-existing user if present
+vdeluser seafile
+# Add user
+vadduser seafile
 
 
 # -------------------------------------------
