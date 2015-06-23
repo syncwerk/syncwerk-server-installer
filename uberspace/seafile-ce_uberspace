@@ -111,7 +111,6 @@ done
 mysql ${DB_SEAHUB} < ~/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
-
 # -------------------------------------------
 # Ports
 # -------------------------------------------
@@ -169,6 +168,26 @@ if [[ ${MODE} = custom ]]
     # Delete port list
     rm ${PORT_LIST}
 fi
+
+
+# -------------------------------------------
+# Creating local EMAIL_HOST_USER mail account
+# -------------------------------------------
+EMAIL_HOST_USER_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | sha1sum | cut -b -14)
+# Set up virtual domain for first usage
+vsetup
+# Info
+cat <<EOF
+
+  Creating local EMAIL_HOST_USER. Use ${EMAIL_HOST_USER_PW} as the users password.
+  If you choose to use a different password, you must change it accordingly
+  in ~/seafile/seahub_settings.py and restart seafile with 'seafile restart'
+
+EOF
+# Delete pre-existing user if present
+vdeluser seafile
+# Add user
+vadduser seafile
 
 
 # -------------------------------------------
@@ -429,7 +448,7 @@ DATABASES = {
 EMAIL_USE_TLS                       = True
 EMAIL_HOST                          = 'localhost'
 EMAIL_HOST_USER                     = 'seafile@${WHOAMI}.${HOSTNAME}'
-EMAIL_HOST_PASSWORD                 = 'seafile'
+EMAIL_HOST_PASSWORD                 = '${EMAIL_HOST_USER_PW}'
 EMAIL_PORT                          = '587'
 DEFAULT_FROM_EMAIL                  = 'EMAIL_HOST_USER'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
@@ -452,26 +471,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
 FILE_SERVER_ROOT                    = 'https://${WHOAMI}.${HOSTNAME}/seafhttp'
 DEBUG = False
 EOF
-
-
-# -------------------------------------------
-# Creating local EMAIL_HOST_USER mail account
-# -------------------------------------------
-EMAIL_HOST_USER_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | sha1sum | cut -b -14)
-# Set up virtual domain for first usage
-vsetup
-# Info
-cat <<EOF
-
-  Creating local EMAIL_HOST_USER. Use ${EMAIL_HOST_USER_PW} as the users password.
-  if you choose to use a different password, you must change it acordingly
-  in ~/seafile/seahub_settings.py and restart seafile with 'seafile restart'
-
-EOF
-# Delete pre-existing user if present
-vdeluser seafile
-# Add user
-vadduser seafile
 
 
 # -------------------------------------------
@@ -521,9 +520,10 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   SEAFDAV_PORT:        $SEAFDAV_PORT
 
   This report is also saved to ~/seafile/seafile-ce_uberspace.log
-  Next you should manually complete the following steps
+
+  You can start and stop your Seafile server with the command 'seafile'
   -----------------------------------------------------------------
-  1) Setup mail in ~/seafile/seahub_settings.py
+  Usage: seafile {start|stop|restart}
 
   Optional steps
   -----------------------------------------------------------------
