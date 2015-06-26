@@ -1,4 +1,5 @@
 #!/bin/bash
+(
 #
 # seafile-server-installer/seafile-pro_debian-jessie-amd64
 #
@@ -33,9 +34,91 @@ FILESERVER_PORT=8082
 SERVER_PORT=10001
 SEAFILE_SERVER_PORT=12001
 # Don't touch the following variable, unless you know what you are doing
-SEAFILE_VERSION=4.1.2
+SEAFILE_VERSION=4.2.0
 SEAFILE_EDITION=pro-server
 SEAFILE_SOURCE=/usr/src/seafile/seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
+export DEBIAN_FRONTEND=noninteractive
+
+
+# -------------------------------------------
+# Functions
+# -------------------------------------------
+function print-system-infos {
+# -------------------------------------------
+# Log system infos
+# -------------------------------------------
+echo Timestamp
+echo -----------------------------------------------------------------
+date
+echo
+echo
+echo Hostnames
+echo -----------------------------------------------------------------
+echo "$(hostname -f),$(hostname -s),$(hostname -d),$(hostname -i)"
+echo
+echo
+echo Content of /etc/hosts
+echo -----------------------------------------------------------------
+cat /etc/hosts
+echo
+echo
+echo Active Kernel
+echo -----------------------------------------------------------------
+uname -a
+echo
+echo
+echo Network Interfaces
+echo -----------------------------------------------------------------
+ifconfig -a
+echo
+echo
+echo IP Addresses
+echo -----------------------------------------------------------------
+ip addr show
+echo
+echo
+echo DNS Servers
+echo -----------------------------------------------------------------
+cat /etc/resolv.conf
+echo
+echo
+echo Routes
+echo -----------------------------------------------------------------
+route -n
+echo
+echo
+echo Content of /etc/network/interfaces
+echo -----------------------------------------------------------------
+cat /etc/network/interfaces
+echo
+echo
+echo Debian Version
+echo -----------------------------------------------------------------
+cat /etc/debian_version
+echo
+echo
+find /etc/apt/ -type f | grep -v gpg | while read line ; do echo ; \
+    echo Content of $line ; \
+    echo ----------------------------------------------------------------- ; \
+    cat $line ; \
+	echo ;
+done
+echo
+echo
+echo Installed packages
+echo -----------------------------------------------------------------
+dpkg -l
+echo
+echo
+echo Process List
+echo -----------------------------------------------------------------
+ps axu
+echo
+echo
+echo Local user accounts
+echo -----------------------------------------------------------------
+cat /etc/passwd
+}
 
 
 # -------------------------------------------
@@ -63,6 +146,12 @@ cat <<EOF
 EOF
 read dummy
 clear
+
+
+# -------------------------------------------
+# Start the magic
+# -------------------------------------------
+print-system-infos
 
 
 # -------------------------------------------
@@ -101,7 +190,7 @@ apt-get dist-upgrade -y
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-apt-get install sudo ntp htop pwgen curl openssl unattended-upgrades -y
+apt-get install sudo ntp less htop pwgen curl openssl unattended-upgrades -y
 
 
 # -------------------------------------------
@@ -330,7 +419,7 @@ systemctl restart nginx
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
-DEBIAN_FRONTEND=noninteractive apt-get install mariadb-server -y
+apt-get install mariadb-server -y
 
 SQLROOTPW=$(pwgen)
 
@@ -534,7 +623,7 @@ mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
 
 # Import Seahub database structure
-mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+mysql seahub-db < /opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
 
 # -------------------------------------------
@@ -792,9 +881,9 @@ systemctl restart seafile-server
 # -------------------------------------------
 # Final report
 # -------------------------------------------
-cat > ${SEAFILE_DIR}/seafile-pro-installer.log<<EOF
+cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
 
-  Your Seafile server is installed
+  Your Seafile server
   -----------------------------------------------------------------
 
   Server Name:         ${SEAFILE_SERVER_NAME}
@@ -808,44 +897,34 @@ cat > ${SEAFILE_DIR}/seafile-pro-installer.log<<EOF
   Seafile DB Credentials:  Check /opt/seafile/.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
 
-  This report is also saved to ${SEAFILE_DIR}/seafile-pro-installer.log
-
+  Switch to Seafile system account with: su - ${SEAFILE_USER} -s /bin/bash
 
 
   Next you should manually complete the following steps
   -----------------------------------------------------------------
 
-  1) Run seafile-server-change-address to add your Seafile servers DNS name
-
-  2) If this server is behind a firewall, you need to ensure that
+  1) If this server is behind a firewall, you need to ensure that
      tcp port 443 for the NGINX reverse proxy is open. Optionally
      you may also open tcp port 80 which redirects all unencrypted
      http traffic to the encrypted https port.
 
-  3) Seahub tries to send emails via the local server. Install and
-     configure Postfix for this to work.
-
-
+  2) Seahub tries to send emails via the local Postfix mail server.
+     Make sure Postfix is setup correctly for your environment.
 
 
   Optional steps
   -----------------------------------------------------------------
 
-  1) Check seahub_settings.py and customize it to fit your needs. Consult
+  1) Run seafile-server-change-address to change your Seafile servers DNS name.
+
+  2) Check seahub_settings.py and customize it to fit your needs. Consult
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
-  2) Setup NGINX with official SSL certificate.
+  3) Setup NGINX with official SSL certificate.
 
-  3) Harden system with port knocking, fail2ban, etc.
+  4) Harden system with port knocking, fail2ban, etc.
 
-  5) Enable unattended installation of security updates. Check
-     https://wiki.debian.org/UnattendedUpgrades for details.
-
-  6) Implement a backup routine for your Seafile server.
-
-  7) Update NGINX worker processes to reflect the number of CPU cores.
-
-
+  5) Implement a backup routine for your Seafile server.
 
 
   Seafile support options
@@ -855,6 +934,11 @@ cat > ${SEAFILE_DIR}/seafile-pro-installer.log<<EOF
   For paid commercial support visit:  https://seafile.de
 
 
+  Debug infos
+  -----------------------------------------------------------------
+  If the installation fails for any reason, review
+  /root/$(basename ${0})_installation.log
+  or send us the log by mail to $(basename ${0})@seafile.de
 
 
   Contribute
@@ -862,13 +946,148 @@ cat > ${SEAFILE_DIR}/seafile-pro-installer.log<<EOF
   Please contact alexander.jackson@seafile.de
   for bugs or suggestions about this installer. Thank you!
 
+
+  This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
+
 EOF
 
-chmod 600 ${SEAFILE_DIR}/seafile-pro-installer.log
-chown -R ${SEAFILE_USER}.nogroup ${SEAFILE_DIR}/seafile-pro-installer.log
+chmod 600 ${SEAFILE_DIR}/$(basename ${0})_report.log
+chown -R ${SEAFILE_USER}.nogroup ${SEAFILE_DIR}/$(basename ${0})_report.log
 
+
+# -------------------------------------------
+# Install seafile-server-change-address script
+# -------------------------------------------
+cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
+#/bin/bash
+#set -x
+# -------------------------------------------
+# Save at /usr/local/sbin/seafile-server-change-address and set permissions with
+# chmod 500 /usr/local/sbin/seafile-server-change-address
+# -------------------------------------------
+
+
+# -------------------------------------------
+# Vars
+# -------------------------------------------
+HOSTNAME=$(hostname -f)
+SEAFILE_DIR=/opt/seafile
+
+
+# -------------------------------------------
+# Intro
+# -------------------------------------------
 clear
+cat <<EOF
 
-less ${SEAFILE_DIR}/seafile-pro-installer.log
+  Deutsch
+  -------------------------------------------
+  Mit diesem Skript können Sie die Adresse Ihres
+  Seafile Serves ändern. Das ist zum Beispiel nötig wenn
+  sich Ihre Domain- oder IP-Adresse geändert hat.
 
-echo I am finished, enjoy! \;-\)
+  Wird Seafile mit der falschen Adresse betrieben,
+  funktioniert der Up- und Download von Dateien nicht.
+
+  Soll der Server mittes Portweiterleitung erreichbar
+  sein, verwenden Sie bitte die öffentliche oder externe
+  IP Ihres Routers bzw. einen öffentlich Domainnamen.
+
+  Bei Falscheingaben rufen Sie das Skript bitte erneut auf.
+
+  Der aktuelle Hostname wird vorausgefüllt. Ggf. einfach
+  ändern.
+
+
+  English
+  -------------------------------------------
+  With this script you can change the address of your
+  Seafile server. For example this is necessary if
+  your DNS or IP address has changed.
+
+  If the wrong address is set, up- and downloads will not work.
+
+  If the needs to be accessible from the WAN, but resides behind
+  a NAT router use the public IP or better the external DNS address.
+
+  If you made a mistake setting up the address, just run this skript again.
+
+  The current hostname is pre-populated. If necessary, simply change
+  it to fit your needs.
+
+EOF
+
+echo "Geben Sie jetzt die neue IP oder Domainadresse"
+echo "Enter your new IP or DNS name"
+read -e -p "Neue Domainadresse:" -i " ${HOSTNAME}" URL
+
+
+cat <<EOF
+
+  Die eingebenen Adresse lautet: ${URL}
+  Your new address: ${URL}
+
+  -------------------------------------------
+  Fortfahren mit ENTER. Abruch mit STRG-C...
+  Proceed with ENTER. Abort with CTRL-C...
+
+EOF
+read dummy
+
+
+# -------------------------------------------
+# Aendere Adressen in seahub_settings.py und ccnet.conf
+# -------------------------------------------
+echo Applying changes
+sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
+sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
+sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
+sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_DIR}/seahub_settings.py
+sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_DIR}/ccnet/ccnet.conf
+
+
+# -------------------------------------------
+# Starte Seafile neu
+# -------------------------------------------
+echo restarting Seafile server
+service seafile-server restart
+
+
+# -------------------------------------------
+# Outro
+# -------------------------------------------
+clear
+cat <<EOF
+
+  Deutsch
+  -------------------------------------------
+  Fertig! Der Seafile Server wurde neu gestartet.
+
+  Seahub sollte nun über https://${HOSTNAME} erreichbar sein.
+
+
+  English
+  -------------------------------------------
+  Done! Your Seafile Server has been restarted.
+
+  Seahub should be reachable at https://${HOSTNAME}.
+
+EOF
+ENDOFILE
+
+chmod 500 /usr/local/sbin/seafile-server-change-address
+
+
+# -------------------------------------------
+# Report
+# -------------------------------------------
+print-system-infos
+
+cat ${SEAFILE_DIR}/$(basename ${0})_report.log
+
+
+# -------------------------------------------
+# Done!
+# -------------------------------------------
+) 2>&1 | tee /root/$(basename ${0})_installation.log
+chmod 600 /root/$(basename ${0})_installation.log
