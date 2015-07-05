@@ -1,5 +1,5 @@
 # seafile-server-installer
-## Seafile Server CE\* and PRO\*\*
+## Auto install Seafile Server CE\* and PRO\*\*
 These installers offer a quick and easy way to set up a production ready Seafile Server; using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
 \* Community Edition
