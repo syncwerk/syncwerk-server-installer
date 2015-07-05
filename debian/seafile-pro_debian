@@ -47,6 +47,7 @@ if [ $(getconf LONG_BIT) = "64" ]
   else
     ARCH=i386
 fi
+DEB_ARCH=$(dpkg --print-architecture)
 
 
 # -------------------------------------------
@@ -71,9 +72,14 @@ echo -----------------------------------------------------------------
 cat /etc/hosts
 echo
 echo
-echo Architecture
+echo OS Architecture
 echo -----------------------------------------------------------------
 echo ${ARCH}
+echo
+echo
+echo Debian Package Architecture
+echo -----------------------------------------------------------------
+echo ${DEB_ARCH}
 echo
 echo
 echo Active Kernel
