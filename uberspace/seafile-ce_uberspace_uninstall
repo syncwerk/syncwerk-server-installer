@@ -25,7 +25,7 @@
 # Vars
 # -------------------------------------------
 SILENCER='> /dev/null 2>&1'
-
+WHOAMI=$(whoami)
 
 # -------------------------------------------
 # Seafile Server Community Edition on Uberspace
@@ -48,7 +48,7 @@ clear
 # -------------------------------------------
 # Kill anything Seafile related
 # -------------------------------------------
-ps aux | grep sea | grep -v grep | grep -v uninstall | awk '{ print $2 }' | while read line; do kill $line ; done
+ps aux | grep sea | grep -v grep | grep -v uninstall | awk '{ print $2 }' | while read line ; do kill ${line} ${SILENCER} ; done
 
 # -------------------------------------------
 # remove Seafile, Apache and Python 2.7 related directories and files
@@ -59,9 +59,15 @@ eval rm -r ~/seafile-ce_* ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ~/html/.h
 # -------------------------------------------
 # Drop databases
 # -------------------------------------------
-for i in haiwen_ccnet haiwen_seafile haiwen_seahub; do
+for i in ${WHOAMI}_ccnet ${WHOAMI}_seafile ${WHOAMI}_seahub; do
   mysql -e "DROP DATABASE IF EXISTS \`${i}\`;"
 done
+
+
+# -------------------------------------------
+# Deleting Seafile mail account
+# -------------------------------------------
+vdeluser seafile
 
 
 # -------------------------------------------
