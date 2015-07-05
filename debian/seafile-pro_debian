@@ -587,21 +587,6 @@ if [ ${OS} = "wheezy" ]
     systemctl enable seafile-server
 fi
 
-
-# -------------------------------------------
-# Seafile
-# -------------------------------------------
-adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
-
-mkdir -p /opt/seafile/installed
-cd /opt/seafile/
-
-curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
-tar xzf seafile-server_latest_${ARCH}.tar.gz
-SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
-mv seafile-server_latest_${ARCH}.tar.gz installed/seafile-server_${SEAFILE_VERSION}_${ARCH}.tar.gz
-
-
 # -------------------------------------------
 # Seafile
 # -------------------------------------------
