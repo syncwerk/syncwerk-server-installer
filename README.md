@@ -58,7 +58,7 @@ Never run these scripts on a production server. They are more or less a one tric
 
 ## Installation
 ### Seafile Server CE
-Except for the Uberspace installer **all installers need to run as root**. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers. Make sure your OS package repository (/etc/apt/sources.list) is set correct before proceeding.
+Except for the Uberspace installer **all installers need to run as root**. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers. Make sure your OS package repository (e.g. /etc/apt/sources.list) is set correct before proceeding.
 
 For **Debian Wheezy and Jessie (32bit and 64bit)**:
 <pre>
