@@ -2,8 +2,7 @@
 These installers offer a quick and easy way to set up a production ready Seafile Server using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
 \* Community Edition
-
-\*\* Professional Edition
+** Professional Edition
 
 ## What's it for?
 Install the [Seafile Server](http://seafile.com/en/home/) component in a standard and more secure manner then our current out of the box setup scripts offer. Instead of SQLite we're using MariaDB and NGINX instead of Gunicorn.
