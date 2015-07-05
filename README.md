@@ -1,30 +1,28 @@
-# seafile-server-installer
-## Auto install Seafile Server CE* and PRO**
+# Auto install Seafile Server CE* and PRO**
 These installers offer a quick and easy way to set up a production ready Seafile Server using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
 \* Community Edition
+
 \*\* Professional Edition
 
-### What's it for?
-Installing the [Seafile Server](http://seafile.com/en/home/) on Debian or Ubuntu in a standard and more secure manner then the out of the box setup scripts offer. Instead of SQLite we're using MariaDB and instead of Gunicorn we're using NGINX.
+## What's it for?
+Install the [Seafile Server](http://seafile.com/en/home/) component in a standard and more secure manner then our current out of the box setup scripts offer. Instead of SQLite we're using MariaDB and NGINX instead of Gunicorn.
 
 
-### Why?
-There are just too many ways to misconfigure a manual Seafile server installation. We've notices that many people don't realize that the default installation is unsecure. In other cases people get stuck during the installation or forget a step like changing "FILE_SERVER_ROOT" or use IP addresses instead of resolvable DNS names.
-The scripts are derived from our [reference installation for Seafile Server Professional](https://wiki.seafile.com.de/doku.php?id=debian_7_wheezy_64bit). It helps us to standardize the installation procedure and helps with identifying setup errors more easily.
+## Why?
+There too many ways to misconfigure a manual Seafile server installation. We've notices that many people don't realize that the default installation is very unsafe. In other cases people get stuck during the manual installation procedure or forget a step like changing "FILE_SERVER_ROOT" or use IP addresses instead of resolvable DNS names.
+The scripts are derived from our [reference installation for Seafile Server Professional](https://wiki.seafile.com.de/doku.php?id=debian_7_wheezy_64bit). They help us to standardize the installation procedure and identifying setup errors more easily.
 
-### Supported operating system
+## Supported OS
 1. Debian Wheezy and Jessie - [Video: Debian Jessie minimal installation](https://seafile.tv/2015/06/16/debian-jessie-minimalinstallation-fuer-seafile/)
 2. Ubuntu Trusty - [Video: Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu-trusty-minimalinstallation-fuer-den-seafile-server/)
 3. Uberspace
 
-Just select the corresponding installer for your OS. All scripts are meant to run with the bare minimum OS setup. We strongly suggest not installing Seafile server besides desktop environment or hosting panels like Plesk, ISPConfig, etc. Professional installations which don't follow our setup suggestions, don't qualify for official support. Please keep this in mind.
+Just select the corresponding installer for your OS. All scripts are meant to run with the bare minimum OS setup. We strongly suggest not installing Seafile server besides desktop environment or hosting panels like Plesk, ISPConfig, etc. Professional installations which don't follow our setup suggestions, don't qualify for official support. Keep this in mind.
 
 
-## Caution!
-Never run these scripts on a production server. It's more or less a one trick pony and can seriously damage production systems. So run it only one and delete it afterwards.
-
-As a precaution I have added a few simple checks to abort installation if the unprivileged Seafile user or Seafile installation directory pre-exist:
+## Caution
+Never run these scripts on a production server. They are more or less a one trick pony and can seriously damage production systems. Run it only once and delete it afterwards. As a precaution I have added a few simple checks to abort installation if any of these fails:
 
 1. Check if you're running this script as root. If not, abort.
 2. Check if the user "seafile" exists. If yes, abort.
@@ -86,7 +84,7 @@ bash seafile-ce_uberspace
 
 
 #### Seafile Server PRO
-You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. Seafile Professional is free for up to 3 users. You can order a free license at  [https://shop.seafile.de/produkt/seafile-professional-free/](https://shop.seafile.de/produkt/seafile-professional-free/).
+You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. Seafile Professional is free for up to 3 users. Order your free copy   [here](https://shop.seafile.de/produkt/seafile-professional-free/).
 
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 <pre>
