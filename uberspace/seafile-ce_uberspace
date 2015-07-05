@@ -1,4 +1,5 @@
 #!/bin/bash
+(
 #
 # seafile-server-installer/seafile-ce_uberspace
 #
@@ -18,17 +19,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to debug
-#set -x
+# set -x
+
+
+# -------------------------------------------
+# Sync local Uberspace FS
+# -------------------------------------------
+sync
 
 
 # -------------------------------------------
 # Vars
 # -------------------------------------------
-SEAFILE_ADMIN=admin@seafile.local
-SEAFILE_USER=seafile
 WHOAMI=$(whoami)
 HOSTNAME=$(hostname -f)
+SEAFILE_ADMIN=admin@${WHOAMI}.${HOSTNAME}
+SEAFILE_USER=seafile
 SERVER_NAME=$(echo ${WHOAMI}$(hostname -s) | cut -c -16)
+# Optionally start installer with parameter "custom" to set ports manually
+MODE=${1}
 
 
 # -------------------------------------------
@@ -36,7 +45,8 @@ SERVER_NAME=$(echo ${WHOAMI}$(hostname -s) | cut -c -16)
 # -------------------------------------------
 clear
 cat <<EOF
-  This script installs the community edition of the Seafile Server on Uberspace
+  This script installs the community edition of the
+  Seafile Server on Uberspace
   -----------------------------------------------------------------
   This installer is meant to run on a fresh Uberspace.
   If you run it on a production server things can and
@@ -100,44 +110,84 @@ done
 
 mysql ${DB_SEAHUB} < ~/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysql.sql
 
+
 # -------------------------------------------
-# Get free ports
-# ------------------------------------------- 
-START_PORT=61100
-END_PORT=65535
-INCREMENT=1
-PORT=${START_PORT}
-PORT_LIST=free_ports.txt
+# Ports
+# -------------------------------------------
+if [[ ${MODE} = custom ]]
 
-# Empty port list
-echo -n > ${PORT_LIST}
+  then
 
-COUNT=1
-while [ ${COUNT} -le 5 ]; do
-  ISFREE=$(netstat -tapln | grep ${PORT})
-    while [[ -n "${ISFREE}" ]]; do
-      PORT=$[PORT+INCREMENT]
-      ISFREE=$(netstat -tapln | grep ${PORT});
-        if [ ${COUNT} > ${END_PORT} ]; then
-          echo "Not enough free ports available. Aborting installation!" ; exit 1
-        fi
+    # -------------------------------------------
+    # Set ports manually
+    # -------------------------------------------
+    read -e -p "Enter Seahub Port:" -i "8000" SEAHUB_PORT
+    read -e -p "Enter Seafdav Port:" -i "8080" SEAFDAV_PORT
+    read -e -p "Enter Fileserver Port:" -i "8082" FILESERVER_PORT
+    read -e -p "Enter CCNET Port:" -i "10001" CCNET_PORT
+    read -e -p "Enter Seafile Server Port:" -i "12001" SEAFILE_PORT
+
+  else
+
+    # -------------------------------------------
+    # Get free ports
+    # -------------------------------------------
+    START_PORT=61100
+    END_PORT=65535
+    INCREMENT=1
+    PORT=${START_PORT}
+    PORT_LIST=free_ports.txt
+
+    # Empty port list
+    echo -n > ${PORT_LIST}
+
+    COUNT=1
+    while [ ${COUNT} -le 5 ]; do
+      ISFREE=$(netstat -tapln | grep ${PORT})
+        while [[ -n "${ISFREE}" ]]; do
+          PORT=$[PORT+INCREMENT]
+          ISFREE=$(netstat -tapln | grep ${PORT});
+            if [ ${COUNT} > ${END_PORT} ]; then
+              echo "Not enough free ports available. Aborting installation!" ; exit 1
+            fi
+        done
+
+    # Write free port to file
+    echo -n "${PORT} " >> ${PORT_LIST}
+
+    # Increment search port
+    PORT=$(( PORT+1 ))
+
+    # Increment loop counter
+    (( COUNT++ ))
     done
 
-# Write free port to file
-echo -n "${PORT} " >> ${PORT_LIST}
+    # Import free ports to vars
+    read SEAHUB_PORT FILESERVER_PORT CCNET_PORT SEAFILE_PORT SEAFDAV_PORT< ${PORT_LIST}
 
-# Increment search port
-PORT=$(( PORT+1 ))
+    # Delete port list
+    rm ${PORT_LIST}
+fi
 
-# Increment loop counter
-(( COUNT++ ))
-done
 
-# Import free ports to vars
-read SEAHUB_PORT FILESERVER_PORT SERVER_PORT SEAFILE_SERVER_PORT SEAFDAV_PORT< ${PORT_LIST}
+# -------------------------------------------
+# Creating local EMAIL_HOST_USER mail account
+# -------------------------------------------
+EMAIL_HOST_USER_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | sha1sum | cut -b -14)
+# Set up virtual domain for first usage
+vsetup
+# Info
+cat <<EOF
 
-# Delete port list
-rm ${PORT_LIST}
+  Creating local EMAIL_HOST_USER. Use ${EMAIL_HOST_USER_PW} as the users password.
+  If you choose to use a different password, you must change it accordingly
+  in ~/seafile/seahub_settings.py and restart seafile with 'seafile restart'
+
+EOF
+# Delete pre-existing user if present
+vdeluser seafile
+# Add user
+vadduser seafile
 
 
 # -------------------------------------------
@@ -201,6 +251,7 @@ runfastcgi(method='threaded', daemonize='false')
 EOF
 
 chmod 755 ~/fcgi-bin/seahub
+
 
 # -------------------------------------------
 # Seafile start script
@@ -271,7 +322,7 @@ SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
 # -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
-  --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${HOSTNAME}"
+  --name "${SERVER_NAME}" --port "${CCNET_PORT}" --host "${HOSTNAME}"
 
 # Fix service url
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${WHOAMI}.${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
@@ -281,7 +332,7 @@ eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${WHOAMI}.${HOSTNAME}/' $
 # Create seafile conf
 # -------------------------------------------
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_DATA_DIR}" \
-  --port ${SEAFILE_SERVER_PORT} --fileserver-port ${FILESERVER_PORT}
+  --port ${SEAFILE_PORT} --fileserver-port ${FILESERVER_PORT}
 
 
 # -------------------------------------------
@@ -347,7 +398,7 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
-SEAFILESQLPW=$(grep password $HOME/.my.cnf | awk -F'=' {'print $2'} | awk -F' ' {'print $1'})
+SEAFILESQLPW=$(grep -A10000  "\[client\]" ${HOME}/.my.cnf | grep -m1 password | awk -F'=' {'print $2'} | awk -F' ' {'print $1'})
 
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
 [Database]
@@ -394,13 +445,14 @@ DATABASES = {
         }
     }
 }
-EMAIL_USE_TLS                       = False
+EMAIL_USE_TLS                       = True
 EMAIL_HOST                          = 'localhost'
-EMAIL_HOST_USER                     = ''
-EMAIL_HOST_PASSWORD                 = ''
-EMAIL_PORT                          = '25'
-DEFAULT_FROM_EMAIL                  = 'seafile@${HOSTNAME}'
+EMAIL_HOST_USER                     = 'seafile@${WHOAMI}.${HOSTNAME}'
+EMAIL_HOST_PASSWORD                 = '${EMAIL_HOST_USER_PW}'
+EMAIL_PORT                          = '587'
+DEFAULT_FROM_EMAIL                  = 'EMAIL_HOST_USER'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
+REPLACE_FROM_EMAIL                  = True
 TIME_ZONE                           = 'Europe/Berlin'
 SITE_BASE                           = 'https://${WHOAMI}.${HOSTNAME}'
 SITE_NAME                           = 'Seafile Server'
@@ -417,7 +469,7 @@ SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
 FILE_SERVER_ROOT                    = 'https://${WHOAMI}.${HOSTNAME}/seafhttp'
-DEBUG = True
+DEBUG = False
 EOF
 
 
@@ -430,7 +482,7 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
-SEAFILE_ADMIN_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | base64 -w 0 | rev | cut -b 2- | rev)
+SEAFILE_ADMIN_PW=$(dd if=/dev/urandom bs=1 count=14 2>/dev/null | sha1sum | cut -b -14)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
 
@@ -460,18 +512,19 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
   Seafile Data Dir:    ${SEAFILE_DATA_DIR}
-  
+
   SEAHUB_PORT:         $SEAHUB_PORT
   FILESERVER_PORT:     $FILESERVER_PORT
   SERVER_PORT:         $SERVER_PORT
-  SEAFILE_SERVER_PORT: $SEAFILE_SERVER_PORT
+  SEAFILE_PORT:        $SEAFILE_PORT
   SEAFDAV_PORT:        $SEAFDAV_PORT
 
   This report is also saved to ~/seafile/seafile-ce_uberspace.log
-  Next you should manually complete the following steps
+
+  You can start and stop your Seafile server with the command 'seafile'
   -----------------------------------------------------------------
-  1) Setup mail in ~/seafile/seahub_settings.py
-  
+  Usage: seafile {start|stop|restart}
+
   Optional steps
   -----------------------------------------------------------------
   1) Check seahub_settings.py and customize it to fit your needs. Consult
@@ -481,13 +534,20 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   -----------------------------------------------------------------
   For free community support visit:   https://forum.seafile-server.org
   For paid commercial support visit:  https://seafile.de
-  
+
   Contribute
   -----------------------------------------------------------------
   Contact alexander.jackson@seafile.de for bugs or suggestions about this installer.
-  
+
 EOF
 
 chmod 600 ~/seafile/seafile-ce_uberspace.log
+
+
+# -------------------------------------------
+# Done!
+# -------------------------------------------
+) 2>&1 | tee ~/seafile-ce_uberspace_installation_debug.log
+chmod 600 ~/seafile-ce_uberspace_installation_debug.log
 
 less ~/seafile/seafile-ce_uberspace.log
