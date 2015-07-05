@@ -1,7 +1,9 @@
 # seafile-server-installer
-## Seafile Server CE (Community Edition) and Seafile Server PRO (Professional Edition)
+## Seafile Server CE* and PRO**
 These installers offer a quick and easy way to set up a production ready Seafile Server; using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
+* Community Edition
+** Professional Edition
 
 ### What's it for?
 Installing the [Seafile Server](http://seafile.com/en/home/) on Debian or Ubuntu in a standard and more secure manner then the out of the box setup scripts offer. Instead of SQLite we're using MariaDB and instead of Gunicorn we're using NGINX.
