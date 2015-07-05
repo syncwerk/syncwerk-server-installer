@@ -28,7 +28,7 @@ Never run these scripts on a production server. They are more or less a one tric
 3. Check if the directory "/opt/seafile" exists. If yes, abort.
 
 
-### Main features
+## Main features
 1. HTTPS-Proxy on port 443
 2. Forced redirect from unenrypted HTTP port 80 to encrypted HTTPS port 443 (Better usability. Just close port 80 with `ufw delete allow http` if you don't want this.)
 2. Seahub with FastCGI
@@ -41,7 +41,7 @@ Never run these scripts on a production server. They are more or less a one tric
 9. Fail2ban for SSH (Ideas for hardening of Seahub with are very welcome...)
 
 
-### Key points of the installation procedure
+## Key points of the installation procedure
 1. Update and upgrade the OS
 2. Install NGINX from http://nginx.org/packages/mainline/debian/
 3. Create Seafile init script and add it to startup
@@ -56,8 +56,8 @@ Never run these scripts on a production server. They are more or less a one tric
 12. Show setup infos and what to do next.
 
 
-### Installation
-#### Seafile Server CE
+## Installation
+### Seafile Server CE
 Except for the Uberspace installer **all installers need to run as root**. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers. Make sure your OS package repository (/etc/apt/sources.list) is set correct before proceeding.
 
 For **Debian Wheezy and Jessie (32bit and 64bit)**:
@@ -82,7 +82,7 @@ bash seafile-ce_uberspace
 </pre>
 
 
-#### Seafile Server PRO
+### Seafile Server PRO
 You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. Seafile Professional is free for up to 3 users. Order your free copy   [here](https://shop.seafile.de/produkt/seafile-professional-free/).
 
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
@@ -93,7 +93,7 @@ bash seafile-ce_debian
 </pre>
 
 
-### Troubleshooting
+## Troubleshooting
 If your installation did not finish successfully, check `/root/seafile-pro_debian_installation.log` for errors.
 
 Alpha: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
@@ -107,7 +107,7 @@ bash seafile-db-fixer
 </pre>
 
 
-### How do I update Seafile?
+## How do I update Seafile?
 You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile.
 
 To login as the Seafile users run `su - seafile -s /bin/bash` and then proceed with the update procedure as usual.
@@ -115,12 +115,12 @@ To login as the Seafile users run `su - seafile -s /bin/bash` and then proceed w
 BTW: Ideas on how to automate upgrades are very welcome!
 
 
-### What do I have to do after the installer has finished?
+## What do I have to do after the installer has finished?
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if you run it again.
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation.
 
 
-### License
+## License
 Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
 
 This program is free software: you can redistribute it and/or modify
@@ -134,5 +134,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 
-### Where can I submit bugs or add suggestions?
+## Where can I submit bugs or add suggestions?
 Create an issue on Github or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
