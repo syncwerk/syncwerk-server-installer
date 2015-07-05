@@ -46,7 +46,7 @@ Never run these scripts on a production server. They are more or less a one tric
 2. Install NGINX from http://nginx.org/packages/mainline/debian/
 3. Create Seafile init script and add it to startup
 4. Create unprivilieged system user "seafile" with home directory "/opt/seafile"
-5. Download and extract latest Seafile server sources from https://seafile.de/download/
+5. Download and extract latest Seafile Server CE sources from https://seafile.de/download/
 6. Create "seafile" database user and Seafile databases (DB-Credentials in ~/.my.cnf)
 7. Initialize various Seafile files
 8. Enable SeafDAV, Memcached and MariaDB, Postfix, UFW and Fail2ban
