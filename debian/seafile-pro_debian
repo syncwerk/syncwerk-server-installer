@@ -203,6 +203,17 @@ fi
 
 
 # -------------------------------------------
+# Abort if Seafile Professional source is missing
+# -------------------------------------------
+if [[ -f ${SEAFILE_SOURCE} ]] ;
+then
+  echo "  Found ${SEAFILE_SOURCE}. Proceeding with installation..."
+else
+  echo "  Aborting because ${SEAFILE_SOURCE} is missing" ; exit 1
+fi
+
+
+# -------------------------------------------
 # Update System
 # -------------------------------------------
 apt-get update
@@ -608,12 +619,12 @@ mv ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz installed/seafi
 # -------------------------------------------
 # Seafile DB
 # -------------------------------------------
-SQLSEAFILEPW=$(pwgen)
+SEAFILE_DB_PW=$(pwgen)
 
 cat > /opt/seafile/.my.cnf <<EOF
 [client]
 user=seafile
-password=$SQLSEAFILEPW
+password=${SEAFILE_DB_PW}
 EOF
 
 chmod 600 /opt/seafile/.my.cnf
@@ -625,7 +636,7 @@ mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
 
 # Create user
-mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SQLSEAFILEPW';"
+mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SEAFILE_DB_PW';"
 
 # Grant privileges on databases to user
 mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
@@ -747,14 +758,12 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # Setup professional features
 # -------------------------------------------
 PRO_PY=${INSTALLPATH}/pro/pro.py
-$PYTHON ${PRO_PY} setup
+$PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
 
 
 # -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
-SEAFILESQLPW=$(grep password /opt/seafile/.my.cnf | awk -F'=' {'print $2'})
-
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
 
 [Database]
@@ -762,7 +771,7 @@ ENGINE = mysql
 HOST = 127.0.0.1
 PORT = 3306
 USER = seafile
-PASSWD = ${SEAFILESQLPW}
+PASSWD = ${SEAFILE_DB_PW}
 DB = ccnet-db
 CONNECTION_CHARSET = utf8
 EOF
@@ -778,7 +787,7 @@ type = mysql
 host = 127.0.0.1
 port = 3306
 user = seafile
-password = ${SEAFILESQLPW}
+password = ${SEAFILE_DB_PW}
 db_name = seafile-db
 connection_charset = utf8
 EOF
@@ -794,7 +803,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'seahub-db',
         'USER': 'seafile',
-        'PASSWORD': '${SEAFILESQLPW}',
+        'PASSWORD': '${SEAFILE_DB_PW}',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
