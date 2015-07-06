@@ -203,6 +203,17 @@ fi
 
 
 # -------------------------------------------
+# Abort if Seafile Professional source is missing
+# -------------------------------------------
+if [[ -f ${SEAFILE_SOURCE} ]] ;
+then
+  echo "  Found ${SEAFILE_SOURCE}. Proceeding with installation..."
+else
+  echo "  Aborting because ${SEAFILE_SOURCE} is missing" ; exit 1
+fi
+
+
+# -------------------------------------------
 # Update System
 # -------------------------------------------
 apt-get update
