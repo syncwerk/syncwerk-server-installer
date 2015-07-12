@@ -115,7 +115,7 @@ echo -----------------------------------------------------------------
 ip route show table all
 echo
 echo
-echo Content of /etc/sysconfig/network-scripts/ifcfg-eth*
+echo "Content of /etc/sysconfig/network-scripts/ifcfg-eth\*"
 echo -----------------------------------------------------------------
 for eth in /etc/sysconfig/network-scripts/ifcfg-eth* ; do echo ${eth} ; cat ${eth} ; done
 echo
@@ -224,7 +224,7 @@ fi
 # -------------------------------------------
 # Upgrade System
 # -------------------------------------------
-yum upgrade
+yum upgrade -y
 
 
 # -------------------------------------------
@@ -280,7 +280,7 @@ python-imaging MySQL-python memcached python-memcached openssl libreoffice -y
 yum install epel-release -y
 yum install nginx -y
 
-rm /etc/nginx/conf.d/*
+rm -rf /etc/nginx/conf.d/*
 
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
 server {
