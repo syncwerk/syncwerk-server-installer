@@ -97,7 +97,7 @@ echo
 echo
 echo Network Interfaces
 echo -----------------------------------------------------------------
-ifconfig -a
+ip link show
 echo
 echo
 echo IP Addresses
@@ -112,10 +112,10 @@ echo
 echo
 echo Routes
 echo -----------------------------------------------------------------
-route -n
+ip route show table all
 echo
 echo
-echo Content of /etc/network/interfaces
+echo Content of /etc/sysconfig/network-scripts/ifcfg-eth*
 echo -----------------------------------------------------------------
 for eth in /etc/sysconfig/network-scripts/ifcfg-eth* ; do echo ${eth} ; cat ${eth} ; done
 echo
