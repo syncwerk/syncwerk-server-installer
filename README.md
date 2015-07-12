@@ -15,7 +15,8 @@ The scripts are derived from our [reference installation for Seafile Server Prof
 ## Supported OS
 1. Debian Wheezy and Jessie - [Video: Debian Jessie minimal installation](https://seafile.tv/2015/06/16/debian-jessie-minimalinstallation-fuer-seafile/)
 2. Ubuntu Trusty - [Video: Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu-trusty-minimalinstallation-fuer-den-seafile-server/)
-3. Uberspace
+3. Centos 7 (Minimal installation)
+4. Uberspace
 
 Just select the corresponding installer for your OS. All scripts are meant to run with the bare minimum OS setup. We strongly suggest not installing Seafile server besides desktop environment or hosting panels like Plesk, ISPConfig, etc. Professional installations which don't follow our setup suggestions, don't qualify for official support. Keep this in mind.
 
@@ -92,6 +93,12 @@ wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-
 bash seafile-ce_debian
 </pre>
 
+**Beta:** For **Centos 7 (64bit only)** run the following lines as root
+<pre>
+cd /root
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/centos/seafile-pro_centos-7-amd64
+bash seafile-pro_centos-7-amd64
+</pre>
 
 ## Troubleshooting
 If your installation did not finish successfully, check `/root/seafile-pro_debian_installation.log` for errors.
