@@ -284,6 +284,7 @@ python-imaging MySQL-python memcached python-memcached libreoffice -y
 # NGINX
 # -------------------------------------------
 yum install nginx -y
+systemctl enable nginx
 
 rm -rf /etc/nginx/conf.d/*
 
@@ -475,13 +476,12 @@ eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.
 systemctl restart nginx
 
 
-
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
 yum install mariadb-server -y
-systemctl start mariadb.service
-systemctl enable mariadb.service
+systemctl start mariadb
+systemctl enable mariadb
 
 SQLROOTPW=$(pwgen 14)
 mysqladmin -u root password ${SQLROOTPW}
@@ -501,67 +501,44 @@ chmod 600 /root/.my.cnf
 # -------------------------------------------
 # Seafile init script
 # -------------------------------------------
-cat > /etc/init.d/seafile-server <<'EOF'
-#!/bin/bash
-### BEGIN INIT INFO
-# Provides:          seafile-server
-# Required-Start:    $remote_fs $syslog mysql
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Seafile server
-# Description:       Start Seafile server
-### END INIT INFO
+cat > /etc/systemd/system/seafile.service <<'EOF'
+[Unit]
+Description=Seafile Server
+After=network.target mariadb.service
 
-# Author: Alexander Jackson <alexander.jackson@seafile.de>
-#
+[Service]
+Type=oneshot
+ExecStart=/opt/seafile/seafile-server-latest/seafile.sh start
+ExecStop=/opt/seafile/seafile-server-latest/seafile.sh stop
+RemainAfterExit=yes
+User=seafile
+Group=seafile
 
-# Change the value of "user" to your linux user name
-user=seafile
-
-# Change the value of "seafile_dir" to your path of seafile installation
-seafile_dir=/opt/seafile
-script_path=${seafile_dir}/seafile-server-latest
-seafile_init_log=${seafile_dir}/logs/seafile.init.log
-seahub_init_log=${seafile_dir}/logs/seahub.init.log
-
-# Change the value of fastcgi to true if fastcgi is to be used
-fastcgi=true
-# Set the port of fastcgi, default is 8000. Change it if you need different.
-fastcgi_port=8000
-
-case "$1" in
-  start)
-    sudo -u ${user} ${script_path}/seafile.sh start >> ${seafile_init_log}
-    if [  $fastcgi = true ];
-      then
-        sudo -u ${user} ${script_path}/seahub.sh start-fastcgi ${fastcgi_port} >> ${seahub_init_log}
-      else
-        sudo -u ${user} ${script_path}/seahub.sh start >> ${seahub_init_log}
-      fi
-    ;;
-  restart)
-    sudo -u ${user} ${script_path}/seafile.sh restart >> ${seafile_init_log}
-    if [  $fastcgi = true ];
-      then
-        sudo -u ${user} ${script_path}/seahub.sh restart-fastcgi ${fastcgi_port} >> ${seahub_init_log}
-      else
-        sudo -u ${user} ${script_path}/seahub.sh restart >> ${seahub_init_log}
-      fi
-    ;;
-  stop)
-    sudo -u ${user} ${script_path}/seafile.sh $1 >> ${seafile_init_log}
-    sudo -u ${user} ${script_path}/seahub.sh $1 >> ${seahub_init_log}
-    ;;
-  *)
-    echo "Usage: /etc/init.d/seafile-server {start|stop|restart}"
-    exit 1
-    ;;
-esac
+[Install]
+WantedBy=multi-user.target
 EOF
 
-chmod +x /etc/init.d/seafile-server
-systemctl enable seafile-server
+systemctl enable seafile
+
+
+cat > /etc/systemd/system/seahub.service <<'EOF'
+[Unit]
+Description=Seafile hub
+After=network.target seafile.service
+
+[Service]
+ExecStart=/opt/seafile/seafile-server-latest/seahub.sh start-fastcgi 8000
+ExecStop=/opt/seafile/seafile-server-latest/seahub.sh stop
+User=seafile
+Group=seafile
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable seahub
 
 
 # -------------------------------------------
@@ -858,6 +835,12 @@ systemctl restart seafile-server
 
 
 # -------------------------------------------
+# SELinux prints warnings instead of enforcing
+# -------------------------------------------
+sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
+
+
+# -------------------------------------------
 # Final report
 # -------------------------------------------
 cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
@@ -877,6 +860,16 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   Root DB Credentials:     Check /root/.my.cnf
 
   Switch to Seafile system account with: su - ${SEAFILE_USER} -s /bin/bash
+
+
+  Watch out
+  -----------------------------------------------------------------
+  SELINX could currently be enforced. You might have to reboot your
+  server before permissive mode is activated and Seafile works as expected...
+
+  SELINX Status
+  -----------------------------------------------------------------
+  $(sestatus)
 
 
   Next you should manually complete the following steps
