@@ -236,7 +236,7 @@ yum upgrade -y
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-yum install sudo ntp less htop pwgen curl openssl nano net-tools lsof -y
+yum install sudo ntp less htop pwgen curl openssl nano net-tools lsof deltarpm -y
 
 
 # -------------------------------------------
