@@ -222,6 +222,12 @@ fi
 
 
 # -------------------------------------------
+# Add Extra Packages for Enterprise Linux (EPEL)
+# -------------------------------------------
+yum install epel-release -y
+
+
+# -------------------------------------------
 # Upgrade System
 # -------------------------------------------
 yum upgrade -y
@@ -277,7 +283,6 @@ python-imaging MySQL-python memcached python-memcached openssl libreoffice -y
 # -------------------------------------------
 # NGINX
 # -------------------------------------------
-yum install epel-release -y
 yum install nginx -y
 
 rm -rf /etc/nginx/conf.d/*
