@@ -276,8 +276,8 @@ sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
 # -------------------------------------------
 # Seafile Professional requirements
 # -------------------------------------------
-yum install java-1.7.0-openjdk poppler-utils python-dev python-setuptools \
-python-imaging MySQL-python memcached python-memcached libreoffice -y
+yum install java-1.7.0-openjdk poppler-utils python-dev python-setuptools python-imaging \
+MySQL-python memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno -y
 
 
 # -------------------------------------------
@@ -695,7 +695,13 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # Setup professional features
 # -------------------------------------------
 PRO_PY=${INSTALLPATH}/pro/pro.py
-$PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+python2.7 ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+
+
+# -------------------------------------------
+# Enable office preview in Seahub
+# -------------------------------------------
+sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
 
 
 # -------------------------------------------
