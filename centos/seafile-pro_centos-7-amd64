@@ -542,6 +542,21 @@ systemctl enable seahub
 
 
 # -------------------------------------------
+# Seafile restart script
+# -------------------------------------------
+cat > /usr/local/sbin/seafile-restart << 'EOF'
+#!/bin/bash
+for ACTION in stop start ; do
+    for SERVICE in seafile seahub ; do
+      systemctl ${ACTION} ${SERVICE}
+    done
+done
+EOF
+
+chmod 700 /usr/local/sbin/seafile-restart
+
+
+# -------------------------------------------
 # Seafile
 # -------------------------------------------
 useradd --system --comment "${SEAFILE_USER}" ${SEAFILE_USER} --home-dir  /opt/seafile
