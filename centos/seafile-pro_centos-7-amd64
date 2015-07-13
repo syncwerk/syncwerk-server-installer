@@ -492,7 +492,7 @@ yum install mariadb-server -y
 systemctl start mariadb
 systemctl enable mariadb
 
-SQLROOTPW=$(pwgen 14)
+SQLROOTPW=$(pwgen 14 1)
 mysqladmin -u root password ${SQLROOTPW}
 
 # Securing MariaDB
@@ -580,7 +580,7 @@ mv ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz installed/seafi
 # -------------------------------------------
 # Seafile DB
 # -------------------------------------------
-SEAFILE_DB_PW=$(pwgen)
+SEAFILE_DB_PW=$(pwgen 14 1)
 
 cat > /opt/seafile/.my.cnf <<EOF
 [client]
@@ -824,7 +824,7 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
-SEAFILE_ADMIN_PW=$(pwgen)
+SEAFILE_ADMIN_PW=$(pwgen 14 1)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
 
@@ -859,8 +859,7 @@ sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
 # -------------------------------------------
 # Start seafile server
 # -------------------------------------------
-echo "Starting productive Seafile server"
-systemctl restart seafile-server
+seafile-restart
 
 
 # -------------------------------------------
@@ -1034,7 +1033,7 @@ sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_DIR}/ccnet/
 # -------------------------------------------
 # Starte Seafile neu
 # -------------------------------------------
-systemctl restart seafile-server
+seafile-restart
 
 
 # -------------------------------------------
