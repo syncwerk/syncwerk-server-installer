@@ -222,15 +222,6 @@ fi
 
 
 # -------------------------------------------
-# SELinux
-# -------------------------------------------
-# Put SELinux in permissive mode
-setenforce 0
-# Put SELinux in permissive mode permanently
-sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
-
-
-# -------------------------------------------
 # Add Extra Packages for Enterprise Linux (EPEL)
 # -------------------------------------------
 yum install epel-release -y
@@ -286,7 +277,7 @@ sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
 # Seafile Professional requirements
 # -------------------------------------------
 yum install java-1.7.0-openjdk poppler-utils python-devel python-setuptools python-imaging \
-MySQL-python memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno -y
+MySQL-python memcached python-memcached libreoffice-headless libreoffice-pyuno -y
 
 
 # -------------------------------------------
@@ -722,6 +713,12 @@ ${INSTALLPATH}/pro/pro.py setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306
 
 
 # -------------------------------------------
+# Enable office preview in Seahub
+# -------------------------------------------
+sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
+
+
+# -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
@@ -851,16 +848,16 @@ chown ${SEAFILE_USER}.${SEAFILE_USER} -R /opt/seafile/
 
 
 # -------------------------------------------
-# Enable office preview in Seahub
-# -------------------------------------------
-sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
-
-
-# -------------------------------------------
 # Start seafile server
 # -------------------------------------------
 echo "Starting productive Seafile server"
 systemctl restart seafile-server
+
+
+# -------------------------------------------
+# SELinux prints warnings instead of enforcing
+# -------------------------------------------
+sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
 
 
 # -------------------------------------------
