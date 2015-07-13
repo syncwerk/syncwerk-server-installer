@@ -158,7 +158,7 @@ cat <<EOF
   Install Seafile Server Professional Edition on Centos 7.
   Seafile Server Professional Edition is only available for 64bit.
 
-  - Newest Seafile server version, NGINX, MariaDB, Memcached -
+  - Seafile Professional, NGINX, MariaDB, Memcached -
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
@@ -276,8 +276,8 @@ sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
 # -------------------------------------------
 # Seafile Professional requirements
 # -------------------------------------------
-yum install java-1.7.0-openjdk poppler-utils python-dev python-setuptools python-imaging \
-MySQL-python memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno -y
+yum install java-1.7.0-openjdk poppler-utils python-devel python-setuptools python-imaging \
+MySQL-python memcached python-memcached libreoffice-headless libreoffice-pyuno -y
 
 
 # -------------------------------------------
@@ -694,8 +694,7 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # -------------------------------------------
 # Setup professional features
 # -------------------------------------------
-PRO_PY=${INSTALLPATH}/pro/pro.py
-python2.7 ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+${INSTALLPATH}/pro/pro.py setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
 
 
 # -------------------------------------------
