@@ -150,7 +150,7 @@ cat <<EOF
   Install Seafile Server Professional Edition on Debian 7 and
   Debian 8. Seafile Server Professional Edition is only available for 64bit.
 
-  - Newest Seafile server version, NGINX, MariaDB, Memcached -
+  - Seafile Professional, NGINX, MariaDB, Memcached -
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
