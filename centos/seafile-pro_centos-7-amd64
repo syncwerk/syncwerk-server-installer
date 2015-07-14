@@ -811,6 +811,10 @@ THUMBNAIL_ROOT                      = '${TOPDIR}/seahub-data/thumbnail/thumb/'
 THUMBNAIL_EXTENSION                 = 'png'
 THUMBNAIL_DEFAULT_SIZE              = '24'
 PREVIEW_DEFAULT_SIZE                = '100'
+REPO_PASSWORD_MIN_LENGTH            = 8
+USER_PASSWORD_MIN_LENGTH            = 8
+USER_PASSWORD_STRENGTH_LEVEL        = 3
+USER_STRONG_PASSWORD_REQUIRED       = True
 EOF
 
 
