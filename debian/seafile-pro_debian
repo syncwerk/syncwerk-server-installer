@@ -916,9 +916,9 @@ echo "Starting productive Seafile server"
 
 if [ ${OS} = "wheezy" ]
   then
-    service seafile-server start
+    for i in stop start ; do service seafile-server ${i} ; done
   else
-    systemctl restart seafile-server
+    for i in stop start ; do systemctl ${i} seafile-server ; done
 fi
 
 
