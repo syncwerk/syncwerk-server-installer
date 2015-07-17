@@ -223,7 +223,7 @@ apt-get dist-upgrade -y
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-apt-get install sudo ntp less htop pwgen curl openssl unattended-upgrades -y
+apt-get install sudo ntp less htop pv pwgen curl openssl unattended-upgrades -y
 
 
 # -------------------------------------------
@@ -889,6 +889,12 @@ ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seafile.sh start
 ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub.sh start
 ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub.sh stop
 ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seafile.sh stop
+
+
+# -------------------------------------------
+# Sync and wait for 10 seconds before proceeding with installation. Fixes problems on slower systems
+# -------------------------------------------
+sync ; echo "Waiting for 10 seconds before proceeding..." ; sleep 10 | pv
 
 
 # -------------------------------------------
