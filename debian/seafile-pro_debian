@@ -546,6 +546,8 @@ chmod 600 /root/.my.cnf
 # -------------------------------------------
 # Seafile init script
 # -------------------------------------------
+if [ ${OS} = "wheezy" ]
+then
 cat > /etc/init.d/seafile-server <<'EOF'
 #!/bin/bash
 ### BEGIN INIT INFO
@@ -606,12 +608,63 @@ esac
 EOF
 
 chmod +x /etc/init.d/seafile-server
-if [ ${OS} = "wheezy" ]
-  then
-    update-rc.d seafile-server defaults
-  else
-    systemctl enable seafile-server
+update-rc.d seafile-server defaults
+
+else
+cat > /etc/systemd/system/seafile.service <<'EOF'
+[Unit]
+Description=Seafile Server
+After=network.target mysql.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/seafile/seafile-server-latest/seafile.sh start
+ExecStop=/opt/seafile/seafile-server-latest/seafile.sh stop
+RemainAfterExit=yes
+User=seafile
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable seafile
+
+cat > /etc/systemd/system/seahub.service <<'EOF'
+[Unit]
+Description=Seafile Seahub
+After=network.target seafile.service
+
+[Service]
+ExecStart=/opt/seafile/seafile-server-latest/seahub.sh start-fastcgi 8000
+ExecStop=/opt/seafile/seafile-server-latest/seahub.sh stop
+User=seafile
+Group=nogroup
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable seahub
+
+
+# -------------------------------------------
+# Seafile restart script
+# -------------------------------------------
+cat > /usr/local/sbin/seafile-restart << 'EOF'
+#!/bin/bash
+for ACTION in stop start ; do
+    for SERVICE in seafile seahub ; do
+      systemctl ${ACTION} ${SERVICE}
+    done
+done
+EOF
+
+chmod 700 /usr/local/sbin/seafile-restart
 fi
+
 
 # -------------------------------------------
 # Seafile
@@ -922,9 +975,9 @@ echo "Starting productive Seafile server"
 
 if [ ${OS} = "wheezy" ]
   then
-    for i in stop start ; do service seafile-server ${i} ; done
+    service seafile-server restart
   else
-    for i in stop start ; do systemctl ${i} seafile-server ; done
+    /usr/local/sbin/seafile-restart
 fi
 
 
