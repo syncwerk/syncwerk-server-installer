@@ -291,8 +291,17 @@ dpkg-reconfigure unattended-upgrades
 # -------------------------------------------
 # Seafile Professional requirements
 # -------------------------------------------
-apt-get install python-setuptools python-simplejson python-imaging python-mysqldb \
-openjdk-7-jre memcached python-memcache openssl libreoffice python-uno poppler-utils -y
+apt-get install python-setuptools python-simplejson python-imaging \
+python-mysqldb libpython2.7 openjdk-7-jre memcached python-memcache openssl  \
+libreoffice libreoffice-script-provider-python ttf-wqy-microhei ttf-wqy-zenhei \
+xfonts-wqy poppler-utils -y
+
+if [ ${OS} = "wheezy" ]
+  then
+    apt-get install python-uno -y
+  else
+    apt-get install python3-uno -y
+fi
 
 
 # -------------------------------------------
@@ -892,6 +901,12 @@ mv ${INSTALLPATH}/check_init_admin.py.backup ${INSTALLPATH}/check_init_admin.py
 # Fix permissions
 # -------------------------------------------
 chown ${SEAFILE_USER}.nogroup -R /opt/seafile/
+
+
+# -------------------------------------------
+# Enable office preview in Seahub
+# -------------------------------------------
+sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
 
 
 # -------------------------------------------
