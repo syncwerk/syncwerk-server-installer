@@ -273,7 +273,7 @@ dpkg-reconfigure unattended-upgrades
 # Seafile CE requirements
 # -------------------------------------------
 apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
-openjdk-7-jre memcached python-memcache pwgen curl openssl -y
+memcached python-memcache pwgen curl openssl -y
 
 
 # -------------------------------------------
