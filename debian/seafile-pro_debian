@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to run in verbose mode
-#set -x
+set -x
 
 
 # -------------------------------------------
@@ -223,7 +223,7 @@ apt-get dist-upgrade -y
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-apt-get install sudo ntp less htop pwgen curl openssl unattended-upgrades -y
+apt-get install sudo ntp less htop pv pwgen curl openssl unattended-upgrades -y
 
 
 # -------------------------------------------
@@ -291,8 +291,17 @@ dpkg-reconfigure unattended-upgrades
 # -------------------------------------------
 # Seafile Professional requirements
 # -------------------------------------------
-apt-get install python-setuptools python-simplejson python-imaging python-mysqldb \
-openjdk-7-jre memcached python-memcache openssl libreoffice python-uno poppler-utils -y
+apt-get install python-setuptools python-simplejson python-imaging \
+python-mysqldb libpython2.7 openjdk-7-jre memcached python-memcache openssl  \
+libreoffice libreoffice-script-provider-python ttf-wqy-microhei ttf-wqy-zenhei \
+xfonts-wqy poppler-utils -y
+
+if [ ${OS} = "wheezy" ]
+  then
+    apt-get install python-uno -y
+  else
+    apt-get install python3-uno -y
+fi
 
 
 # -------------------------------------------
@@ -521,7 +530,7 @@ fi
 
 apt-get install mariadb-server -y
 
-SQLROOTPW=$(pwgen 14)
+SQLROOTPW=$(pwgen 14 1)
 
 mysqladmin -u root password ${SQLROOTPW}
 
@@ -537,6 +546,8 @@ chmod 600 /root/.my.cnf
 # -------------------------------------------
 # Seafile init script
 # -------------------------------------------
+if [ ${OS} = "wheezy" ]
+then
 cat > /etc/init.d/seafile-server <<'EOF'
 #!/bin/bash
 ### BEGIN INIT INFO
@@ -597,12 +608,63 @@ esac
 EOF
 
 chmod +x /etc/init.d/seafile-server
-if [ ${OS} = "wheezy" ]
-  then
-    update-rc.d seafile-server defaults
-  else
-    systemctl enable seafile-server
+update-rc.d seafile-server defaults
+
+else
+cat > /etc/systemd/system/seafile.service <<'EOF'
+[Unit]
+Description=Seafile Server
+After=network.target mysql.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/seafile/seafile-server-latest/seafile.sh start
+ExecStop=/opt/seafile/seafile-server-latest/seafile.sh stop
+RemainAfterExit=yes
+User=seafile
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable seafile
+
+cat > /etc/systemd/system/seahub.service <<'EOF'
+[Unit]
+Description=Seafile Seahub
+After=network.target seafile.service
+
+[Service]
+ExecStart=/opt/seafile/seafile-server-latest/seahub.sh start-fastcgi 8000
+ExecStop=/opt/seafile/seafile-server-latest/seahub.sh stop
+User=seafile
+Group=nogroup
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable seahub
+
+
+# -------------------------------------------
+# Seafile restart script
+# -------------------------------------------
+cat > /usr/local/sbin/seafile-restart << 'EOF'
+#!/bin/bash
+for ACTION in stop start ; do
+    for SERVICE in seafile seahub ; do
+      systemctl ${ACTION} ${SERVICE}
+    done
+done
+EOF
+
+chmod 700 /usr/local/sbin/seafile-restart
 fi
+
 
 # -------------------------------------------
 # Seafile
@@ -619,7 +681,7 @@ mv ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz installed/seafi
 # -------------------------------------------
 # Seafile DB
 # -------------------------------------------
-SEAFILE_DB_PW=$(pwgen)
+SEAFILE_DB_PW=$(pwgen 14 1)
 
 cat > /opt/seafile/.my.cnf <<EOF
 [client]
@@ -868,7 +930,7 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
-SEAFILE_ADMIN_PW=$(pwgen)
+SEAFILE_ADMIN_PW=$(pwgen 14 1)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
 
@@ -880,6 +942,12 @@ ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seafile.sh start
 ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub.sh start
 ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub.sh stop
 ${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seafile.sh stop
+
+
+# -------------------------------------------
+# Sync and wait for 10 seconds before proceeding with installation. Fixes problems on slower systems
+# -------------------------------------------
+sync ; echo "Waiting for 10 seconds before proceeding..." ; sleep 10 | pv
 
 
 # -------------------------------------------
@@ -895,15 +963,21 @@ chown ${SEAFILE_USER}.nogroup -R /opt/seafile/
 
 
 # -------------------------------------------
+# Enable office preview in Seahub
+# -------------------------------------------
+sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
+
+
+# -------------------------------------------
 # Start seafile server
 # -------------------------------------------
 echo "Starting productive Seafile server"
 
 if [ ${OS} = "wheezy" ]
   then
-    service seafile-server start
+    service seafile-server restart
   else
-    systemctl restart seafile-server
+    /usr/local/sbin/seafile-restart
 fi
 
 
