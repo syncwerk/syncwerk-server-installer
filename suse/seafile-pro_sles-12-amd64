@@ -21,8 +21,33 @@
 # Uncomment to run in verbose mode
 set -x
 
-echo "BETA Installer - dont use yet..."
-exit
+cat <<EOF
+BETA Installer - dont use yet...
+
+Issues
+
+1. Missing packages
+   a. memcached
+   b. python-memcached
+   c. libreoffice
+   d. libreoffice-headless
+   e. libreoffice-pyuno
+
+2. Missing Features
+   a. Abort if user seafile exists is broke
+   b  Securing MariaDB
+   c. Autoupdate
+   d. Seafile logrotate
+   e. Memcache
+   f. Office preview in Seahub
+
+Seafile will work but not all features will be available until these issues are fixed...
+
+EOF
+
+echo "Comment next line manually to run installer anyway..."
+exit 0
+
 
 # -------------------------------------------
 # Make sure hosts entry exists
@@ -49,13 +74,13 @@ SEAFILE_EDITION=pro-server
 SEAFILE_SOURCE=/usr/src/seafile/seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
 #export DEBIAN_FRONTEND=noninteractive
 #OS=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $1 }')
-## Get architecture
-#if [ $(getconf LONG_BIT) = "64" ]
-#  then
-#    ARCH=x86-64
-#  else
-#    ARCH=i386
-#fi
+# Get architecture
+if [ $(getconf LONG_BIT) = "64" ]
+  then
+    ARCH=x86-64
+  else
+    ARCH=i386
+fi
 #PACKAGE_ARCH=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $2 }')
 
 
@@ -136,8 +161,9 @@ echo
 echo
 echo Installed packages
 echo -----------------------------------------------------------------
-#rpm -qa
 zypper repos
+echo
+zypper search --installed-only
 echo
 echo
 echo Process List
@@ -197,7 +223,7 @@ fi
 # -------------------------------------------
 # Abort if user seafile exists
 # -------------------------------------------
-#if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ;
+#if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ; # FIXME broke on SLES 12...
 #then
 #  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
 #fi
@@ -248,8 +274,21 @@ zypper --non-interactive update
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-#yum install sudo ntp less htop pwgen curl openssl nano net-tools lsof deltarpm -y
 zypper --non-interactive install sudo ntp less curl openssl net-tools lsof deltarpm
+
+
+# -------------------------------------------
+# Homemade pwgen
+# -------------------------------------------
+cat > /usr/local/bin/pwgen <<'EOF'
+#!/bin/bash
+length=${1}
+[[ "${1}" == "" ]] && length=16
+tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
+EOF
+
+chmod +x /usr/local/bin/pwgen
+
 
 # -------------------------------------------
 # ensure correct time is set
@@ -260,16 +299,16 @@ ntpd -gq
 # -------------------------------------------
 # Security programs
 # -------------------------------------------
-#yum install firewalld fail2ban -y
-SuSEfirewall2 stop # FIXME Disable for now
+zypper --non-interactive install SuSEfirewall2
+
 
 # -------------------------------------------
 # Activate firewall
-# https://fedoraproject.org/wiki/FirewallD
-# https://www.optimox.de/tutorials/linux-allgemein/centos-firewall-konfigurieren-mit-firewalld
+# https://en.opensuse.org/SuSEfirewall2
+# http://docs.saltstack.com/en/latest/topics/tutorials/firewall.html
 # -------------------------------------------
-#for i in ssh http https ; do firewall-cmd --zone=public --add-service=${i} --permanent ; done
-#firewall-cmd --reload
+for i in ssh http https ; do SuSEfirewall2 open EXT TCP ${i} ; done
+for i in stop start ; do SuSEfirewall2 ${i} ; done
 
 
 # -------------------------------------------
@@ -281,8 +320,7 @@ zypper --non-interactive install postfix
 # -------------------------------------------
 # Unattended upgrades
 # -------------------------------------------
-#yum install yum-cron -y
-#sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
+# See https://www.suse.com/documentation/sles-12/pdfdoc/book_sle_admin/book_sle_admin.pdf (1.3 Automatic Online Update) if you want this. I am not touching this for now...
 
 
 # -------------------------------------------
@@ -290,6 +328,7 @@ zypper --non-interactive install postfix
 # -------------------------------------------
 zypper --non-interactive install java-1_7_0-openjdk poppler-tools python-devel python-setuptools python-imaging python-mysql
 # FIXME memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno
+
 
 # -------------------------------------------
 # NGINX
@@ -516,7 +555,7 @@ chmod 600 /root/.my.cnf
 cat > /etc/systemd/system/seafile.service <<'EOF'
 [Unit]
 Description=Seafile Server
-After=network.target mariadb.service
+After=network.target mysql.service
 
 [Service]
 Type=oneshot
