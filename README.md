@@ -78,7 +78,7 @@ bash seafile-ce_ubuntu-trusty-amd64
 
 For **Uberspace** run the following lines:
 <pre>
-wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_uberspace
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_uberspace
 bash seafile-ce_uberspace
 </pre>
 
