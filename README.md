@@ -84,7 +84,9 @@ For **Uberspace** run the following lines:
 
 
 ### Seafile Server PRO
-You will have to download the Seafile Professional Server package separately and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation. Seafile Professional is free for up to 3 users. [**Order your free copy**](https://shop.seafile.de/produkt/seafile-professional-free/).
+You will have to download the Seafile Professional Server package prior to the installation and save it to /usr/src/seafile/. Make sure the variable `SEAFILE_VERSION` is set to the downloaded version before proceeding with the installation.
+
+Seafile Professional is free for up to 3 users. [**Order your free copy here**](https://shop.seafile.de/produkt/seafile-professional-free/).
 
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 
