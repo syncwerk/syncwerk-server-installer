@@ -133,14 +133,14 @@ BTW: Ideas on how to automate upgrades are very welcome!
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation.
 
 ## Troubleshooting
-If your installation did not finish successfully, check `/root/seafile-pro_debian_installation.log` for errors.
+If your installation did not finish successfully, check `/root/[installer_name]_installation.log` for errors.
 
 Alpha: Convert seafile.db (SQLite DB) to MySQL - **Use with extreme caution only**
 
 This is only needed if your seafile-db was mistakenly created as SQLite database by one of the older installers. Only installations till end of May 2015 should be affected. To find out if you are affected, just run `find / -type f -name seafile.db -print`. If it finds the file we suggest converting your installation. You can use this script, but be cautios. **It is not very well tested and could seriously brake things.** Make a backup before running seafile-db-fixer... If you want to fix the problem manually, consult http://manual.seafile.com/deploy/migrate_from_sqlite_to_mysql.html for general instructions.
 
     cd /root
-    wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/misc/seafile-db-fixer
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/misc/seafile-db-fixer
     bash seafile-db-fixer
 
 ## License
@@ -155,7 +155,6 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
-
 
 ## Where can I submit bugs or add suggestions?
 Create an issue on Github or just reply in the [corresponding forum thread](https://forum.seafile-server.org/t/howto-seafile-server-community-edition-on-debian-jessie-amd64/1464).
