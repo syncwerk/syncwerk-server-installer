@@ -64,7 +64,7 @@ Except for the Uberspace installer **all installers need to run as root**. Runni
 For **Debian Wheezy and Jessie (32bit and 64bit)**:
 <pre>
 cd /root
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-ce_debian
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_debian
 bash seafile-ce_debian
 </pre>
 
@@ -72,13 +72,13 @@ For **Ubuntu Trusty (64bit)**:
 <pre>
 sudo su
 cd /root
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/ubuntu/seafile-ce_ubuntu-trusty-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_ubuntu-trusty-amd64
 bash seafile-ce_ubuntu-trusty-amd64
 </pre>
 
 For **Uberspace** run the following lines:
 <pre>
-wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/uberspace/seafile-ce_uberspace
+wget https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_uberspace
 bash seafile-ce_uberspace
 </pre>
 
@@ -89,15 +89,22 @@ You will have to download the Seafile Professional Server package separately and
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 <pre>
 cd /root
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/debian/seafile-pro_debian
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_debian
 bash seafile-ce_debian
 </pre>
 
-**Beta:** For **Centos 7 (64bit only)** run the following lines as root
+For **Centos 7 (64bit only)** run the following lines as root
 <pre>
 cd /root
-wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/centos/seafile-pro_centos-7-amd64
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_centos-7-amd64
 bash seafile-pro_centos-7-amd64
+</pre>
+
+**BETA:** For **SUSE Enterprise Linux 12 (64bit only)** run the following lines as root
+<pre>
+cd /root
+wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_sles-12-amd64
+bash seafile-pro_sles-12-amd64
 </pre>
 
 ## Troubleshooting
