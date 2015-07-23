@@ -25,7 +25,7 @@ Video: [Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu
 #### [Community Edition](https://github.com/SeafileDE/seafile-server-installer/tree/master/community-edition)
 1. Debian Wheezy & Jessie
 2. Ubuntu Trusty
-3. Uberspace
+3. Uberspace (Centos 6.x only)
 
 #### [Professional Edition](https://github.com/SeafileDE/seafile-server-installer/tree/master/professional-edition)
 1. Debian Wheezy & Jessie
