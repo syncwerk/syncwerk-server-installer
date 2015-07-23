@@ -325,7 +325,7 @@ curl -OL http://widehat.opensuse.org/ports/ppc/distribution/12.2/repo/oss/suse/n
 rpm -i python-python-memcached-1.47-3.1.4.noarch.rpm
 
 # Install LibreOffice 4.4.5.1 from The Document Foundations archive
-# zypper --non-interactive install libgconfmm-2_6-1 libgnome-devel libGLU1 FIXME install only if required
+zypper --non-interactive install libGLU1 gnome-vfs2
 cd /usr/src
 wget https://downloadarchive.documentfoundation.org/libreoffice/old/4.4.5.1/rpm/x86_64/LibreOffice_4.4.5.1_Linux_x86-64_rpm.tar.gz
 tar xzf LibreOffice_4.4.5.1_Linux_x86-64_rpm.tar.gz
