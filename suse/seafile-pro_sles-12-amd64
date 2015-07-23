@@ -327,7 +327,24 @@ zypper --non-interactive install postfix
 # Seafile Professional requirements
 # -------------------------------------------
 zypper --non-interactive install java-1_7_0-openjdk poppler-tools python-devel python-setuptools python-imaging python-mysql
-# FIXME memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno
+
+# Install memcached from OpenSUSE 13.2
+cd /usr/src
+curl -OL http://mirror.optimate-server.de/opensuse/distribution/13.2/repo/oss/suse/x86_64/memcached-1.4.20-2.1.2.x86_64.rpm
+rpm -i memcached-1.4.20-2.1.2.x86_64.rpm
+systemctl enable memcached
+systemctl start memcached
+
+# Install python-python-memcached from OpenSUSE 12.2
+curl -OL http://widehat.opensuse.org/ports/ppc/distribution/12.2/repo/oss/suse/noarch/python-python-memcached-1.47-3.1.4.noarch.rpm
+rpm -i python-python-memcached-1.47-3.1.4.noarch.rpm
+
+# Install LibreOffice 4.4.5.1 from The Document Foundations archive
+# zypper --non-interactive install libgconfmm-2_6-1 libgnome-devel libGLU1 FIXME install only if required
+cd /usr/src
+wget https://downloadarchive.documentfoundation.org/libreoffice/old/4.4.5.1/rpm/x86_64/LibreOffice_4.4.5.1_Linux_x86-64_rpm.tar.gz
+tar xzf LibreOffice_4.4.5.1_Linux_x86-64_rpm.tar.gz
+rpm -i LibreOffice_4.4.5.1_Linux_x86-64_rpm/RPMS/*.rpm
 
 
 # -------------------------------------------
@@ -814,12 +831,12 @@ DATABASES = {
     }
 }
 
-#CACHES = { #FIXME
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#    'LOCATION': '127.0.0.1:11211',
-#    }
-#}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+    'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 EMAIL_USE_TLS                       = False
 EMAIL_HOST                          = 'localhost'
@@ -899,7 +916,7 @@ chown ${SEAFILE_USER}.${SEAFILE_USER} -R /opt/seafile/
 # -------------------------------------------
 # Enable office preview in Seahub
 # -------------------------------------------
-#sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf #FIXME
+sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
 
 
 # -------------------------------------------
