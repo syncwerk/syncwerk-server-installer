@@ -91,8 +91,8 @@ Seafile Professional is free for up to 3 users. [**Order your free copy here**](
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_debian
-    bash seafile-ce_debian
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_debian-amd64
+    bash seafile-ce_debian-amd64
 
 
 For **Centos 7 (64bit only)** run the following lines as root
