@@ -1,7 +1,7 @@
 #!/bin/bash
 (
 #
-# seafile-server-installer/seafile-pro_cenots-7-amd64
+# seafile-server-installer/seafile-sles-12-amd64
 #
 # Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
 #
@@ -20,6 +20,18 @@
 #
 # Uncomment to run in verbose mode
 set -x
+
+cat <<EOF
+BETA Installer - dont use yet...
+
+Issues
+ a. Abort if user seafile exists is broke
+ b.  Securing MariaDB
+ c. Autoupdate
+ d. Seafile logrotate
+
+Seafile will work but not all features will be available until these issues are fixed...
+EOF
 
 
 # -------------------------------------------
@@ -46,7 +58,7 @@ SEAFILE_VERSION=4.2.4
 SEAFILE_EDITION=pro-server
 SEAFILE_SOURCE=/usr/src/seafile/seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
 #export DEBIAN_FRONTEND=noninteractive
-OS=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $1 }')
+#OS=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $1 }')
 # Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
   then
@@ -54,7 +66,7 @@ if [ $(getconf LONG_BIT) = "64" ]
   else
     ARCH=i386
 fi
-PACKAGE_ARCH=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $2 }')
+#PACKAGE_ARCH=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $2 }')
 
 
 # -------------------------------------------
@@ -114,27 +126,29 @@ echo -----------------------------------------------------------------
 ip route show table all
 echo
 echo
-echo "Content of /etc/sysconfig/network-scripts/ifcfg-eth*"
+echo "Content of /etc/sysconfig/network/ifcfg-eth*"
 echo -----------------------------------------------------------------
-for eth in /etc/sysconfig/network-scripts/ifcfg-eth* ; do echo ${eth} ; cat ${eth} ; done
+for eth in /etc/sysconfig/network/ifcfg-eth* ; do echo ${eth} ; cat ${eth} ; done
 echo
 echo
-echo Centos Version
+echo SUSE Version
 echo -----------------------------------------------------------------
-cat /etc/redhat-release
+cat /etc/issue
 echo
 echo
-find /etc/yum/ -type f | while read line ; do echo ; \
-    echo Content of ${line} ; \
-    echo ----------------------------------------------------------------- ; \
-    cat ${line} ; \
-	echo ;
-done
+#find /etc/yum/ -type f | while read line ; do echo ; \
+#    echo Content of ${line} ; \
+#    echo ----------------------------------------------------------------- ; \
+#    cat ${line} ; \
+#	echo ;
+#done
 echo
 echo
 echo Installed packages
 echo -----------------------------------------------------------------
-rpm -qa
+zypper repos
+echo
+zypper search --installed-only
 echo
 echo
 echo Process List
@@ -154,7 +168,7 @@ cat /etc/passwd
 clear
 cat <<EOF
 
-  Install Seafile Server Professional Edition on Centos 7.
+  Install Seafile Server Professional Edition on SUSE Enterprise Linux 12.
   Seafile Server Professional Edition is only available for 64bit.
 
   - Seafile Professional, NGINX, MariaDB, Memcached -
@@ -194,10 +208,10 @@ fi
 # -------------------------------------------
 # Abort if user seafile exists
 # -------------------------------------------
-if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ;
-then
-  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
-fi
+#if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ; # FIXME broke on SLES 12...
+#then
+#  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
+#fi
 
 
 # -------------------------------------------
@@ -224,27 +238,41 @@ fi
 # SELinux
 # -------------------------------------------
 # Put SELinux in permissive mode
-setenforce 0
+#setenforce 0
 # Put SELinux in permissive mode permanently
-sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
+#sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
 
 
 # -------------------------------------------
 # Add Extra Packages for Enterprise Linux (EPEL)
 # -------------------------------------------
-yum install epel-release -y
+#yum install epel-release -y
 
 
 # -------------------------------------------
 # Upgrade System
 # -------------------------------------------
-yum upgrade -y
+zypper refresh
+zypper --non-interactive update
 
 
 # -------------------------------------------
 # Additional requirements
 # -------------------------------------------
-yum install sudo ntp less htop pwgen curl openssl nano net-tools lsof deltarpm -y
+zypper --non-interactive install sudo ntp less curl openssl net-tools lsof deltarpm
+
+
+# -------------------------------------------
+# Homemade pwgen
+# -------------------------------------------
+cat > /usr/local/bin/pwgen <<'EOF'
+#!/bin/bash
+length=${1}
+[[ "${1}" == "" ]] && length=16
+tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${length} | xargs
+EOF
+
+chmod +x /usr/local/bin/pwgen
 
 
 # -------------------------------------------
@@ -256,42 +284,59 @@ ntpd -gq
 # -------------------------------------------
 # Security programs
 # -------------------------------------------
-yum install firewalld fail2ban -y
+zypper --non-interactive install SuSEfirewall2
 
 
 # -------------------------------------------
 # Activate firewall
-# https://fedoraproject.org/wiki/FirewallD
-# https://www.optimox.de/tutorials/linux-allgemein/centos-firewall-konfigurieren-mit-firewalld
+# https://en.opensuse.org/SuSEfirewall2
+# http://docs.saltstack.com/en/latest/topics/tutorials/firewall.html
 # -------------------------------------------
-for i in ssh http https ; do firewall-cmd --zone=public --add-service=${i} --permanent ; done
-firewall-cmd --reload
+for i in ssh http https ; do SuSEfirewall2 open EXT TCP ${i} ; done
+for i in stop start ; do SuSEfirewall2 ${i} ; done
 
 
 # -------------------------------------------
 # Postfix
 # -------------------------------------------
-yum install postfix -y
+zypper --non-interactive install postfix
 
 
 # -------------------------------------------
 # Unattended upgrades
 # -------------------------------------------
-yum install yum-cron -y
-sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
+# See https://www.suse.com/documentation/sles-12/pdfdoc/book_sle_admin/book_sle_admin.pdf (1.3 Automatic Online Update) if you want this. I am not touching this for now...
 
 
 # -------------------------------------------
 # Seafile Professional requirements
 # -------------------------------------------
-yum install java-1.7.0-openjdk poppler-utils python-devel python-setuptools python-imaging \
-MySQL-python memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno -y
+zypper --non-interactive install java-1_7_0-openjdk poppler-tools python-devel python-setuptools python-imaging python-mysql
+
+# Install memcached from OpenSUSE 13.2
+cd /usr/src
+curl -OL http://mirror.optimate-server.de/opensuse/distribution/13.2/repo/oss/suse/x86_64/memcached-1.4.20-2.1.2.x86_64.rpm
+rpm -i memcached-1.4.20-2.1.2.x86_64.rpm
+systemctl enable memcached
+systemctl start memcached
+
+# Install python-python-memcached from OpenSUSE 12.2
+curl -OL http://widehat.opensuse.org/ports/ppc/distribution/12.2/repo/oss/suse/noarch/python-python-memcached-1.47-3.1.4.noarch.rpm
+rpm -i python-python-memcached-1.47-3.1.4.noarch.rpm
+
+# Install LibreOffice 4.4.5.1 from The Document Foundations archive
+zypper --non-interactive install libGLU1 gnome-vfs2
+cd /usr/src
+wget https://downloadarchive.documentfoundation.org/libreoffice/old/4.4.5.1/rpm/x86_64/LibreOffice_4.4.5.1_Linux_x86-64_rpm.tar.gz
+tar xzf LibreOffice_4.4.5.1_Linux_x86-64_rpm.tar.gz
+rpm -i LibreOffice_4.4.5.1_Linux_x86-64_rpm/RPMS/*.rpm
 
 
 # -------------------------------------------
 # NGINX
 # -------------------------------------------
-yum install nginx -y
+zypper addrepo -G -t yum -c 'http://nginx.org/packages/sles/12' nginx
+zypper --non-interactive install nginx
 systemctl enable nginx
 
 rm -rf /etc/nginx/conf.d/*
@@ -396,7 +441,7 @@ DNS.1 = localhost
 DNS.2 = $(hostname -f)
 DNS.3 = $(hostname -s)
 IP.1 = 127.0.0.1
-IP.2 = $(hostname -i)
+IP.2 = $(hostname -i | awk '{ print $1 }')
 EOF
 
 openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf -sha256
@@ -409,7 +454,7 @@ cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
 
 cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
 user nginx nginx;
-worker_processes 4;
+worker_processes 1;
 
 events {
   worker_connections 8096;
@@ -487,14 +532,14 @@ systemctl restart nginx
 # -------------------------------------------
 # MariaDB
 # -------------------------------------------
-yum install mariadb-server -y
-systemctl start mariadb
-systemctl enable mariadb
+zypper --non-interactive install mariadb
+systemctl start mysql
+systemctl enable mysql
 
-SQLROOTPW=$(pwgen 14 1)
+SQLROOTPW=$(pwgen 14)
 mysqladmin -u root password ${SQLROOTPW}
 
-# Securing MariaDB
+# Securing MariaDB FIXME
 #/usr/bin/mysql_secure_installation
 
 cat > /root/.my.cnf <<EOF
@@ -512,7 +557,7 @@ chmod 600 /root/.my.cnf
 cat > /etc/systemd/system/seafile.service <<'EOF'
 [Unit]
 Description=Seafile Server
-After=network.target mariadb.service
+After=network.target mysql.service
 
 [Service]
 Type=oneshot
@@ -567,7 +612,7 @@ chmod 700 /usr/local/sbin/seafile-restart
 # -------------------------------------------
 # Seafile
 # -------------------------------------------
-useradd --system --comment "${SEAFILE_USER}" ${SEAFILE_USER} --home-dir  /opt/seafile
+useradd --system --user-group --comment "${SEAFILE_USER}" ${SEAFILE_USER} --home-dir  /opt/seafile
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
 cp ${SEAFILE_SOURCE} ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
@@ -579,7 +624,7 @@ mv ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz installed/seafi
 # -------------------------------------------
 # Seafile DB
 # -------------------------------------------
-SEAFILE_DB_PW=$(pwgen 14 1)
+SEAFILE_DB_PW=$(pwgen 14)
 
 cat > /opt/seafile/.my.cnf <<EOF
 [client]
@@ -827,7 +872,7 @@ cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
-SEAFILE_ADMIN_PW=$(pwgen 14 1)
+SEAFILE_ADMIN_PW=$(pwgen 14)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
 
