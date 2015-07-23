@@ -25,28 +25,13 @@ cat <<EOF
 BETA Installer - dont use yet...
 
 Issues
-
-1. Missing packages
-   a. memcached
-   b. python-memcached
-   c. libreoffice
-   d. libreoffice-headless
-   e. libreoffice-pyuno
-
-2. Missing Features
-   a. Abort if user seafile exists is broke
-   b  Securing MariaDB
-   c. Autoupdate
-   d. Seafile logrotate
-   e. Memcache
-   f. Office preview in Seahub
+ a. Abort if user seafile exists is broke
+ b.  Securing MariaDB
+ c. Autoupdate
+ d. Seafile logrotate
 
 Seafile will work but not all features will be available until these issues are fixed...
-
 EOF
-
-echo "Comment next line manually to run installer anyway..."
-exit 0
 
 
 # -------------------------------------------
