@@ -26,7 +26,7 @@ BETA Installer - dont use yet...
 
 Issues
  a. Abort if user seafile exists is broke
- b.  Securing MariaDB
+ b. Securing MariaDB
  c. Autoupdate
  d. Seafile logrotate
 
