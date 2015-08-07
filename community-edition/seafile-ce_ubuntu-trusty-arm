@@ -40,8 +40,7 @@ exit 0
 SEAFILE_ADMIN=admin@${HOSTNAME}
 SEAFILE_USER=seafile
 SERVER_NAME=$(hostname -s | cut -c -16)
-IP_OR_DOMAIN=$(hostname -i)
-HOSTNAME=$(hostname -i)
+HOSTNAME=$(hostname -f)
 SEAFILE_DIR=/opt/seafile
 SEAFILE_TIME_ZONE="Europe/Berlin"
 # Don't touch the following variable, unless you know what you are doing
@@ -645,10 +644,10 @@ SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
 # -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
-  --name "${SERVER_NAME}" --host "${IP_OR_DOMAIN}"
+  --name "${SERVER_NAME}" --host "${HOSTNAME}"
 
 # Fix service url
-eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${IP_OR_DOMAIN}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
+eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
 
 
 # -------------------------------------------
