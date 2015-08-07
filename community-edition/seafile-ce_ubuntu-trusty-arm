@@ -281,17 +281,10 @@ openjdk-7-jre memcached python-memcache pwgen curl openssl -y
 # -------------------------------------------
 # NGINX
 # -------------------------------------------
-cat > /etc/apt/sources.list.d/nginx.list <<EOF
-deb http://nginx.org/packages/mainline/ubuntu/ trusty nginx
-deb-src http://nginx.org/packages/mainline/ubuntu/ trusty nginx
-EOF
-wget -O - http://nginx.org/packages/keys/nginx_signing.key | apt-key add -
-
-apt-get update
-apt-get upgrade -y
 apt-get install nginx -y
 
-rm /etc/nginx/conf.d/*
+mkdir -p /etc/nginx/conf.d/
+rm /etc/nginx/conf.d/* /etc/nginx/sites-enabled/*
 
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
 server {
@@ -478,7 +471,7 @@ EOF
 CPUS=$(cat /proc/cpuinfo | grep processor | wc | awk '{ print $1 }')
 eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.conf"
 
-systemctl restart nginx
+service nginx restart
 
 
 # -------------------------------------------
