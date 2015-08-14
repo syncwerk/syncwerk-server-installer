@@ -25,7 +25,8 @@ Video: [Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu
 #### [Community Edition](https://github.com/SeafileDE/seafile-server-installer/tree/master/community-edition)
 1. Debian Wheezy & Jessie
 2. Ubuntu Trusty
-3. Uberspace (Centos 6.x only)
+3. Ubuntu Trusty (Pi / ARM)
+4. Uberspace (Centos 6.x only)
 
 #### [Professional Edition](https://github.com/SeafileDE/seafile-server-installer/tree/master/professional-edition)
 1. Debian Wheezy & Jessie
@@ -74,6 +75,14 @@ For **Ubuntu Trusty (64bit)**:
     cd /root
     wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_ubuntu-trusty-amd64
     bash seafile-ce_ubuntu-trusty-amd64
+
+
+BETA: For **Ubuntu Trusty (Pi/ARM)**:
+
+    sudo su
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_ubuntu-trusty-arm
+    bash seafile-ce_ubuntu-trusty-arm
 
 
 For **Uberspace** run the following lines:
