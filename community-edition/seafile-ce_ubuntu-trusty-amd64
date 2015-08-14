@@ -102,7 +102,7 @@ apt-get install aptitude -y
 # Additional requirements
 # -------------------------------------------
 aptitude install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
-openjdk-7-jre memcached python-memcache pwgen curl openssl -y
+memcached python-memcache pwgen curl openssl -y
 
 
 # -------------------------------------------
