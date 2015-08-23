@@ -108,7 +108,7 @@ find /etc/apt/ -type f | grep -v gpg | while read line ; do echo ; \
     echo Content of $line ; \
     echo ----------------------------------------------------------------- ; \
     cat $line ; \
-	echo ;
+  echo ;
 done
 echo
 echo
