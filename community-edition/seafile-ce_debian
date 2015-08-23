@@ -21,6 +21,8 @@
 # Uncomment to run in verbose mode
 #set -x
 
+
+
 # Vars
 SERVER_NAME=$(hostname -s | cut -c -16)
 HOSTNAME=$(hostname -f)
@@ -29,10 +31,12 @@ SEAFILE_USER=seafile
 FILESERVER_PORT=8082
 SEAFILE_DIR=/opt/seafile
 SEAFILE_TIME_ZONE="Europe/Berlin"
-# Don't touch the following variable, unless you know what you are doing
+
+## Don't touch the following variable, unless you know what you are doing
 export DEBIAN_FRONTEND=noninteractive
 OS=$(lsb_release -c | awk '{ print $2 }')
-# Get architecture
+
+## Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
   then
     ARCH=x86-64
@@ -40,9 +44,10 @@ if [ $(getconf LONG_BIT) = "64" ]
     ARCH=i386
 fi
 
+
+
 # Functions
 function print-system-infos {
-
 # Log system infos
 echo Timestamp
 echo -----------------------------------------------------------------
@@ -201,7 +206,6 @@ yes | ufw enable
 
 
 function setup-fail2ban {
-
 apt-get install fail2ban -y
 }
 
@@ -229,9 +233,7 @@ postfix postfix/bad_recipient_delimiter error
 postfix postfix/protocols       select  all
 postfix postfix/chattr  boolean false
 EOF
-
 apt-get install postfix -y
-
 dpkg-reconfigure postfix
 }
 
@@ -240,9 +242,7 @@ function setup-unattended-upgrades {
 debconf-set-selections <<EOF
 unattended-upgrades     unattended-upgrades/enable_auto_updates boolean true
 EOF
-
 apt-get install unattended-upgrades -y
-
 dpkg-reconfigure unattended-upgrades
 }
 
@@ -260,13 +260,10 @@ deb http://nginx.org/packages/mainline/debian/ ${OS} nginx
 deb-src http://nginx.org/packages/mainline/debian/ ${OS} nginx
 EOF
 wget -O - http://nginx.org/packages/keys/nginx_signing.key | apt-key add -
-
 apt-get update
 apt-get upgrade -y
 apt-get install nginx -y
-
 rm /etc/nginx/conf.d/*
-
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
 server {
   listen       80;
@@ -334,7 +331,6 @@ EOF
 
 # Create optimized nginx.conf
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-
 cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
 user nginx nginx;
 worker_processes 4;
@@ -389,7 +385,6 @@ ENDOFFILE
 
 # Setup perfect forward secrecy
 openssl dhparam -dsaparam -out /etc/nginx/dh4096.pem 4096
-
 cat > /etc/nginx/perfect-forward-secrecy.conf <<'EOF'
 ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 ssl_prefer_server_ciphers on;
@@ -407,9 +402,7 @@ eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.
 
 function create-self-signed-certificate-for-nginx {
 mkdir /etc/nginx/ssl
-
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-
 cat > /etc/nginx/ssl/seafile.cnf << EOF
 [req]
 distinguished_name = req_distinguished_name
@@ -439,7 +432,6 @@ DNS.3 = $(hostname -s)
 IP.1 = 127.0.0.1
 IP.2 = $(hostname -i)
 EOF
-
 openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf -sha256
 }
 
@@ -461,24 +453,18 @@ cat > /etc/apt/sources.list.d/mariadb.list <<EOF
 deb http://mirror.netcologne.de/mariadb/repo/10.0/debian wheezy main
 deb-src http://mirror.netcologne.de/mariadb/repo/10.0/debian wheezy main
 EOF
-
 apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
 apt-get update
 apt-get upgrade -y
 fi
-
 apt-get install mariadb-server -y
-
 SQLROOTPW=$(pwgen 14 1)
-
 mysqladmin -u root password ${SQLROOTPW}
-
 cat > /root/.my.cnf <<EOF
 [client]
 user=root
 password=${SQLROOTPW}
 EOF
-
 chmod 600 /root/.my.cnf
 }
 
@@ -542,7 +528,6 @@ case "$1" in
     ;;
 esac
 EOF
-
 chmod +x /etc/init.d/seafile-server
 update-rc.d seafile-server defaults
 }
@@ -569,25 +554,17 @@ mv seafile-server_latest_${ARCH}.tar.gz installed/seafile-server_${SEAFILE_VERSI
 
 function create-seafile-database {
 SQLSEAFILEPW=$(pwgen 14 1)
-
 cat > /opt/seafile/.my.cnf <<EOF
 [client]
 user=seafile
 password=$SQLSEAFILEPW
 EOF
-
 chmod 600 /opt/seafile/.my.cnf
 chown -R ${SEAFILE_USER}.nogroup /opt/seafile/
-
-# Create databases
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-
-# Create user
 mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SQLSEAFILEPW';"
-
-# Grant privileges on databases to user
 mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
@@ -602,10 +579,7 @@ mysql seahub-db < /opt/seafile/seafile-server-${SEAFILE_VERSION}/seahub/sql/mysq
 function setup-seafile {
 cd /opt/seafile/seafile-server-${SEAFILE_VERSION}/
 
-
-
 # Vars - Don't touch these unless you really know what you are doing!
-
 SCRIPT=$(readlink -f "$0")
 INSTALLPATH=/opt/seafile/seafile-server-${SEAFILE_VERSION}/
 TOPDIR=$(dirname "${INSTALLPATH}")
@@ -677,7 +651,6 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 
 # Configuring ccnet.conf
 SEAFILESQLPW=$(grep password /opt/seafile/.my.cnf | awk -F'=' {'print $2'})
-
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
 
 [Database]
@@ -776,7 +749,6 @@ chown ${SEAFILE_USER}.nogroup -R /opt/seafile/
 
 function start-seafile-server {
 echo "Starting productive Seafile server"
-
 if [ ${OS} = "wheezy" ]
   then
     service seafile-server start
@@ -894,7 +866,6 @@ cat <<EOF
 
 EOF
 ENDOFILE
-
 chmod 500 /usr/local/sbin/seafile-server-change-address
 }
 
@@ -969,13 +940,12 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
 
 EOF
-
 chmod 600 ${SEAFILE_DIR}/$(basename ${0})_report.log
 chown -R ${SEAFILE_USER}.nogroup ${SEAFILE_DIR}/$(basename ${0})_report.log
 }
 
 
-# Start the magic
+# Install Seafile server
 print-system-infos
 intro
 ensure-we-are-running-the-installer-on-a-supported-operating-system
@@ -1004,9 +974,6 @@ start-seafile-server
 setup-seafile-server-change-address-script
 outro
 print-system-infos
-
 cat ${SEAFILE_DIR}/$(basename ${0})_report.log
-
-# Done!
 ) 2>&1 | tee /root/$(basename ${0})_installation.log
 chmod 600 /root/$(basename ${0})_installation.log
