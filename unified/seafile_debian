@@ -174,7 +174,7 @@ cat <<EOF
 
   Installing Seafile Server ${SEAFILE_SERVER_VERSION} on Debian. 
 
-  - Seafile server ${SEAFILE_SERVER_VERSION}, NGINX, MariaDB, Memcached -
+  - NGINX, MariaDB, Memcached, SeafDAV, logrotate -
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
@@ -873,7 +873,7 @@ cp ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py ${SEAFILE_SERVER_INSTALL_P
 # Set admin credentials in check_init_admin.py
 SEAFILE_SERVER_ADMIN_PASSWORD=$(pwgen 14 1)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_SERVER_ADMIN}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
-eval "sed -i 's/= ask_admin_password()/= \"${{SEAFILE_SERVER_ADMIN_PASSWORD}}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
+eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_SERVER_ADMIN_PASSWORD}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
 
 # Start and stop Seafile eco system. This generates the initial admin user.
 ${SEAFILE_SERVER_INSTALL_PATH}/seafile.sh start
@@ -1063,7 +1063,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Server Address:      https://${HOSTNAME}
 
   Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
-  Admin Password:      ${{SEAFILE_SERVER_ADMIN_PASSWORD}}
+  Admin Password:      ${SEAFILE_SERVER_ADMIN_PASSWORD}
 
   Seafile Home Dir:    ${SEAFILE_HOME_DIR}
   Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
