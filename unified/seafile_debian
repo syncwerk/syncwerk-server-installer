@@ -24,9 +24,11 @@ set -x
 
 # Determine which Seafile version to install
 cat <<EOF
-Possible options:
-1 = Seafile Community Edition (CE)
-2 = Seafile Professional (PRO)
+
+  Possible options:
+  1 = Seafile Community Edition (CE)
+  2 = Seafile Professional (PRO)
+
 EOF
 PS3="Which Seafile version would you like to install? "
 select SEAFILE_SERVER_VERSION in CE PRO ABORT
@@ -546,7 +548,6 @@ function setup-seafile-server-autostart {
 if [ ${OS} = "wheezy" ]
 then
 cat > /etc/init.d/seafile-server <<'EOF'
-cat > /etc/init.d/seafile-server <<'EOF'
 #!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          seafile-server
@@ -870,7 +871,7 @@ EOF
 cp ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup
 
 # Set admin credentials in check_init_admin.py
-{SEAFILE_SERVER_ADMIN_PASSWORD}=$(pwgen 14 1)
+SEAFILE_SERVER_ADMIN_PASSWORD=$(pwgen 14 1)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_SERVER_ADMIN}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${{SEAFILE_SERVER_ADMIN_PASSWORD}}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
 
