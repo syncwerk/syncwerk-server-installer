@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to run in verbose mode
-#set -x
+set -x
 
 
 # Determine which Seafile version to install
@@ -243,7 +243,7 @@ apt-get dist-upgrade -y
 
 
 function install-system-utils {
-apt-get install apt-utils -y
+apt-get install apt-utils dialog mtr nload htop less mc -y
 }
 
 
@@ -379,7 +379,7 @@ server {
   }
 
   location /media {
-    root ${SEAFILE_SERVER_HOME}/seafile-server-latest/seahub;
+    root /opt/seafile/seafile-server-latest/seahub;
   }
 
   location /seafdav {
@@ -686,18 +686,18 @@ fi
 
 
 function create-seafile-database {
-SQLSEAFILEPW=$(pwgen 14 1)
+SEAFILE_DB_PW=$(pwgen 14 1)
 cat > ${SEAFILE_SERVER_HOME}.my.cnf <<EOF
 [client]
 user=seafile
-password=$SQLSEAFILEPW
+password=${SEAFILE_DB_PW}
 EOF
 chmod 600 ${SEAFILE_SERVER_HOME}.my.cnf
 chown -R ${SEAFILE_USER}.nogroup ${SEAFILE_SERVER_HOME}
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SQLSEAFILEPW';"
+mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '${SEAFILE_DB_PW}';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
@@ -718,11 +718,9 @@ TOPDIR=$(dirname "${SEAFILE_SERVER_INSTALL_PATH}")
 SRC_DOCS_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${SEAFILE_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
 DEFAULT_CCNET_CONF_DIR=${TOPDIR}/ccnet
-DEFAULT_SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
-DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 DEFAULT_CONF_DIR=${TOPDIR}/conf
-SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
-LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
+SEAFILE_SERVER_DATA_DIR=${TOPDIR}/seafile-data
+LIBRARY_TEMPLATE_DIR=${SEAFILE_SERVER_DATA_DIR}/library-template
 DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
 CCNET_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/ccnet-init
 SEAF_SERVER_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/seaf-server-init
@@ -740,11 +738,11 @@ LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CON
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
 
 # Create seafile conf
-LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_DATA_DIR}" \
+LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_SERVER_DATA_DIR}" \
   --fileserver-port ${SEAFILE_FILESERVER_PORT}
 
 # Write seafile.ini
-echo "${SEAFILE_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
+echo "${SEAFILE_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
 
 # Configure Seafile WebDAV Server(SeafDAV)
 mkdir -p ${DEFAULT_CONF_DIR}
@@ -772,10 +770,8 @@ mkdir -p "${TOPDIR}/logs"
 ln -s $(basename ${SEAFILE_SERVER_INSTALL_PATH}) ${SEAFILE_SERVER_SYMLINK}
 
 # Fix permissions
-chmod 0600 "$DEST_SETTINGS_PY"
-chmod 0700 "$DEFAULT_CCNET_CONF_DIR"
-chmod 0700 "$SEAFILE_DATA_DIR"
-chmod 0700 "$DEFAULT_CONF_DIR"
+chmod 0600 ${DEST_SETTINGS_PY}
+chmod 0700 ${DEFAULT_CCNET_CONF_DIR} ${SEAFILE_SERVER_DATA_DIR} ${DEFAULT_CONF_DIR}
 
 # copy user manuals to library template
 mkdir -p ${LIBRARY_TEMPLATE_DIR}
@@ -789,7 +785,6 @@ if [ ${SEAFILE_PRO} = "enabled" ]
 fi
 
 # Configuring ccnet.conf
-SEAFILE_DB_PW=$(grep password ${SEAFILE_SERVER_HOME}.my.cnf | awk -F'=' {'print $2'})
 cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
 
 [Database]
@@ -1071,7 +1066,8 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
 
-  Seafile Data Dir:    ${SEAFILE_DATA_DIR}
+  Seafile Home Dir:    ${SEAFILE_HOME_DIR}
+  Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
 
   Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
