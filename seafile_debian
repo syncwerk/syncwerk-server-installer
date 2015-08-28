@@ -1110,6 +1110,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
   3) Setup NGINX with official SSL certificate and create safe DH primes...
+     (https://forum.seafile-server.org/t/kostenfreies-startssl-class-1-zertifikat-fur-nginx-und-seafile-beziehen/1642)
 
   4) Harden system with port knocking, fail2ban, etc.
 
