@@ -722,21 +722,19 @@ function setup-seafile-server {
 cd ${SEAFILE_SERVER_INSTALL_PATH}
 
 # Vars - Don't touch these unless you really know what you are doing!
-SCRIPT=$(readlink -f "$0")
-TOPDIR=$(dirname "${SEAFILE_SERVER_INSTALL_PATH}")
 SRC_DOCS_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${SEAFILE_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
-DEFAULT_CCNET_CONF_DIR=${TOPDIR}/ccnet
-DEFAULT_CONF_DIR=${TOPDIR}/conf
-SEAFILE_SERVER_DATA_DIR=${TOPDIR}/seafile-data
+DEFAULT_CCNET_CONF_DIR=${SEAFILE_SERVER_HOME}/ccnet
+DEFAULT_CONF_DIR=${SEAFILE_SERVER_HOME}/conf
+SEAFILE_SERVER_DATA_DIR=${SEAFILE_SERVER_HOME}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_SERVER_DATA_DIR}/library-template
-DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
+DEST_SETTINGS_PY=${SEAFILE_SERVER_HOME}/seahub_settings.py
 CCNET_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/ccnet-init
 SEAF_SERVER_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/seaf-server-init
 MEDIA_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seahub/media
 ORIG_AVATAR_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seahub/media/avatars
-DEST_AVATAR_DIR=${TOPDIR}/seahub-data/avatars
-SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
+DEST_AVATAR_DIR=${SEAFILE_SERVER_HOME}/seahub-data/avatars
+SEAFILE_SERVER_SYMLINK=${SEAFILE_SERVER_HOME}/seafile-server-latest
 
 # Create ccnet conf
 export SEAFILE_LD_LIBRARY_PATH=${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib/:${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib64:${LD_LIBRARY_PATH}
@@ -768,12 +766,12 @@ key=$(python "${SEAHUB_SECRET_KEYGEN}")
 echo "SECRET_KEY = \"${key}\"" > "${DEST_SETTINGS_PY}"
 
 # prepare avatar directory
-mkdir -p "${TOPDIR}/seahub-data"
+mkdir -p "${SEAFILE_SERVER_HOME}/seahub-data"
 mv "${ORIG_AVATAR_DIR}" "${DEST_AVATAR_DIR}"
 ln -s ../../../seahub-data/avatars ${MEDIA_DIR}
 
 # create logs directory
-mkdir -p "${TOPDIR}/logs"
+mkdir -p "${SEAFILE_SERVER_HOME}/logs"
 
 # Create symlink for current server version
 ln -s $(basename ${SEAFILE_SERVER_INSTALL_PATH}) ${SEAFILE_SERVER_SYMLINK}
@@ -807,7 +805,7 @@ CONNECTION_CHARSET = utf8
 EOF
 
 # Configuring seafile.conf
-cat >> ${TOPDIR}/seafile-data/seafile.conf <<EOF
+cat >> ${SEAFILE_SERVER_HOME}/seafile-data/seafile.conf <<EOF
 
 [database]
 type = mysql
@@ -870,7 +868,7 @@ USER_PASSWORD_STRENGTH_LEVEL        = 3
 USER_STRONG_PASSWORD_REQUIRED       = True
 ENABLE_MAKE_GROUP_PUBLIC            = False
 ENABLE_THUMBNAIL                    = True
-THUMBNAIL_ROOT                      = '${TOPDIR}/seahub-data/thumbnail/thumb/'
+THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}/seahub-data/thumbnail/thumb/'
 REPO_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_STRENGTH_LEVEL        = 3
@@ -901,7 +899,7 @@ chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
 # Enable office preview in Seahub
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
+    sed -i 's/enabled = false/enabled = true/' ${SEAFILE_SERVER_HOME}/pro-data/seafevents.conf
 fi
 }
 
