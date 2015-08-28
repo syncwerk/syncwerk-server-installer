@@ -109,6 +109,16 @@ echo -----------------------------------------------------------------
 echo ${DEB_ARCH}
 echo
 echo
+echo CPU info
+echo -----------------------------------------------------------------
+echo cat /proc/cpuinfo
+echo
+echo
+echo Memory info
+echo -----------------------------------------------------------------
+echo cat /proc/meminfo
+echo
+echo
 echo Active Kernel
 echo -----------------------------------------------------------------
 uname -a
