@@ -182,7 +182,7 @@ function description {
 clear
 cat <<EOF
 
-  Installing Seafile Server ${SEAFILE_SERVER_VERSION} on Debian. 
+  Installing Seafile Server ${SEAFILE_SERVER_VERSION} on Debian (${OS}/${ARCH}). 
 
   - NGINX, MariaDB, Memcached, SeafDAV, logrotate -
   -----------------------------------------------------------------
