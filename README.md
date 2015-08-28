@@ -62,7 +62,8 @@ As a precaution I have added a few simple checks to abort installation if any of
 ### Seafile Server CE
 Except for the Uberspace installer **all installers need to run as root**. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers. Make sure your OS package repository (e.g. /etc/apt/sources.list) is set correct before proceeding.
 
-For **Debian Wheezy and Jessie, Seafile Server CE (32bit and 64bit) and Seafile Server PRO (64bit only)**:
+For **Debian Wheezy and Jessie (32bit and 64bit)**:
+
 
     apt-get install lsb-release -y
     cd /root
@@ -100,9 +101,10 @@ Seafile Professional is free for up to 3 users. [**Order your free copy here**](
 
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 
+    apt-get install lsb-release -y
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_debian-amd64
-    bash seafile-pro_debian-amd64
+    wget --no-check-certificate https://github.com/SeafileDE/seafile-server-installer/blob/master/seafile_debian
+    bash seafile_debian
 
 
 For **Centos 7 (64bit only)** run the following lines as root
