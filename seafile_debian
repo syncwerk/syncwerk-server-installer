@@ -63,6 +63,7 @@ if [ ! -f /usr/bin/lsb_release ]; then
     exit
 fi
 OS=$(lsb_release -c | awk '{ print $2 }')
+OS_DESC=$(lsb_release -d | awk -F':' '{ print $2}')
 
 # Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
@@ -97,6 +98,11 @@ echo
 echo Content of /etc/hosts
 echo -----------------------------------------------------------------
 cat /etc/hosts
+echo
+echo
+echo OS
+echo -----------------------------------------------------------------
+lsb_release -a
 echo
 echo
 echo OS Architecture
@@ -182,9 +188,10 @@ function description {
 clear
 cat <<EOF
 
-  Installing Seafile Server ${SEAFILE_SERVER_VERSION} on Debian (${OS}/${ARCH}). 
+  Installing Seafile Server ${SEAFILE_SERVER_VERSION} on
+  ${OS_DESC} (${ARCH}). 
 
-  - NGINX, MariaDB, Memcached, SeafDAV, logrotate -
+  Features: NGINX, MariaDB, Memcached, SeafDAV, logrotate
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
