@@ -100,7 +100,7 @@ You will have to download the Seafile Professional Server package prior to the i
 Seafile Professional is free for up to 3 users. Order your free copy here:
 
 * [English: Seafile Professional (Free)](https://shop.seafile.com/produkt/seafile-professional-free/) 
-* [Deutsch: Seafile Professional (Kostenlos)](https://shop.seafile.de/produkt/seafile-professional-kostenlos/).
+* [Deutsch: Seafile Professional (Kostenlos)](https://shop.seafile.de/produkt/seafile-professional-kostenlos/)
 
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 
