@@ -398,7 +398,7 @@ openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafi
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
 
 cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
-user nginx nginx;
+user www-data www-data;
 worker_processes 4;
 
 events {
