@@ -582,12 +582,14 @@ update-rc.d seafile-server defaults
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
-curl -OL https://github.com/haiwen/seafile-rpi/releases/download/v4.3.2/seafile-server_4.3.2_pi.tar.gz
-tar xzf seafile-server_4.3.2_pi.tar.gz
+# contact seafile-raspberry-pi@mno.pw if not up to date
+rm -f seafile-server-latest-rpi-stable.tar.gz
+curl -OL https://mno.pw/s/seafile-server-latest-rpi-stable -o seafile-server-latest-rpi-stable.tar.gz
+tar xzf seafile-server-latest-rpi-stable.tar.gz
 
 SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
 
-mv seafile-server_4.3.2_pi.tar.gz installed/seafile-server_${SEAFILE_VERSION}_pi.tar.gz
+mv seafile-server-latest-rpi-stable.tar.gz installed/seafile-server_${SEAFILE_VERSION}_pi.tar.gz
 
 
 # -------------------------------------------
