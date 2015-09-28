@@ -43,9 +43,28 @@ SERVER_NAME=$(hostname -s | cut -c -16)
 HOSTNAME=$(hostname -f)
 SEAFILE_DIR=/opt/seafile
 SEAFILE_TIME_ZONE="Europe/Berlin"
-# Don't touch the following variable, unless you know what you are doing
+
+# -------------------------------------------
+# Various tests
+# -------------------------------------------
+# Don't touch any variables below this line, unless you know what you are doing
 export DEBIAN_FRONTEND=noninteractive
 OS=$(lsb_release -c | awk '{ print $2 }')
+
+# Ensure SERVER_NAME length is greater then 2 characters
+while test "${#SERVER_NAME}" -lt 2
+  do SERVER_NAME="${SERVER_NAME}_"
+done
+
+# Validate SEAFILE_ADMIN email address syntax
+if [[ ${SEAFILE_ADMIN} =~ ^(.+)@(.+)\.(.+)$ ]]; 
+  then
+    echo "Seafile admin email address ${SEAFILE_ADMIN} is valid."
+  else
+    echo "Seafile admin email address ${SEAFILE_ADMIN} is invalid. Setting to admin@seafile.local instead."
+	SEAFILE_ADMIN=admin@seafile.local
+fi
+
 # Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
   then
