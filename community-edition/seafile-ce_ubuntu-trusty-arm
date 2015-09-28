@@ -44,6 +44,9 @@ HOSTNAME=$(hostname -f)
 SEAFILE_DIR=/opt/seafile
 SEAFILE_TIME_ZONE="Europe/Berlin"
 
+# RELEASE_TYPE: Possible values are stable or beta
+RELEASE_TYPE=stable 
+
 # -------------------------------------------
 # Various tests
 # -------------------------------------------
@@ -582,12 +585,11 @@ update-rc.d seafile-server defaults
 adduser --system --gecos "${SEAFILE_USER}" ${SEAFILE_USER} --home /opt/seafile
 mkdir -p /opt/seafile/installed
 cd /opt/seafile/
-curl -OL https://github.com/haiwen/seafile-rpi/releases/download/v4.3.2/seafile-server_4.3.2_pi.tar.gz
-tar xzf seafile-server_4.3.2_pi.tar.gz
 
+curl -OL https://download.seafile.de/seafile-server_latest-${RELEASE_TYPE}_pi.tar.gz
+tar xzf seafile-server_latest-${RELEASE_TYPE}_pi.tar.gz
 SEAFILE_VERSION=$(basename /opt/seafile/seafile-server-* | awk -F'-' ' { print $3  }')
-
-mv seafile-server_4.3.2_pi.tar.gz installed/seafile-server_${SEAFILE_VERSION}_pi.tar.gz
+mv seafile-server_latest-${RELEASE_TYPE}_pi.tar.gz installed/seafile-server_${SEAFILE_VERSION}_stable_pi.tar.gz
 
 
 # -------------------------------------------
