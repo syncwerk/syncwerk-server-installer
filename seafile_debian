@@ -364,7 +364,7 @@ server {
 }
 
 server {
-  listen 443 spdy;
+  listen 443 http2;
   server_name  "";
 
   ssl on;
