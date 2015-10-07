@@ -184,17 +184,6 @@ print-system-infos
 
 
 # -------------------------------------------
-# Ensure Seafile Professional Sources are available
-# -------------------------------------------
-if [[ -f ${SEAFILE_SOURCE} ]] ;
-  then
-    echo "Found ${SEAFILE_SOURCE}. Proceeding with installation..."
-  else
-    echo "Aborting because ${SEAFILE_SOURCE} is missing" ; exit 1
-fi
-
-  
-# -------------------------------------------
 # Ensure we are running the installer as root
 # -------------------------------------------
 if [[ $EUID -ne 0 ]]; then
