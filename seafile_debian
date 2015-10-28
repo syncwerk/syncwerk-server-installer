@@ -924,7 +924,7 @@ ${SEAFILE_SERVER_HOME}logs/seaf-server.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}pids/seaf-server.pid ] || kill -USR1 ${cat ${SEAFILE_SERVER_HOME}pids/seaf-server.pid}
+    [ ! -f ${SEAFILE_SERVER_HOME}pids/seaf-server.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}pids/seaf-server.pid}
   endscript
 }
 
@@ -938,7 +938,7 @@ ${SEAFILE_SERVER_HOME}logs/ccnet.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}pids/ccnet.pid ] || kill -USR1 ${cat ${SEAFILE_SERVER_HOME}pids/ccnet.pid}
+    [ ! -f ${SEAFILE_SERVER_HOME}pids/ccnet.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}pids/ccnet.pid}
   endscript
 }
 EOF
