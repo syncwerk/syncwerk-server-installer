@@ -697,7 +697,17 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
     mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
     SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
   else
-    curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+    
+    # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok. 
+    #curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+    
+    if [ $(getconf LONG_BIT) = "64" ]
+      then
+       curl -L https://app.seafile.de/f/4ba97d34f3/?dl=1 -o seafile-server_latest_x86-64.tar.gz
+    else
+       curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+    fi
+
     tar xzf seafile-server_latest_${ARCH}.tar.gz
     SEAFILE_SERVER_VERSION=$(basename ${SEAFILE_SERVER_HOME}/seafile-server-* | awk -F'-' ' { print $3 }')
     mv seafile-server_latest_${ARCH}.tar.gz installed/seafile-server_${SEAFILE_SERVER_VERSION}_${ARCH}.tar.gz
