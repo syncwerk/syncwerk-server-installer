@@ -10,7 +10,11 @@ Install the [Seafile Server](http://seafile.com/en/home/) in a standard and more
 
 
 ## Why?
+<<<<<<< HEAD
 There are too many ways to misconfigure a manual Seafile server installation. We've noticed that many people don't realize that the default installation is very unsafe. In other cases people get stuck during the manual installation procedure or forget a step like changing `FILE_SERVER_ROOT` or use IP addresses instead of resolvable DNS names.
+=======
+There too many ways to misconfigure a manual Seafile server installation. We've noticed that many people don't realize that the default installation is very unsafe. In other cases people get stuck during the manual installation procedure or forget a step like changing `FILE_SERVER_ROOT` or use IP addresses instead of resolvable DNS names.
+>>>>>>> 74ce8b673129d1562a984524ca88ad8cd2cdec9a
 
 The scripts are derived from our [reference installation for Seafile Server Professional](https://wiki.seafile.de/tutorials/debian_8_jessie_64bit). They help us to standardize the installation procedure and identifying setup errors more easily.
 
