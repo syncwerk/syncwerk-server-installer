@@ -10,11 +10,7 @@ Install the [Seafile Server](http://seafile.com/en/home/) in a standard and more
 
 
 ## Why?
-<<<<<<< HEAD
 There are too many ways to misconfigure a manual Seafile server installation. We've noticed that many people don't realize that the default installation is very unsafe. In other cases people get stuck during the manual installation procedure or forget a step like changing `FILE_SERVER_ROOT` or use IP addresses instead of resolvable DNS names.
-=======
-There too many ways to misconfigure a manual Seafile server installation. We've noticed that many people don't realize that the default installation is very unsafe. In other cases people get stuck during the manual installation procedure or forget a step like changing `FILE_SERVER_ROOT` or use IP addresses instead of resolvable DNS names.
->>>>>>> 74ce8b673129d1562a984524ca88ad8cd2cdec9a
 
 The scripts are derived from our [reference installation for Seafile Server Professional](https://wiki.seafile.de/tutorials/debian_8_jessie_64bit). They help us to standardize the installation procedure and identifying setup errors more easily.
 
@@ -39,7 +35,8 @@ Video: [Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu
 4. SUSE Linux Enterprise Server 12
 
 ## Caution
-Never run these scripts on a production server. They are more or less a one trick pony and could seriously damage production systems. Run it only once and delete it afterwards. If something goes wrong, restart with a fresh machine.
+Never run these scripts on a production server. They are more or less a one trick pony and could seriously damage production systems. Run it only once and
+delete it afterwards. If something goes wrong, restart with a fresh machine.
 
 As a precaution I have added a few simple checks to abort installation if any of these fails:
 
@@ -64,7 +61,8 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 ## Installation
 ### Seafile Server CE
-Except for the Uberspace installer **all installers need to run as root**. Running them with sudo will not work! Login as root or switch to root with sudo su before installing with these installers. Make sure your OS package repository (e.g. /etc/apt/sources.list) is set correct before proceeding.
+Except for the Uberspace installer **all installers need to run as root**. Running them with sudo will not work! Login as root or switch to root with sudo
+su before installing with these installers. Make sure your OS package repository (e.g. /etc/apt/sources.list) is set correct before proceeding.
 
 For **Debian Wheezy and Jessie (32bit and 64bit)**:
 
@@ -103,7 +101,7 @@ You will have to download the Seafile Professional Server package prior to the i
 
 Seafile Professional is free for up to 3 users. Order your free copy here:
 
-* [English: Seafile Professional (Free)](https://shop.seafile.com/produkt/seafile-professional-free/) 
+* [English: Seafile Professional (Free)](https://shop.seafile.com/produkt/seafile-professional-free/)
 * [Deutsch: Seafile Professional (Kostenlos)](https://shop.seafile.de/produkt/seafile-professional-kostenlos/)
 
 For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
