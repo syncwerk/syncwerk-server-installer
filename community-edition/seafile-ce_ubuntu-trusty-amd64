@@ -86,15 +86,16 @@ fi
 
 
 # -------------------------------------------
+# Ensure aptitude is installed
+# -------------------------------------------
+apt-get install aptitude -y
+
+
+# -------------------------------------------
 # Update System
 # -------------------------------------------
 aptitude update && aptitude dist-upgrade -y
 
-
-# -------------------------------------------
-# Ensure aptitude is installed
-# -------------------------------------------
-apt-get install aptitude -y
 
 # -------------------------------------------
 # Additional requirements
