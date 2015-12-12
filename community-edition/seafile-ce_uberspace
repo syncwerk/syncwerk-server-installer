@@ -230,6 +230,7 @@ sys.path.insert(0, seafile_directory + '/seafile-server-latest/seahub')
 
 # Set environment variables (compare ~/haiwen/seafile-server-latest/seahub.sh)
 os.environ['CCNET_CONF_DIR'] = seafile_directory + '/ccnet'
+os.environ['SEAFILE_CENTRAL_CONF_DIR'] = seafile_directory + '/conf'
 os.environ['SEAHUB_LOG_DIR'] = seafile_directory + '/logs'
 os.environ['SEAFILE_CONF_DIR'] = seafile_directory + '/seafile-data'
 
