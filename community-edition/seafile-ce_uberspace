@@ -73,14 +73,7 @@ fi
 # -------------------------------------------
 # Python requirements
 # -------------------------------------------
-cd
-mkdir -p ~/bin ~/lib/python2.7
-easy_install-2.7 simplejson
-curl --silent http://effbot.org/media/downloads/Imaging-1.1.7.tar.gz | tar -xzf -
-cd Imaging-1.1.7
-perl -pi -e 's|/usr/lib|/usr/lib64|g' setup.py
-python2.7 setup.py install
-rm -rf Imaging-1.1.7
+pip-2.7 install Pillow --user
 
 
 # -------------------------------------------
@@ -181,7 +174,7 @@ cat <<EOF
 
   Creating local EMAIL_HOST_USER. Use ${EMAIL_HOST_USER_PW} as the users password.
   If you choose to use a different password, you must change it accordingly
-  in ~/seafile/seahub_settings.py and restart seafile with 'seafile restart'
+  in ~/seafile/conf/seahub_settings.py and restart seafile with 'seafile restart'
 
 EOF
 # Delete pre-existing user if present
@@ -309,7 +302,7 @@ DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 DEFAULT_CONF_DIR=${TOPDIR}/conf
 SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
-DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
+DEST_SETTINGS_PY=${DEFAULT_CONF_DIR}/seahub_settings.py
 CCNET_INIT=${INSTALLPATH}/seafile/bin/ccnet-init
 SEAF_SERVER_INIT=${INSTALLPATH}/seafile/bin/seaf-server-init
 MEDIA_DIR=${INSTALLPATH}/seahub/media
@@ -327,7 +320,6 @@ LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CON
 
 # Fix service url
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${WHOAMI}.${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
-
 
 # -------------------------------------------
 # Create seafile conf
@@ -399,9 +391,13 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # -------------------------------------------
 # Configuring ccnet.conf
 # -------------------------------------------
+
+# move ccnet.conf to default conf dir
+mv ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf ${DEFAULT_CONF_DIR}/ccnet.conf
+
 SEAFILESQLPW=$(grep -A10000  "\[client\]" ${HOME}/.my.cnf | grep -m1 password | awk -F'=' {'print $2'} | awk -F' ' {'print $1'})
 
-cat >> ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf <<EOF
+cat >> ${DEFAULT_CONF_DIR}/ccnet.conf <<EOF
 [Database]
 ENGINE = mysql
 HOST = 127.0.0.1
