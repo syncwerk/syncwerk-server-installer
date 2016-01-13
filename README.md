@@ -69,8 +69,8 @@ For **Debian Wheezy and Jessie (32bit and 64bit)**:
 
     apt-get install lsb-release -y
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_debian
-    bash seafile_debian
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_v5_debian
+    bash seafile_v5_debian
 
 
 For **Ubuntu Trusty (64bit)**:
