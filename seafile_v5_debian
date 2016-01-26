@@ -962,6 +962,9 @@ EOF
 
 
 function start-seafile-server {
+echo "Fix any ownership issues before starting"
+chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}
+
 echo "Starting productive Seafile server"
 if [ ${OS} = "wheezy" ]
   then
