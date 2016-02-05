@@ -53,7 +53,7 @@ ps aux | grep sea | grep -v grep | grep -v uninstall | awk '{ print $2 }' | whil
 # -------------------------------------------
 # remove Seafile, Apache and Python 2.7 related directories and files
 # -------------------------------------------
-eval rm -r ~/seafile-ce_* ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ~/html/.htaccess ~/bin ~/lib/python2.7 ${SILENCER}
+eval rm -r ~/seafile-ce_* ~/seafile/ ~/bin/seafile* ~/fcgi-bin/seahub* ~/html/.htaccess ~/bin ~/lib/python2.7 /tmp/seahub_cache ${SILENCER}
 
 
 # -------------------------------------------
