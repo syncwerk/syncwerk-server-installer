@@ -27,7 +27,7 @@
 SEAFILE_ADMIN=admin@seafile.local
 SEAFILE_USER=seafile
 SERVER_NAME=$(hostname -s | cut -c -16)
-IP_OR_DOMAIN=$(hostname -i)
+IP_OR_DOMAIN=$(hostname -s)
 HOSTNAME=$(hostname -i)
 FILESERVER_PORT=8082
 
@@ -374,7 +374,6 @@ DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 DEFAULT_CONF_DIR=${TOPDIR}/conf
 SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
-DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
 CCNET_INIT=${INSTALLPATH}/seafile/bin/ccnet-init
 SEAF_SERVER_INIT=${INSTALLPATH}/seafile/bin/seaf-server-init
 MEDIA_DIR=${INSTALLPATH}/seahub/media
@@ -448,7 +447,7 @@ ln -s $(basename ${INSTALLPATH}) ${SEAFILE_SERVER_SYMLINK}
 
 
 # Fix permissions
-chmod 0600 "$DEST_SETTINGS_PY"
+chmod 0700 "$DEST_SETTINGS_PY"
 chmod 0700 "$DEFAULT_CCNET_CONF_DIR"
 chmod 0700 "$SEAFILE_DATA_DIR"
 chmod 0700 "$DEFAULT_CONF_DIR"
@@ -479,7 +478,11 @@ CONNECTION_CHARSET = utf8
 EOF
 
 
-# -------------------------------------------
+#now copy to the correct folder
+cp ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf ${DEFAULT_CONF_DIR}  
+
+#
+-------------------------------------------
 # Configuring seafile.conf
 # -------------------------------------------
 cat >> ${TOPDIR}/seafile-data/seafile.conf <<EOF
@@ -494,11 +497,12 @@ db_name = seafile-db
 connection_charset = utf8
 EOF
 
+cp ${TOPDIR}/seafile-data/seafile.conf ${DEFAULT_CONF_DIR}
 
 # -------------------------------------------
 # Configuring seahub_settings.py
 # -------------------------------------------
-cat >> ${DEST_SETTINGS_PY} <<EOF
+cat >> ${DEFAULT_CONF_DIR}/seahub_settings.py <<EOF
 
 DATABASES = {
     'default': {
@@ -547,6 +551,11 @@ FILE_SERVER_ROOT                    = 'https://${IP_OR_DOMAIN}/seafhttp'
 EOF
 
 
+#--------------------------------------------
+# Set the correct permissions to seahub_settings
+#--------------------------------------------
+chmod 700 ${DEFAULT_CONF_DIR}/seahub_settings.py
+
 # -------------------------------------------
 # Backup check_init_admin.py befor applying changes
 # -------------------------------------------
@@ -592,7 +601,7 @@ service seafile-server start
 # -------------------------------------------
 # Final report
 # -------------------------------------------
-cat > ${seafile_dir}/aio_seafile-server.log<<EOF
+cat >> ${TOPDIR}/aio_seafile-server.log <<EOF
 
   Your Seafile server is installed
   -----------------------------------------------------------------
@@ -666,8 +675,8 @@ cat > ${seafile_dir}/aio_seafile-server.log<<EOF
 
 EOF
 
-chmod 600 ${seafile_dir}/aio_seafile-server.log
-chown -R ${SEAFILE_USER}.nogroup ${seafile_dir}/aio_seafile-server.log
+chmod 600 ${TOPDIR}/aio_seafile-server.log
+chown -R ${SEAFILE_USER}.nogroup ${TOPDIR}/aio_seafile-server.log
 
 
 # -------------------------------------------
@@ -678,4 +687,7 @@ chmod 500 /usr/local/sbin/seafile-server-change-address
 
 clear
 
-cat ${seafile_dir}/aio_seafile-server.log
+cat ${TOPDIR}/aio_seafile-server.log
+
+#now establish the correct permissions to start and stop seafile
+chown -R ${SEAFILE_USER}.nogroup /opt/seafile/
