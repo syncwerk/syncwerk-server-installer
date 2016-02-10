@@ -186,17 +186,8 @@ vadduser seafile
 # -------------------------------------------
 # Apache htaccess
 # -------------------------------------------
-DEFAULT="${WHOAMI}.${HOSTNAME}"
-read -p "Under which domain will the service be reachable? [$DEFAULT]: " DOMAIN
-if [ -z "$DOMAIN" ]; then
-    DOMAIN=$DEFAULT
-fi
-
-DEFAULT="$HOME/html"
-read -p "Where is the document root for that domain? [$DEFAULT]: " DOCUMENT_ROOT
-if [ -z "$DOCUMENT_ROOT" ]; then
-    DOCUMENT_ROOT=$DEFAULT
-fi
+read -e -p "Enter the domain at which the service will be reachable: " -i "${WHOAMI}.${HOSTNAME}" DOMAIN
+read -e -p "Enter the document root for that domain: " -i "$HOME/html" DOCUMENT_ROOT
 
 cat > ${DOCUMENT_ROOT}/.htaccess <<EOF
 RewriteEngine on
