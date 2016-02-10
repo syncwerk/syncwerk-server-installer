@@ -186,26 +186,33 @@ vadduser seafile
 # -------------------------------------------
 # Apache htaccess
 # -------------------------------------------
-cat > ~/html/.htaccess <<"EOF"
+DEFAULT="${WHOAMI}.${HOSTNAME}"
+read -p "Under which domain will the service be reachable? [$DEFAULT]: " DOMAIN
+if [ -z "$DOMAIN" ]; then
+    DOMAIN=$DEFAULT
+fi
+
+DEFAULT="$HOME/html"
+read -p "Where is the document root for that domain? [$DEFAULT]: " DOCUMENT_ROOT
+if [ -z "$DOCUMENT_ROOT" ]; then
+    DOCUMENT_ROOT=$DEFAULT
+fi
+
+cat > ${DOCUMENT_ROOT}/.htaccess <<EOF
 RewriteEngine on
 
 # Redirect to https
 RewriteCond %{HTTPS} !=on
 RewriteCond %{ENV:HTTPS} !=on
-RewriteRule ^(.*)$ https://WHOAMI.HOSTNAME/$1 [L,R=301]
+RewriteRule ^(.*)$ https://$DOMAIN/\$1 [L,R=301]
 
 # Port of seafile httpserver (compare ~/haiwen/seafile-data/seafile.conf)
-RewriteRule ^seafhttp/(.*)$ http://localhost:FILESERVER_PORT/$1 [QSA,P,L]
+RewriteRule ^seafhttp/(.*)$ http://localhost:$FILESERVER_PORT/\$1 [QSA,P,L]
 
-RewriteRule ^/(seafmedia.*)$ /$1 [QSA,L,PT]
+RewriteRule ^/(seafmedia.*)$ /\$1 [QSA,L,PT]
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ /fcgi-bin/seahub/$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteRule ^(.*)$ /fcgi-bin/seahub/\$1 [QSA,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 EOF
-
-# Set seahub port
-eval sed -i 's/WHOAMI/${WHOAMI}/' ~/html/.htaccess
-eval sed -i 's/HOSTNAME/${HOSTNAME}/' ~/html/.htaccess
-eval sed -i 's/FILESERVER_PORT/${FILESERVER_PORT}/' ~/html/.htaccess
 
 
 # -------------------------------------------
@@ -319,7 +326,7 @@ LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CON
   --name "${SERVER_NAME}" --port "${CCNET_PORT}" --host "${HOSTNAME}"
 
 # Fix service url
-eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${WHOAMI}.${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
+eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${DOMAIN}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
 
 # -------------------------------------------
 # Create seafile conf
@@ -451,7 +458,7 @@ DEFAULT_FROM_EMAIL                  = 'EMAIL_HOST_USER'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
 REPLACE_FROM_EMAIL                  = True
 TIME_ZONE                           = 'Europe/Berlin'
-SITE_BASE                           = 'https://${WHOAMI}.${HOSTNAME}'
+SITE_BASE                           = 'https://${DOMAIN}'
 SITE_NAME                           = 'Seafile Server'
 SITE_TITLE                          = 'Seafile Server'
 SITE_ROOT                           = '/'
@@ -465,7 +472,7 @@ FILE_PREVIEW_MAX_SIZE               = 30 * 1024 * 1024
 SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
-FILE_SERVER_ROOT                    = 'https://${WHOAMI}.${HOSTNAME}/seafhttp'
+FILE_SERVER_ROOT                    = 'https://${DOMAIN}/seafhttp'
 DEBUG = False
 EOF
 
@@ -505,7 +512,7 @@ cat > ~/seafile/seafile-ce_uberspace.log <<EOF
   Your Seafile server is installed
   -----------------------------------------------------------------
   Server Name:         ${SERVER_NAME}
-  Server Address:      https://${WHOAMI}.${HOSTNAME}
+  Server Address:      https://${DOMAIN}
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
   Seafile Data Dir:    ${SEAFILE_DATA_DIR}
