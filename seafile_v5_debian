@@ -262,7 +262,7 @@ apt-get dist-upgrade -y
 
 
 function install-system-utils {
-apt-get install apt-utils dialog mtr nload htop less mc -y
+apt-get install apt-utils dialog mtr nload htop less mc tar -y
 }
 
 
