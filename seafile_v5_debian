@@ -340,17 +340,6 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
 fi
 }
 
-
-function add-nginx-org-sources {
-cat > /etc/apt/sources.list.d/nginx.list <<EOF
-# NGINX Repository
-deb http://nginx.org/packages/mainline/debian/ ${OS} nginx
-deb-src http://nginx.org/packages/mainline/debian/ ${OS} nginx
-EOF
-wget -O - http://nginx.org/packages/keys/nginx_signing.key | apt-key add -
-}
-
-
 function setup-nginx {
 apt-get update
 apt-get upgrade -y
@@ -364,7 +353,7 @@ server {
 }
 
 server {
-  listen 443 http2;
+  listen 443;
   server_name  "";
 
   ssl on;
@@ -428,8 +417,13 @@ EOF
 
 # Create optimized nginx.conf
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
-user nginx nginx;
+NGINX_USER=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f2 | cut -d";" -f1) 
+NGINX_GROUP=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f3 | cut -d";" -f1) 
+if [ ${#NGINX_GROUP} -lt 2 ]; then
+    NGINX_GROUP="${NGINX_USER}";
+fi
+cat > /etc/nginx/nginx.conf <<ENDOFFILE
+user ${NGINX_USER} ${NGINX_GROUP};
 worker_processes 4;
 
 events {
@@ -1180,7 +1174,6 @@ setup-fail2ban
 setup-postfix
 setup-unattended-upgrades
 install-seafile-server-requirements
-add-nginx-org-sources
 setup-nginx
 create-self-signed-certificate-for-nginx
 restart-nginx
