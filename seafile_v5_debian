@@ -51,7 +51,8 @@ HOSTNAME=$(hostname -f)
 SEAFILE_SERVER_ADMIN=admin@${HOSTNAME}
 SEAFILE_SERVER_USER=seafile
 SEAFILE_SERVER_FILESERVER_PORT=8082
-SEAFILE_SERVER_HOME=/opt/seafile/
+# Without trailing slash
+SEAFILE_SERVER_HOME=/opt/seafile
 SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
 
 # Don't touch the following variable, unless you know what you are doing
@@ -712,12 +713,12 @@ fi
 
 function create-seafile-database {
 SEAFILE_DB_PW=$(pwgen 14 1)
-cat > ${SEAFILE_SERVER_HOME}.my.cnf <<EOF
+cat > ${SEAFILE_SERVER_HOME}/.my.cnf <<EOF
 [client]
 user=seafile
 password=${SEAFILE_DB_PW}
 EOF
-chmod 600 ${SEAFILE_SERVER_HOME}.my.cnf
+chmod 600 ${SEAFILE_SERVER_HOME}/.my.cnf
 chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
@@ -885,7 +886,7 @@ USER_PASSWORD_STRENGTH_LEVEL        = 3
 USER_STRONG_PASSWORD_REQUIRED       = True
 ENABLE_MAKE_GROUP_PUBLIC            = False
 ENABLE_THUMBNAIL                    = True
-THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}seahub-data/thumbnail/thumb/'
+THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}/seahub-data/thumbnail/thumb/'
 REPO_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_STRENGTH_LEVEL        = 3
@@ -924,7 +925,7 @@ fi
 function setup-seafile-server-logrotate {
 apt-get install logrotate -y
 cat > /etc/logrotate.d/seafile <<EOF
-${SEAFILE_SERVER_HOME}logs/seaf-server.log
+${SEAFILE_SERVER_HOME}/logs/seaf-server.log
 {
   daily
   missingok
@@ -934,11 +935,11 @@ ${SEAFILE_SERVER_HOME}logs/seaf-server.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}pids/seaf-server.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}pids/seaf-server.pid}
+    [ ! -f ${SEAFILE_SERVER_HOME}/pids/seaf-server.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}/pids/seaf-server.pid}
   endscript
 }
 
-${SEAFILE_SERVER_HOME}logs/ccnet.log
+${SEAFILE_SERVER_HOME}/logs/ccnet.log
 {
   daily
   missingok
@@ -948,7 +949,7 @@ ${SEAFILE_SERVER_HOME}logs/ccnet.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}pids/ccnet.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}pids/ccnet.pid}
+    [ ! -f ${SEAFILE_SERVER_HOME}/pids/ccnet.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}/pids/ccnet.pid}
   endscript
 }
 EOF
@@ -1096,7 +1097,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile Home Dir:    ${SEAFILE_HOME_DIR}
   Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
 
-  Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}.my.cnf
+  Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}/.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
 
   Switch to Seafile system account with: su - ${SEAFILE_SERVER_USER} -s /bin/bash
