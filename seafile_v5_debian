@@ -424,7 +424,7 @@ if [ ${#NGINX_GROUP} -lt 2 ]; then
     NGINX_GROUP="${NGINX_USER}";
 fi
 cat > /etc/nginx/nginx.conf <<ENDOFFILE
-user ${NGINX_USER} ${NGINX_GROUP};
+user $NGINX_USER $NGINX_GROUP;
 worker_processes 4;
 
 events {
@@ -442,9 +442,9 @@ http {
   client_max_body_size 50M;
   include /etc/nginx/mime.types;
   default_type application/octet-stream;
-  log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-  '$status $body_bytes_sent "$http_referer" '
-  '"$http_user_agent" "$http_x_forwarded_for"';
+  log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+  '\$status \$body_bytes_sent "\$http_referer" '
+  '"\$http_user_agent" "\$http_x_forwarded_for"';
   access_log /var/log/nginx/access.log main;
   error_log /var/log/nginx/error.log warn;
   sendfile on;
@@ -466,7 +466,7 @@ http {
   #gzip_disable "MSIE [1-6].";
   include /etc/nginx/conf.d/*.conf;
 
-  map $scheme $php_https {
+  map \$scheme \$php_https {
     default off;
     https on;
   }
@@ -698,7 +698,7 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
     
     if [ $(getconf LONG_BIT) = "64" ]
       then
-       curl -L https://app.seafile.de/f/4ba97d34f3/?dl=1 -o seafile-server_latest_x86-64.tar.gz
+       wget $(wget "https://www.seafile.com/en/download/" -O- | grep -o https://bintray.com/artifact/download/seafile-org/seafile/seafile-server_5.*x86-64.tar.gz) -o seafile-server_latest_x86-64.tar.gz
     else
        curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
     fi
