@@ -342,8 +342,6 @@ fi
 }
 
 function setup-nginx {
-apt-get update
-apt-get upgrade -y
 apt-get install nginx -y
 rm /etc/nginx/conf.d/*
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
