@@ -625,8 +625,8 @@ SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
 DEFAULT_SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
+DEFAULT_CCNET_CONF_DIR=${TOPDIR}/ccnet
 DEFAULT_CONF_DIR=${TOPDIR}/conf
-DEFAULT_CCNET_CONF_DIR=${DEFAULT_CONF_DIR}
 SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
 DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
@@ -643,7 +643,7 @@ SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
 # -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
-  --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${HOSTNAME}"
+  --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
 
 # Fix service url
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
@@ -1020,14 +1020,14 @@ read dummy
 
 
 # -------------------------------------------
-# Aendere Adressen in seahub_settings.py und ccnet.conf
+# Other addresses in seahub_settings.py and ccnet.conf
 # -------------------------------------------
 echo Applying changes
 sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
 sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
 sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
 sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_DIR}/seahub_settings.py
-sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_DIR}/ccnet/ccnet.conf
+sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf
 
 
 # -------------------------------------------
