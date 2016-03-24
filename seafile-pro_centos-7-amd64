@@ -21,6 +21,8 @@
 # Uncomment to run in verbose mode
 set -x
 
+# Stop on first error
+set -e
 
 # -------------------------------------------
 # Make sure hosts entry exists
@@ -71,7 +73,7 @@ echo
 echo
 echo Hostnames
 echo -----------------------------------------------------------------
-echo "$(hostname -f),$(hostname -s),$(hostname -d),$(hostname -i)"
+echo "$(hostname -f),$(hostname -s),$(hostname -d),$(hostname -I|cut -f 1 -d ' ' )"
 echo
 echo
 echo Content of /etc/hosts
@@ -114,9 +116,9 @@ echo -----------------------------------------------------------------
 ip route show table all
 echo
 echo
-echo "Content of /etc/sysconfig/network-scripts/ifcfg-eth*"
+echo "Content of /etc/sysconfig/network-scripts/ifcfg-*"
 echo -----------------------------------------------------------------
-for eth in /etc/sysconfig/network-scripts/ifcfg-eth* ; do echo ${eth} ; cat ${eth} ; done
+for eth in /etc/sysconfig/network-scripts/ifcfg-* ; do echo ${eth} ; cat ${eth} ; done
 echo
 echo
 echo Centos Version
@@ -216,7 +218,7 @@ if [[ -f ${SEAFILE_SOURCE} ]] ;
 then
   echo "  Found ${SEAFILE_SOURCE}. Proceeding with installation..."
 else
-  echo "  Aborting because ${SEAFILE_SOURCE} is missing" ; exit 1
+  echo "  Aborting because SEAFILE_SOURCE environment variable is missing." ; exit 1
 fi
 
 
@@ -365,7 +367,7 @@ EOF
 # -------------------------------------------
 # Create self-signed certificate for NGINX
 # -------------------------------------------
-mkdir /etc/nginx/ssl
+mkdir -p /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
 
@@ -396,7 +398,7 @@ DNS.1 = localhost
 DNS.2 = $(hostname -f)
 DNS.3 = $(hostname -s)
 IP.1 = 127.0.0.1
-IP.2 = $(hostname -i)
+IP.2 = $(hostname -I|cut -f 1 -d ' ')
 EOF
 
 openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf -sha256
@@ -621,10 +623,10 @@ INSTALLPATH=/opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/
 TOPDIR=$(dirname "${INSTALLPATH}")
 SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
-DEFAULT_CCNET_CONF_DIR=${TOPDIR}/ccnet
 DEFAULT_SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 DEFAULT_CONF_DIR=${TOPDIR}/conf
+DEFAULT_CCNET_CONF_DIR=${DEFAULT_CONF_DIR}
 SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
 DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
