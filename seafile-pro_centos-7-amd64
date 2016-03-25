@@ -27,20 +27,15 @@ set -x
 set -e
 
 
-# -------------------------------------------
 # Make sure hosts entry exists
-# -------------------------------------------
 line="$(ip addr show eth0 | grep "inet " | awk '{ print $2 }' | awk -F'/' '{ print $1 }') $(hostname)"
 (cat /etc/hosts; echo "${line}") | uniq > /etc/hosts.uniq ; mv -f /etc/hosts.uniq /etc/hosts
 
 
-# -------------------------------------------
 # Vars
-# -------------------------------------------
 SERVER_NAME=$(hostname -s | cut -c -16)
 while test "${#SERVER_NAME}" -lt 2; do SERVER_NAME="${SERVER_NAME}_"; done
 HOSTNAME=$(hostname -f)
-
 SEAFILE_SERVER_ADMIN=admin@${HOSTNAME}
 SEAFILE_SERVER_USER=seafile
 SEAFILE_SERVER_FILESERVER_PORT=8082
@@ -64,13 +59,9 @@ SEAFILE_SERVER_VERSION=$(echo ${SEAFILE_SERVER_SOURCE} | awk -F '_' '{ print $2}
 
 
 
-# -------------------------------------------
 # Functions
-# -------------------------------------------
 function print-system-infos {
-# -------------------------------------------
 # Log system infos
-# -------------------------------------------
 echo Timestamp
 echo -----------------------------------------------------------------
 date
@@ -155,9 +146,7 @@ cat /etc/passwd
 }
 
 
-# -------------------------------------------
 # Seafile Server Professional Edition on CentOS 7 (64bit)
-# -------------------------------------------
 clear
 cat <<EOF
 
@@ -184,41 +173,31 @@ read dummy
 clear
 
 
-# -------------------------------------------
 # Start the magic
-# -------------------------------------------
 print-system-infos
 
 
-# -------------------------------------------
 # Ensure we are running the installer as root
-# -------------------------------------------
 if [[ $EUID -ne 0 ]]; then
   echo "  Aborting because you are not root" ; exit 1
 fi
 
 
-# -------------------------------------------
 # Abort if user seafile exists
-# -------------------------------------------
 if getent passwd ${SEAFILE_SERVER_USER} > /dev/null 2>&1 ;
 then
   echo "  Aborting because user ${SEAFILE_SERVER_USER} already exist" ; exit 1
 fi
 
 
-# -------------------------------------------
 # Abort if directory /opt/seafile/ exists
-# -------------------------------------------
 if [[ -d "${SEAFILE_SERVER_HOME}" ]] ;
 then
   echo "  Aborting because directory ${SEAFILE_SERVER_HOME} already exist" ; exit 1
 fi
 
 
-# -------------------------------------------
 # Abort if Seafile Professional source is missing
-# -------------------------------------------
 if [[ -f ${SEAFILE_SERVER_SOURCE} ]] ;
 then
   echo "  Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
@@ -227,77 +206,55 @@ else
 fi
 
 
-# -------------------------------------------
 # SELinux
-# -------------------------------------------
 # Put SELinux in permissive mode
 setenforce 0
 # Put SELinux in permissive mode permanently
 sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
 
 
-# -------------------------------------------
 # Add Extra Packages for Enterprise Linux (EPEL)
-# -------------------------------------------
 yum install epel-release -y
 
 
-# -------------------------------------------
 # Upgrade System
-# -------------------------------------------
 yum upgrade -y
 
 
-# -------------------------------------------
 # Additional requirements
-# -------------------------------------------
 yum install sudo ntp less htop pwgen curl openssl nano net-tools lsof deltarpm -y
 
 
-# -------------------------------------------
 # ensure correct time is set
-# -------------------------------------------
 ntpd -gq
 
 
-# -------------------------------------------
 # Security programs
-# -------------------------------------------
 yum install firewalld fail2ban -y
 
 
-# -------------------------------------------
 # Activate firewall
 # https://fedoraproject.org/wiki/FirewallD
 # https://www.optimox.de/tutorials/linux-allgemein/centos-firewall-konfigurieren-mit-firewalld
-# -------------------------------------------
 for i in ssh http https ; do firewall-cmd --zone=public --add-service=${i} --permanent ; done
 firewall-cmd --reload
 
 
-# -------------------------------------------
 # Postfix
-# -------------------------------------------
 yum install postfix -y
 
 
-# -------------------------------------------
 # Unattended upgrades
-# -------------------------------------------
 yum install yum-cron -y
 sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
 
 
-# -------------------------------------------
 # Seafile Professional requirements
-# -------------------------------------------
 yum install java-1.7.0-openjdk poppler-utils python-devel python-setuptools python-imaging \
 MySQL-python memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno -y
 
 
-# -------------------------------------------
 # NGINX
-# -------------------------------------------
 yum install nginx -y
 systemctl enable nginx
 
@@ -369,9 +326,7 @@ server {
 EOF
 
 
-# -------------------------------------------
 # Create self-signed certificate for NGINX
-# -------------------------------------------
 mkdir -p /etc/nginx/ssl
 
 openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
@@ -409,9 +364,7 @@ EOF
 openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf -sha256
 
 
-# -------------------------------------------
 # Create optimized nginx.conf
-# -------------------------------------------
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
 
 cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
@@ -467,9 +420,7 @@ http {
 ENDOFFILE
 
 
-# -------------------------------------------
 # Setup perfect forward secrecy
-# -------------------------------------------
 openssl dhparam -dsaparam -out /etc/nginx/dh4096.pem 4096
 
 cat > /etc/nginx/perfect-forward-secrecy.conf <<'EOF'
@@ -482,18 +433,14 @@ ssl_session_timeout 10m;
 EOF
 
 
-# -------------------------------------------
 # Fix NGINX worker_processes to number of CPU cores
-# -------------------------------------------
 CPUS=$(cat /proc/cpuinfo | grep processor | wc | awk '{ print $1 }')
 eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.conf"
 
 systemctl restart nginx
 
 
-# -------------------------------------------
 # MariaDB
-# -------------------------------------------
 yum install mariadb-server -y
 systemctl start mariadb
 systemctl enable mariadb
@@ -513,9 +460,7 @@ EOF
 chmod 600 /root/.my.cnf
 
 
-# -------------------------------------------
 # Seafile init script
-# -------------------------------------------
 cat > /etc/systemd/system/seafile.service <<'EOF'
 [Unit]
 Description=Seafile Server
@@ -556,9 +501,7 @@ EOF
 systemctl enable seahub
 
 
-# -------------------------------------------
 # Seafile restart script
-# -------------------------------------------
 cat > /usr/local/sbin/seafile-restart << 'EOF'
 #!/bin/bash
 for ACTION in stop start ; do
@@ -571,9 +514,7 @@ EOF
 chmod 700 /usr/local/sbin/seafile-restart
 
 
-# -------------------------------------------
 # Seafile
-# -------------------------------------------
 useradd --system --comment "${SEAFILE_SERVER_USER}" ${SEAFILE_SERVER_USER} --home-dir  ${SEAFILE_SERVER_HOME}
 
 mkdir -p ${SEAFILE_SERVER_HOME}/installed
@@ -585,9 +526,7 @@ mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.ta
 SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
 
 
-# -------------------------------------------
 # Seafile DB
-# -------------------------------------------
 SEAFILE_DB_PW=$(pwgen 14 1)
 cat > ${SEAFILE_SERVER_HOME}/.my.cnf <<EOF
 [client]
@@ -627,9 +566,7 @@ DEST_AVATAR_DIR=${SEAFILE_SERVER_HOME}/seahub-data/avatars
 SEAFILE_SERVER_SYMLINK=${SEAFILE_SERVER_HOME}/seafile-server-latest
 
 
-# -------------------------------------------
 # Create ccnet conf
-# -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib/:${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
   --name "${SERVER_NAME}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
@@ -638,22 +575,16 @@ LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CON
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CONF_DIR}/ccnet.conf"
 
 
-# -------------------------------------------
 # Create seafile conf
-# -------------------------------------------
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_SERVER_DATA_DIR}" \
   --fileserver-port ${SEAFILE_SERVER_FILESERVER_PORT} -F "${DEFAULT_CONF_DIR}"
 
 
-# -------------------------------------------
 # Write seafile.ini
-# -------------------------------------------
 echo "${SEAFILE_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
 
 
-# -------------------------------------------
 # Configure Seafile WebDAV Server(SeafDAV)
-# -------------------------------------------
 mkdir -p ${DEFAULT_CONF_DIR}
 cat > ${DEFAULT_CONF_DIR}/seafdav.conf <<EOF
 [WEBDAV]
@@ -664,30 +595,22 @@ share_name = /seafdav
 EOF
 
 
-# -------------------------------------------
 # generate seahub_settings.py
-# -------------------------------------------
 key=$(python "${SEAHUB_SECRET_KEYGEN}")
 echo "SECRET_KEY = \"${key}\"" > "${DEST_SETTINGS_PY}"
 
 
-# -------------------------------------------
 # prepare avatar directory
-# -------------------------------------------
 mkdir -p "${SEAFILE_SERVER_HOME}/seahub-data"
 mv "${ORIG_AVATAR_DIR}" "${DEST_AVATAR_DIR}"
 ln -s ../../../seahub-data/avatars ${MEDIA_DIR}
 
 
-# -------------------------------------------
 # create logs directory
-# -------------------------------------------
 mkdir -p "${SEAFILE_SERVER_HOME}/logs"
 
 
-# -------------------------------------------
 # Create symlink for current server version
-# -------------------------------------------
 ln -s $(basename ${SEAFILE_SERVER_INSTALL_PATH}) ${SEAFILE_SERVER_SYMLINK}
 
 
@@ -696,23 +619,17 @@ chmod 0600 ${DEST_SETTINGS_PY}
 chmod 0700 ${DEFAULT_CCNET_CONF_DIR} ${SEAFILE_SERVER_DATA_DIR} ${DEFAULT_CONF_DIR}
 
 
-# -------------------------------------------
 # copy user manuals to library template
-# -------------------------------------------
 mkdir -p ${LIBRARY_TEMPLATE_DIR}
 cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 
 
-# -------------------------------------------
 # Setup professional features
-# -------------------------------------------
 PRO_PY=${SEAFILE_SERVER_INSTALL_PATH}/pro/pro.py
 ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
 
 
-# -------------------------------------------
 # Configuring ccnet.conf
-# -------------------------------------------
 cat >> ${DEFAULT_CONF_DIR}/ccnet.conf <<EOF
 
 [Database]
@@ -726,9 +643,7 @@ CONNECTION_CHARSET = utf8
 EOF
 
 
-# -------------------------------------------
 # Configuring seafile.conf
-# -------------------------------------------
 cat >> ${DEFAULT_CONF_DIR}/seafile.conf <<EOF
 
 [database]
@@ -742,9 +657,7 @@ connection_charset = utf8
 EOF
 
 
-# -------------------------------------------
 # Configuring seahub_settings.py
-# -------------------------------------------
 cat >> ${DEST_SETTINGS_PY} <<EOF
 
 DATABASES = {
@@ -803,56 +716,40 @@ USER_STRONG_PASSWORD_REQUIRED       = True
 EOF
 
 
-# -------------------------------------------
 # Backup check_init_admin.py befor applying changes
-# -------------------------------------------
 cp ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup
 
 
-# -------------------------------------------
 # Set admin credentials in check_init_admin.py
-# -------------------------------------------
 SEAFILE_SERVER_ADMIN_PW=$(pwgen 14 1)
 eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_SERVER_ADMIN}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
 eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_SERVER_ADMIN_PW}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
 
 
-# -------------------------------------------
 # Start and stop Seafile eco system. This generates the initial admin user.
-# -------------------------------------------
 ${SEAFILE_SERVER_INSTALL_PATH}/seafile.sh start
 ${SEAFILE_SERVER_INSTALL_PATH}/seahub.sh start
 ${SEAFILE_SERVER_INSTALL_PATH}/seahub.sh stop
 ${SEAFILE_SERVER_INSTALL_PATH}/seafile.sh stop
 
 
-# -------------------------------------------
 # Restore original check_init_admin.py
-# -------------------------------------------
 mv ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py
 
 
-# -------------------------------------------
 # Fix permissions
-# -------------------------------------------
 chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
 
 
-# -------------------------------------------
 # Enable office preview in Seahub
-# -------------------------------------------
 sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
 
 
-# -------------------------------------------
 # Start seafile server
-# -------------------------------------------
 seafile-restart
 
 
-# -------------------------------------------
 # Install seafile-server-change-address script
-# -------------------------------------------
 cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
 #/bin/bash
 #set -x
@@ -961,9 +858,7 @@ ENDOFILE
 chmod 500 /usr/local/sbin/seafile-server-change-address
 
 
-# -------------------------------------------
 # Final report
-# -------------------------------------------
 cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
 
   Your Seafile server
@@ -1041,16 +936,12 @@ chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}/$(basename ${0})_
 
 
 
-# -------------------------------------------
 # Report
-# -------------------------------------------
 print-system-infos
 
 cat ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
 
-# -------------------------------------------
 # Done!
-# -------------------------------------------
 ) 2>&1 | tee /root/$(basename ${0})_installation.log
 chmod 600 /root/$(basename ${0})_installation.log
