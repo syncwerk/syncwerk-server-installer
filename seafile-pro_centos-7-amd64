@@ -695,10 +695,8 @@ ln -s $(basename ${SEAFILE_SERVER_INSTALL_PATH}) ${SEAFILE_SERVER_SYMLINK}
 
 
 # Fix permissions
-chmod 0600 "$DEST_SETTINGS_PY"
-chmod 0700 "$DEFAULT_CCNET_CONF_DIR"
-chmod 0700 "$SEAFILE_SERVER_DATA_DIR"
-chmod 0700 "$DEFAULT_CONF_DIR"
+chmod 0600 ${DEST_SETTINGS_PY}
+chmod 0700 ${DEFAULT_CCNET_CONF_DIR} ${SEAFILE_SERVER_DATA_DIR} ${DEFAULT_CONF_DIR}
 
 
 # -------------------------------------------
