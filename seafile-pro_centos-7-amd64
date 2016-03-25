@@ -44,7 +44,7 @@ HOSTNAME=$(hostname -f)
 SEAFILE_SERVER_ADMIN=admin@${HOSTNAME}
 SEAFILE_SERVER_USER=seafile
 SEAFILE_SERVER_FILESERVER_PORT=8082
-SEAFILE_SERVER_HOME=/opt/seafile
+SEAFILE_SERVER_HOME=/opt/seafile/
 SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
 
 # Don't touch the following variable, unless you know what you are doing
