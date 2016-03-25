@@ -94,7 +94,7 @@ echo
 echo
 echo Memory info
 echo -----------------------------------------------------------------
-cat /proc/memoryinfo
+cat /proc/meminfo
 echo
 echo
 echo Active Kernel
