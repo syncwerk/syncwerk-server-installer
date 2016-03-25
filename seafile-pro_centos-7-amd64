@@ -748,7 +748,7 @@ mv ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup ${SEAFILE_SERVER_IN
 
 
 # Fix permissions
-chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
+chown ${SEAFILE_SERVER_USER}:seafile -R ${SEAFILE_SERVER_HOME}
 
 
 # Enable office preview in Seahub
@@ -941,7 +941,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
 EOF
 
 chmod 600 ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
-chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
+chown -R ${SEAFILE_SERVER_USER}:seafile ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
 
 
