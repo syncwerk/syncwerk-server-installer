@@ -975,6 +975,7 @@ import-seahub-database-structure
 setup-seafile-server
 start-seafile-server
 setup-seafile-server-change-address-script
+installation-summary
 
 
 # Print installation summary
