@@ -612,9 +612,6 @@ mysql seahub-db < ${SEAFILE_SERVER_INSTALL_PATH}/seahub/sql/mysql.sql
 cd ${SEAFILE_SERVER_INSTALL_PATH}
 
 # Vars - Don't touch these unless you really know what you are doing!
-#SCRIPT=$(readlink -f "$0")
-#TOPDIR=$(dirname "${INSTALLPATH}")
-#DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 SRC_DOCS_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${SEAFILE_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
 DEFAULT_CCNET_CONF_DIR=${SEAFILE_SERVER_HOME}/ccnet
@@ -854,104 +851,22 @@ seafile-restart
 
 
 # -------------------------------------------
-# Final report
-# -------------------------------------------
-cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
-
-  Your Seafile server
-  -----------------------------------------------------------------
-
-  Server Name:         ${SERVER_NAME}
-  Server Address:      https://${HOSTNAME}
-
-  Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
-  Admin Password:      ${SEAFILE_SERVER_ADMIN_PW}
-
-  Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
-
-  Seafile DB Credentials:  Check /opt/seafile/.my.cnf
-  Root DB Credentials:     Check /root/.my.cnf
-
-  Switch to Seafile system account with: su - ${SEAFILE_SERVER_USER} -s /bin/bash
-
-
-  Next you should manually complete the following steps
-  -----------------------------------------------------------------
-
-  1) If this server is behind a firewall, you need to ensure that
-     tcp port 443 for the NGINX reverse proxy is open. Optionally
-     you may also open tcp port 80 which redirects all unencrypted
-     http traffic to the encrypted https port.
-
-  2) Seahub tries to send emails via the local Postfix mail server.
-     Make sure Postfix is setup correctly for your environment.
-
-
-  Optional steps
-  -----------------------------------------------------------------
-
-  1) Run seafile-server-change-address to change your Seafile servers DNS name.
-
-  2) Check seahub_settings.py and customize it to fit your needs. Consult
-     http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
-
-  3) Setup NGINX with official SSL certificate.
-
-  4) Harden system with port knocking, fail2ban, etc.
-
-  5) Implement a backup routine for your Seafile server.
-
-
-  Seafile support options
-  -----------------------------------------------------------------
-
-  For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.de
-
-
-  Debug infos
-  -----------------------------------------------------------------
-  If the installation fails for any reason, review
-  /root/$(basename ${0})_installation.log
-  or send us the log by mail to $(basename ${0})@seafile.de
-
-
-  Contribute
-  -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.de
-  for bugs or suggestions about this installer. Thank you!
-
-
-  This report is also saved to ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
-
-EOF
-
-chmod 600 ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
-chown -R ${SEAFILE_SERVER_USER}.${SEAFILE_SERVER_USER} ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
-
-
-# -------------------------------------------
 # Install seafile-server-change-address script
 # -------------------------------------------
 cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
 #/bin/bash
 #set -x
-# -------------------------------------------
+
 # Save at /usr/local/sbin/seafile-server-change-address and set permissions with
 # chmod 500 /usr/local/sbin/seafile-server-change-address
-# -------------------------------------------
 
 
-# -------------------------------------------
 # Vars
-# -------------------------------------------
 HOSTNAME=$(hostname -f)
 SEAFILE_SERVER_HOME=/opt/seafile
 
 
-# -------------------------------------------
 # Intro
-# -------------------------------------------
 clear
 cat <<EOF
 
@@ -1010,26 +925,21 @@ EOF
 read dummy
 
 
-# -------------------------------------------
 # Other addresses in seahub_settings.py and ccnet.conf
-# -------------------------------------------
 echo Applying changes
-sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
-sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
-sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
-sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
-sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf
+sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_SERVER_HOME}/conf/ccnet.conf
 
 
-# -------------------------------------------
 # Starte Seafile neu
-# -------------------------------------------
+echo restarting Seafile server
 seafile-restart
 
 
-# -------------------------------------------
 # Outro
-# -------------------------------------------
 clear
 cat <<EOF
 
@@ -1048,7 +958,6 @@ cat <<EOF
 
 EOF
 ENDOFILE
-
 chmod 500 /usr/local/sbin/seafile-server-change-address
 
 
