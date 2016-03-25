@@ -635,7 +635,7 @@ SEAFILE_SERVER_SYMLINK=${SEAFILE_SERVER_HOME}/seafile-server-latest
 # -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib/:${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
-  --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
+  --name "${SERVER_NAME}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
 
 # Fix service url
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
