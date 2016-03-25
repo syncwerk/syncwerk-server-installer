@@ -644,8 +644,8 @@ eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_C
 # -------------------------------------------
 # Create seafile conf
 # -------------------------------------------
-LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_DATA_DIR}" \
-  --port ${SEAFILE_SERVER_PORT} --fileserver-port ${FILESERVER_PORT}
+LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_SERVER_DATA_DIR}" \
+  --fileserver-port ${SEAFILE_SERVER_FILESERVER_PORT} -F "${DEFAULT_CONF_DIR}"
 
 
 # -------------------------------------------
