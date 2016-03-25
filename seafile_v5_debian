@@ -1095,7 +1095,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
   Admin Password:      ${SEAFILE_SERVER_ADMIN_PASSWORD}
 
-  Seafile Home Dir:    ${SEAFILE_HOME_DIR}
+  Seafile Home Dir:    ${SEAFILE_SERVER_HOME}
   Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
 
   Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}/.my.cnf
