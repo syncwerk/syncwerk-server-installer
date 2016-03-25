@@ -27,11 +27,6 @@ set -x
 set -e
 
 
-# Make sure hosts entry exists
-line="$(ip addr show eth0 | grep "inet " | awk '{ print $2 }' | awk -F'/' '{ print $1 }') $(hostname)"
-(cat /etc/hosts; echo "${line}") | uniq > /etc/hosts.uniq ; mv -f /etc/hosts.uniq /etc/hosts
-
-
 # Vars
 SERVER_NAME=$(hostname -s | cut -c -16)
 while test "${#SERVER_NAME}" -lt 2; do SERVER_NAME="${SERVER_NAME}_"; done
