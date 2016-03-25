@@ -213,7 +213,7 @@ fi
 }
 
 
-function set-premissive-selinux {
+function setup-permissive-selinux {
 # runtime
 setenforce 0
 # permanently
@@ -226,7 +226,7 @@ yum install epel-release -y
 }
 
 
-fuction update-operating-system {
+function update-operating-system {
 yum upgrade -y
 }
 
@@ -267,7 +267,7 @@ MySQL-python memcached python-memcached libreoffice libreoffice-headless libreof
 }
 
 
-function installe-setup-nginx {
+function install-setup-nginx {
 yum install nginx -y
 systemctl enable nginx
 
@@ -953,15 +953,16 @@ are-we-root-abort-if-not
 does-user-exist-and-abort-if-he-does
 does-directory-exist-abort-if-it-does
 abort-if-seafile-professional-source-is-missing
-set-premissive-selinux
+setup-permissive-selinux
 extra-packages-for-enterprise-linux
+update-operating-system
 install-system-utils
 setup-ntpd
 setup-firewall
 install-postfix
 setup-unattended-upgrades
 install-seafile-server-requirments
-installe-setup-nginx
+install-setup-nginx
 create-self-signed-certificate-for-nginx
 restart-nginx
 setup-maridb
