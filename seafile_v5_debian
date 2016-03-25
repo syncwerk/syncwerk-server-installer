@@ -918,7 +918,7 @@ chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
 # Enable office preview in Seahub
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    sed -i 's/enabled = false/enabled = true/' ${SEAFILE_SERVER_HOME}/conf/seafevents.conf
+    sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
 fi
 }
 
