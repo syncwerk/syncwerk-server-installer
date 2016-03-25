@@ -51,14 +51,15 @@ HOSTNAME=$(hostname -f)
 SEAFILE_SERVER_ADMIN=admin@${HOSTNAME}
 SEAFILE_SERVER_USER=seafile
 SEAFILE_SERVER_FILESERVER_PORT=8082
-SEAFILE_SERVER_HOME=/opt/seafile/
+# Without trailing slash
+SEAFILE_SERVER_HOME=/opt/seafile
 SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
 
 # Don't touch the following variable, unless you know what you are doing
 export DEBIAN_FRONTEND=noninteractive
 
 if [ ! -f /usr/bin/lsb_release ]; then
-    echo You need to install lsb-release manually before proceeding. 
+    echo You need to install lsb-release manually before proceeding.
     echo On Debian run \"apt-get install lsb-release\" manually.
     exit
 fi
@@ -117,12 +118,12 @@ echo
 echo
 echo CPU info
 echo -----------------------------------------------------------------
-echo cat /proc/cpuinfo
+cat /proc/cpuinfo
 echo
 echo
 echo Memory info
 echo -----------------------------------------------------------------
-echo cat /proc/meminfo
+cat /proc/meminfo
 echo
 echo
 echo Active Kernel
@@ -189,7 +190,7 @@ clear
 cat <<EOF
 
   Installing Seafile Server ${SEAFILE_SERVER_VERSION} on
-  ${OS_DESC} (${ARCH}). 
+  ${OS_DESC} (${ARCH}).
 
   Features: NGINX, MariaDB, Memcached, SeafDAV, logrotate
   -----------------------------------------------------------------
@@ -262,11 +263,11 @@ apt-get dist-upgrade -y
 
 
 function install-system-utils {
-apt-get install apt-utils dialog mtr nload htop less mc -y
+apt-get install apt-utils dialog mtr nload htop less mc tar -y
 }
 
 
-function setup-ntpd { 
+function setup-ntpd {
 apt-get install ntp -y
 ntpd -gq
 }
@@ -340,20 +341,7 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
 fi
 }
 
-
-function add-nginx-org-sources {
-cat > /etc/apt/sources.list.d/nginx.list <<EOF
-# NGINX Repository
-deb http://nginx.org/packages/mainline/debian/ ${OS} nginx
-deb-src http://nginx.org/packages/mainline/debian/ ${OS} nginx
-EOF
-wget -O - http://nginx.org/packages/keys/nginx_signing.key | apt-key add -
-}
-
-
 function setup-nginx {
-apt-get update
-apt-get upgrade -y
 apt-get install nginx -y
 rm /etc/nginx/conf.d/*
 cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
@@ -364,13 +352,13 @@ server {
 }
 
 server {
-  listen 443 http2;
+  listen 443;
   server_name  "";
 
   ssl on;
   ssl_certificate /etc/nginx/ssl/seafile.crt;
   ssl_certificate_key /etc/nginx/ssl/seafile.key;
-  
+
   proxy_set_header X-Forwarded-For $remote_addr;
 
   location / {
@@ -428,8 +416,13 @@ EOF
 
 # Create optimized nginx.conf
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-cat > /etc/nginx/nginx.conf <<'ENDOFFILE'
-user nginx nginx;
+NGINX_USER=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f2 | cut -d";" -f1)
+NGINX_GROUP=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f3 | cut -d";" -f1)
+if [ ${#NGINX_GROUP} -lt 2 ]; then
+    NGINX_GROUP="${NGINX_USER}";
+fi
+cat > /etc/nginx/nginx.conf <<ENDOFFILE
+user $NGINX_USER $NGINX_GROUP;
 worker_processes 4;
 
 events {
@@ -447,9 +440,9 @@ http {
   client_max_body_size 50M;
   include /etc/nginx/mime.types;
   default_type application/octet-stream;
-  log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-  '$status $body_bytes_sent "$http_referer" '
-  '"$http_user_agent" "$http_x_forwarded_for"';
+  log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+  '\$status \$body_bytes_sent "\$http_referer" '
+  '"\$http_user_agent" "\$http_x_forwarded_for"';
   access_log /var/log/nginx/access.log main;
   error_log /var/log/nginx/error.log warn;
   sendfile on;
@@ -471,7 +464,7 @@ http {
   #gzip_disable "MSIE [1-6].";
   include /etc/nginx/conf.d/*.conf;
 
-  map $scheme $php_https {
+  map \$scheme \$php_https {
     default off;
     https on;
   }
@@ -697,20 +690,23 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
     mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
     SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
   else
-    
-    # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok. 
+
+    # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok.
     #curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
-    
+
     if [ $(getconf LONG_BIT) = "64" ]
       then
-       curl -L https://app.seafile.de/f/4ba97d34f3/?dl=1 -o seafile-server_latest_x86-64.tar.gz
+
+       wget $(wget "https://www.seafile.com/en/download/" -O- | grep -o https://bintray.com/artifact/download/seafile-org/seafile/seafile-server_5.*x86-64.tar.gz) -O seafile-server_latest_x86-64.tar.gz
+       tountar="seafile-server_latest_x86-64.tar.gz"
     else
        curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+       tountar="seafile-server_latest_${ARCH}.tar.gz"
     fi
 
-    tar xzf seafile-server_latest_${ARCH}.tar.gz
+    tar xzf $tountar
     SEAFILE_SERVER_VERSION=$(basename ${SEAFILE_SERVER_HOME}/seafile-server-* | awk -F'-' ' { print $3 }')
-    mv seafile-server_latest_${ARCH}.tar.gz installed/seafile-server_${SEAFILE_SERVER_VERSION}_${ARCH}.tar.gz
+    mv $tountar installed/seafile-server_${SEAFILE_SERVER_VERSION}_${ARCH}.tar.gz
     SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-server-${SEAFILE_SERVER_VERSION}/
 fi
 }
@@ -718,12 +714,12 @@ fi
 
 function create-seafile-database {
 SEAFILE_DB_PW=$(pwgen 14 1)
-cat > ${SEAFILE_SERVER_HOME}.my.cnf <<EOF
+cat > ${SEAFILE_SERVER_HOME}/.my.cnf <<EOF
 [client]
 user=seafile
 password=${SEAFILE_DB_PW}
 EOF
-chmod 600 ${SEAFILE_SERVER_HOME}.my.cnf
+chmod 600 ${SEAFILE_SERVER_HOME}/.my.cnf
 chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
@@ -828,7 +824,7 @@ CONNECTION_CHARSET = utf8
 EOF
 
 # Configuring seafile.conf
-cat >> ${Configuring ccnet.conf}/seafile.conf <<EOF
+cat >> ${DEFAULT_CONF_DIR}/seafile.conf <<EOF
 
 [database]
 type = mysql
@@ -891,7 +887,7 @@ USER_PASSWORD_STRENGTH_LEVEL        = 3
 USER_STRONG_PASSWORD_REQUIRED       = True
 ENABLE_MAKE_GROUP_PUBLIC            = False
 ENABLE_THUMBNAIL                    = True
-THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}seahub-data/thumbnail/thumb/'
+THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}/seahub-data/thumbnail/thumb/'
 REPO_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_STRENGTH_LEVEL        = 3
@@ -922,7 +918,7 @@ chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
 # Enable office preview in Seahub
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    sed -i 's/enabled = false/enabled = true/' ${SEAFILE_SERVER_HOME}/conf/seafevents.conf
+    sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
 fi
 }
 
@@ -930,7 +926,7 @@ fi
 function setup-seafile-server-logrotate {
 apt-get install logrotate -y
 cat > /etc/logrotate.d/seafile <<EOF
-${SEAFILE_SERVER_HOME}logs/seaf-server.log
+${SEAFILE_SERVER_HOME}/logs/seaf-server.log
 {
   daily
   missingok
@@ -940,11 +936,11 @@ ${SEAFILE_SERVER_HOME}logs/seaf-server.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}pids/seaf-server.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}pids/seaf-server.pid}
+    [ ! -f ${SEAFILE_SERVER_HOME}/pids/seaf-server.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}/pids/seaf-server.pid}
   endscript
 }
 
-${SEAFILE_SERVER_HOME}logs/ccnet.log
+${SEAFILE_SERVER_HOME}/logs/ccnet.log
 {
   daily
   missingok
@@ -954,7 +950,7 @@ ${SEAFILE_SERVER_HOME}logs/ccnet.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}pids/ccnet.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}pids/ccnet.pid}
+    [ ! -f ${SEAFILE_SERVER_HOME}/pids/ccnet.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}/pids/ccnet.pid}
   endscript
 }
 EOF
@@ -1099,10 +1095,10 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
   Admin Password:      ${SEAFILE_SERVER_ADMIN_PASSWORD}
 
-  Seafile Home Dir:    ${SEAFILE_HOME_DIR}
+  Seafile Home Dir:    ${SEAFILE_SERVER_HOME}
   Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
 
-  Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}.my.cnf
+  Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}/.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
 
   Switch to Seafile system account with: su - ${SEAFILE_SERVER_USER} -s /bin/bash
@@ -1180,7 +1176,6 @@ setup-fail2ban
 setup-postfix
 setup-unattended-upgrades
 install-seafile-server-requirements
-add-nginx-org-sources
 setup-nginx
 create-self-signed-certificate-for-nginx
 restart-nginx
