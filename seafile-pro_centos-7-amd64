@@ -182,7 +182,7 @@ clear
 
 function are-we-root-abort-if-not {
 if [[ $EUID -ne 0 ]]; then
-  echo "  Aborting because you are not root" ; exit 1
+  echo "Aborting because you are not root" ; exit 1
 fi
 }
 
@@ -190,7 +190,7 @@ fi
 function does-user-exist-and-abort-if-he-does {
 if getent passwd ${SEAFILE_SERVER_USER} > /dev/null 2>&1 ;
 then
-  echo "  Aborting because user ${SEAFILE_SERVER_USER} already exist" ; exit 1
+  echo "Aborting because user ${SEAFILE_SERVER_USER} already exist" ; exit 1
 fi
 }
 
@@ -198,7 +198,7 @@ fi
 function does-directory-exist-abort-if-it-does {
 if [[ -d "${SEAFILE_SERVER_HOME}" ]] ;
 then
-  echo "  Aborting because directory ${SEAFILE_SERVER_HOME} already exist" ; exit 1
+  echo "Aborting because directory ${SEAFILE_SERVER_HOME} already exist" ; exit 1
 fi
 }
 
@@ -206,9 +206,9 @@ fi
 function abort-if-seafile-professional-source-is-missing {
 if [[ -f ${SEAFILE_SERVER_SOURCE} ]] ;
 then
-  echo "  Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
+  echo "Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
 else
-  echo "  Aborting because SEAFILE_SERVER_SOURCE environment variable is missing." ; exit 1
+  echo "Aborting because SEAFILE_SERVER_SOURCE environment variable is missing." ; exit 1
 fi
 }
 
