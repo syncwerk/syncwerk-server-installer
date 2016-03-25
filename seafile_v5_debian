@@ -824,7 +824,7 @@ CONNECTION_CHARSET = utf8
 EOF
 
 # Configuring seafile.conf
-cat >> ${Configuring ccnet.conf}/seafile.conf <<EOF
+cat >> ${DEFAULT_CONF_DIR}/seafile.conf <<EOF
 
 [database]
 type = mysql
@@ -918,7 +918,7 @@ chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
 # Enable office preview in Seahub
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    sed -i 's/enabled = false/enabled = true/' ${SEAFILE_SERVER_HOME}/conf/seafevents.conf
+    sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
 fi
 }
 
@@ -1095,7 +1095,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
   Admin Password:      ${SEAFILE_SERVER_ADMIN_PASSWORD}
 
-  Seafile Home Dir:    ${SEAFILE_HOME_DIR}
+  Seafile Home Dir:    ${SEAFILE_SERVER_HOME}
   Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
 
   Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}/.my.cnf
