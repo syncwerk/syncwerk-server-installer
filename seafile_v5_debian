@@ -824,7 +824,7 @@ CONNECTION_CHARSET = utf8
 EOF
 
 # Configuring seafile.conf
-cat >> ${Configuring ccnet.conf}/seafile.conf <<EOF
+cat >> ${DEFAULT_CONF_DIR}/seafile.conf <<EOF
 
 [database]
 type = mysql
