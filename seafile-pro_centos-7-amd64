@@ -3,7 +3,9 @@
 #
 # seafile-server-installer/seafile-pro_centos-7-amd64
 #
-# Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
+# Copyright 2015-2016
+#   Alexander Jackson <alexander.jackson@seafile.de>
+#   J. Fernando Lagrange <fernando.lagrange@seafile.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +26,7 @@ set -x
 # Stop on first error
 set -e
 
+
 # -------------------------------------------
 # Make sure hosts entry exists
 # -------------------------------------------
@@ -35,20 +38,18 @@ line="$(ip addr show eth0 | grep "inet " | awk '{ print $2 }' | awk -F'/' '{ pri
 # Vars
 # -------------------------------------------
 SERVER_NAME=$(hostname -s | cut -c -16)
+while test "${#SERVER_NAME}" -lt 2; do SERVER_NAME="${SERVER_NAME}_"; done
 HOSTNAME=$(hostname -f)
-SEAFILE_ADMIN=admin@${HOSTNAME}
-SEAFILE_USER=seafile
-FILESERVER_PORT=8082
-SERVER_PORT=10001
-SEAFILE_SERVER_PORT=12001
-SEAFILE_DIR=/opt/seafile
-SEAFILE_TIME_ZONE="Europe/Berlin"
+
+SEAFILE_SERVER_ADMIN=admin@${HOSTNAME}
+SEAFILE_SERVER_USER=seafile
+SEAFILE_SERVER_FILESERVER_PORT=8082
+SEAFILE_SERVER_HOME=/opt/seafile
+SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
+
 # Don't touch the following variable, unless you know what you are doing
-SEAFILE_EDITION=pro-server
-SEAFILE_SOURCE=$(find /usr/src/seafile/seafile-${SEAFILE_EDITION}_*_x86-64.tar.gz | sort -r | head -1)
-SEAFILE_VERSION=$(echo ${SEAFILE_SOURCE} | awk -F '_' '{ print $2}')
-#export DEBIAN_FRONTEND=noninteractive
-OS=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $1 }')
+OS=$(yum version | grep "^Inst" | awk '{ print $2 }' | awk -F'/' '{ print $1 }')
+
 # Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
   then
@@ -56,7 +57,11 @@ if [ $(getconf LONG_BIT) = "64" ]
   else
     ARCH=i386
 fi
-PACKAGE_ARCH=$(yum version | grep "^Installed:" | awk '{ print $2 }' | awk -F'/' '{ print $2 }')
+PACKAGE_ARCH=$(yum version | grep "^Inst:" | awk '{ print $2 }' | awk -F'/' '{ print $2 }')
+
+SEAFILE_SERVER_SOURCE=$(find /usr/src/seafile/seafile-pro-server_*_x86-64.tar.gz | sort -r | head -1)
+SEAFILE_SERVER_VERSION=$(echo ${SEAFILE_SERVER_SOURCE} | awk -F '_' '{ print $2}')
+
 
 
 # -------------------------------------------
@@ -151,12 +156,12 @@ cat /etc/passwd
 
 
 # -------------------------------------------
-# Seafile Server Professional Edition on Debian (64bit)
+# Seafile Server Professional Edition on CentOS 7 (64bit)
 # -------------------------------------------
 clear
 cat <<EOF
 
-  Install Seafile Server Professional Edition on Centos 7.
+  Install Seafile Server Professional Edition on CentOS 7.
   Seafile Server Professional Edition is only available for 64bit.
 
   - Seafile Professional, NGINX, MariaDB, Memcached -
@@ -196,29 +201,29 @@ fi
 # -------------------------------------------
 # Abort if user seafile exists
 # -------------------------------------------
-if getent passwd ${SEAFILE_USER} > /dev/null 2>&1 ;
+if getent passwd ${SEAFILE_SERVER_USER} > /dev/null 2>&1 ;
 then
-  echo "  Aborting because user ${SEAFILE_USER} already exist" ; exit 1
+  echo "  Aborting because user ${SEAFILE_SERVER_USER} already exist" ; exit 1
 fi
 
 
 # -------------------------------------------
 # Abort if directory /opt/seafile/ exists
 # -------------------------------------------
-if [[ -d "/opt/seafile/" ]] ;
+if [[ -d "${SEAFILE_SERVER_HOME}" ]] ;
 then
-  echo "  Aborting because directory /opt/seafile/ already exist" ; exit 1
+  echo "  Aborting because directory ${SEAFILE_SERVER_HOME} already exist" ; exit 1
 fi
 
 
 # -------------------------------------------
 # Abort if Seafile Professional source is missing
 # -------------------------------------------
-if [[ -f ${SEAFILE_SOURCE} ]] ;
+if [[ -f ${SEAFILE_SERVER_SOURCE} ]] ;
 then
-  echo "  Found ${SEAFILE_SOURCE}. Proceeding with installation..."
+  echo "  Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
 else
-  echo "  Aborting because SEAFILE_SOURCE environment variable is missing." ; exit 1
+  echo "  Aborting because SEAFILE_SERVER_SOURCE environment variable is missing." ; exit 1
 fi
 
 
@@ -569,79 +574,66 @@ chmod 700 /usr/local/sbin/seafile-restart
 # -------------------------------------------
 # Seafile
 # -------------------------------------------
-useradd --system --comment "${SEAFILE_USER}" ${SEAFILE_USER} --home-dir  /opt/seafile
-mkdir -p /opt/seafile/installed
-cd /opt/seafile/
-cp ${SEAFILE_SOURCE} ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
-tar xzf ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
+useradd --system --comment "${SEAFILE_SERVER_USER}" ${SEAFILE_SERVER_USER} --home-dir  ${SEAFILE_SERVER_HOME}
 
-mv ./seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz installed/seafile-${SEAFILE_EDITION}_${SEAFILE_VERSION}_x86-64.tar.gz
+mkdir -p ${SEAFILE_SERVER_HOME}/installed
+
+cd ${SEAFILE_SERVER_HOME}
+cp ${SEAFILE_SERVER_SOURCE} ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+tar xzf ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
 
 
 # -------------------------------------------
 # Seafile DB
 # -------------------------------------------
 SEAFILE_DB_PW=$(pwgen 14 1)
-
-cat > /opt/seafile/.my.cnf <<EOF
+cat > ${SEAFILE_SERVER_HOME}/.my.cnf <<EOF
 [client]
 user=seafile
 password=${SEAFILE_DB_PW}
 EOF
-
-chmod 600 /opt/seafile/.my.cnf
-chown -R ${SEAFILE_USER}.${SEAFILE_USER} /opt/seafile/
-
-# Create databases
+chmod 600 ${SEAFILE_SERVER_HOME}/.my.cnf
+chown -R ${SEAFILE_SERVER_USER}.${SEAFILE_SERVER_USER} ${SEAFILE_SERVER_HOME}
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-
-# Create user
 mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '$SEAFILE_DB_PW';"
-
-# Grant privileges on databases to user
 mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
 
 # Import Seahub database structure
-mysql seahub-db < /opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub/sql/mysql.sql
+mysql seahub-db < ${SEAFILE_SERVER_INSTALL_PATH}/seahub/sql/mysql.sql
 
 
-# -------------------------------------------
-# Go to /opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}
-# -------------------------------------------
-cd /opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/
+# Setup Seafile server
+cd ${SEAFILE_SERVER_INSTALL_PATH}
 
-
-# -------------------------------------------
 # Vars - Don't touch these unless you really know what you are doing!
-# -------------------------------------------
-SCRIPT=$(readlink -f "$0")
-INSTALLPATH=/opt/seafile/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/
-TOPDIR=$(dirname "${INSTALLPATH}")
-SRC_DOCS_DIR=${INSTALLPATH}/seafile/docs/
-SEAHUB_SECRET_KEYGEN=${INSTALLPATH}/seahub/tools/secret_key_generator.py
-DEFAULT_SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
-DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
-DEFAULT_CCNET_CONF_DIR=${TOPDIR}/ccnet
-DEFAULT_CONF_DIR=${TOPDIR}/conf
-SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
-LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
-DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
-CCNET_INIT=${INSTALLPATH}/seafile/bin/ccnet-init
-SEAF_SERVER_INIT=${INSTALLPATH}/seafile/bin/seaf-server-init
-MEDIA_DIR=${INSTALLPATH}/seahub/media
-ORIG_AVATAR_DIR=${INSTALLPATH}/seahub/media/avatars
-DEST_AVATAR_DIR=${TOPDIR}/seahub-data/avatars
-SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
+#SCRIPT=$(readlink -f "$0")
+#TOPDIR=$(dirname "${INSTALLPATH}")
+#DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
+SRC_DOCS_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seafile/docs/
+SEAHUB_SECRET_KEYGEN=${SEAFILE_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
+DEFAULT_CCNET_CONF_DIR=${SEAFILE_SERVER_HOME}/ccnet
+DEFAULT_CONF_DIR=${SEAFILE_SERVER_HOME}/conf
+SEAFILE_SERVER_DATA_DIR=${SEAFILE_SERVER_HOME}/seafile-data
+LIBRARY_TEMPLATE_DIR=${SEAFILE_SERVER_DATA_DIR}/library-template
+DEST_SETTINGS_PY=${SEAFILE_SERVER_HOME}/seahub_settings.py
+CCNET_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/ccnet-init
+SEAF_SERVER_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/seaf-server-init
+MEDIA_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seahub/media
+ORIG_AVATAR_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seahub/media/avatars
+DEST_AVATAR_DIR=${SEAFILE_SERVER_HOME}/seahub-data/avatars
+SEAFILE_SERVER_SYMLINK=${SEAFILE_SERVER_HOME}/seafile-server-latest
 
 
 # -------------------------------------------
 # Create ccnet conf
 # -------------------------------------------
-export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
+export SEAFILE_LD_LIBRARY_PATH=${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib/:${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
   --name "${SERVER_NAME}" --port "${SERVER_PORT}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
 
@@ -659,7 +651,7 @@ LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SE
 # -------------------------------------------
 # Write seafile.ini
 # -------------------------------------------
-echo "${SEAFILE_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
+echo "${SEAFILE_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
 
 
 # -------------------------------------------
@@ -685,7 +677,7 @@ echo "SECRET_KEY = \"${key}\"" > "${DEST_SETTINGS_PY}"
 # -------------------------------------------
 # prepare avatar directory
 # -------------------------------------------
-mkdir -p "${TOPDIR}/seahub-data"
+mkdir -p "${SEAFILE_SERVER_HOME}/seahub-data"
 mv "${ORIG_AVATAR_DIR}" "${DEST_AVATAR_DIR}"
 ln -s ../../../seahub-data/avatars ${MEDIA_DIR}
 
@@ -693,19 +685,19 @@ ln -s ../../../seahub-data/avatars ${MEDIA_DIR}
 # -------------------------------------------
 # create logs directory
 # -------------------------------------------
-mkdir -p "${TOPDIR}/logs"
+mkdir -p "${SEAFILE_SERVER_HOME}/logs"
 
 
 # -------------------------------------------
 # Create symlink for current server version
 # -------------------------------------------
-ln -s $(basename ${INSTALLPATH}) ${SEAFILE_SERVER_SYMLINK}
+ln -s $(basename ${SEAFILE_SERVER_INSTALL_PATH}) ${SEAFILE_SERVER_SYMLINK}
 
 
 # Fix permissions
 chmod 0600 "$DEST_SETTINGS_PY"
 chmod 0700 "$DEFAULT_CCNET_CONF_DIR"
-chmod 0700 "$SEAFILE_DATA_DIR"
+chmod 0700 "$SEAFILE_SERVER_DATA_DIR"
 chmod 0700 "$DEFAULT_CONF_DIR"
 
 
@@ -719,7 +711,7 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 # -------------------------------------------
 # Setup professional features
 # -------------------------------------------
-${INSTALLPATH}/pro/pro.py setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+${SEAFILE_SERVER_INSTALL_PATH}/pro/pro.py setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
 
 
 # -------------------------------------------
@@ -741,7 +733,7 @@ EOF
 # -------------------------------------------
 # Configuring seafile.conf
 # -------------------------------------------
-cat >> ${TOPDIR}/seafile-data/seafile.conf <<EOF
+cat >> ${SEAFILE_SERVER_HOME}/seafile-data/seafile.conf <<EOF
 
 [database]
 type = mysql
@@ -787,7 +779,7 @@ EMAIL_HOST_PASSWORD                 = ''
 EMAIL_PORT                          = '25'
 DEFAULT_FROM_EMAIL                  = 'noreply@${HOSTNAME}'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
-TIME_ZONE                           = '${SEAFILE_TIME_ZONE}'
+TIME_ZONE                           = '${SEAFILE_SERVER_TIME_ZONE}'
 SITE_BASE                           = 'https://${HOSTNAME}'
 SITE_NAME                           = 'Seafile Server'
 SITE_TITLE                          = 'Seafile Server'
@@ -807,7 +799,7 @@ USER_PASSWORD_STRENGTH_LEVEL        = 3
 USER_STRONG_PASSWORD_REQUIRED       = True
 ENABLE_MAKE_GROUP_PUBLIC            = False
 ENABLE_THUMBNAIL                    = True
-THUMBNAIL_ROOT                      = '${TOPDIR}/seahub-data/thumbnail/thumb/'
+THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}/seahub-data/thumbnail/thumb/'
 REPO_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_STRENGTH_LEVEL        = 3
@@ -818,42 +810,42 @@ EOF
 # -------------------------------------------
 # Backup check_init_admin.py befor applying changes
 # -------------------------------------------
-cp ${INSTALLPATH}/check_init_admin.py ${INSTALLPATH}/check_init_admin.py.backup
+cp ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup
 
 
 # -------------------------------------------
 # Set admin credentials in check_init_admin.py
 # -------------------------------------------
-SEAFILE_ADMIN_PW=$(pwgen 14 1)
-eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_ADMIN}\"/' ${INSTALLPATH}/check_init_admin.py"
-eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH}/check_init_admin.py"
+SEAFILE_SERVER_ADMIN_PW=$(pwgen 14 1)
+eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_SERVER_ADMIN}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
+eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_SERVER_ADMIN_PW}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
 
 
 # -------------------------------------------
 # Start and stop Seafile eco system. This generates the initial admin user.
 # -------------------------------------------
-${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seafile.sh start
-${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub.sh start
-${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seahub.sh stop
-${TOPDIR}/seafile-${SEAFILE_EDITION}-${SEAFILE_VERSION}/seafile.sh stop
+${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/seafile.sh start
+${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/seahub.sh start
+${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/seahub.sh stop
+${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/seafile.sh stop
 
 
 # -------------------------------------------
 # Restore original check_init_admin.py
 # -------------------------------------------
-mv ${INSTALLPATH}/check_init_admin.py.backup ${INSTALLPATH}/check_init_admin.py
+mv ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py
 
 
 # -------------------------------------------
 # Fix permissions
 # -------------------------------------------
-chown ${SEAFILE_USER}.${SEAFILE_USER} -R /opt/seafile/
+chown ${SEAFILE_SERVER_USER}.${SEAFILE_SERVER_USER} -R /opt/seafile/
 
 
 # -------------------------------------------
 # Enable office preview in Seahub
 # -------------------------------------------
-sed -i 's/enabled = false/enabled = true/' ${TOPDIR}/pro-data/seafevents.conf
+sed -i 's/enabled = false/enabled = true/' ${SEAFILE_SERVER_HOME}/pro-data/seafevents.conf
 
 
 # -------------------------------------------
@@ -865,7 +857,7 @@ seafile-restart
 # -------------------------------------------
 # Final report
 # -------------------------------------------
-cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
+cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
 
   Your Seafile server
   -----------------------------------------------------------------
@@ -873,15 +865,15 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   Server Name:         ${SERVER_NAME}
   Server Address:      https://${HOSTNAME}
 
-  Seafile Admin:       ${SEAFILE_ADMIN}
-  Admin Password:      ${SEAFILE_ADMIN_PW}
+  Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
+  Admin Password:      ${SEAFILE_SERVER_ADMIN_PW}
 
-  Seafile Data Dir:    ${SEAFILE_DATA_DIR}
+  Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
 
   Seafile DB Credentials:  Check /opt/seafile/.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
 
-  Switch to Seafile system account with: su - ${SEAFILE_USER} -s /bin/bash
+  Switch to Seafile system account with: su - ${SEAFILE_SERVER_USER} -s /bin/bash
 
 
   Next you should manually complete the following steps
@@ -931,12 +923,12 @@ cat > ${SEAFILE_DIR}/$(basename ${0})_report.log<<EOF
   for bugs or suggestions about this installer. Thank you!
 
 
-  This report is also saved to ${SEAFILE_DIR}/$(basename ${0})_report.log
+  This report is also saved to ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
 EOF
 
-chmod 600 ${SEAFILE_DIR}/$(basename ${0})_report.log
-chown -R ${SEAFILE_USER}.${SEAFILE_USER} ${SEAFILE_DIR}/$(basename ${0})_report.log
+chmod 600 ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
+chown -R ${SEAFILE_SERVER_USER}.${SEAFILE_SERVER_USER} ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
 
 # -------------------------------------------
@@ -955,7 +947,7 @@ cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
 # Vars
 # -------------------------------------------
 HOSTNAME=$(hostname -f)
-SEAFILE_DIR=/opt/seafile
+SEAFILE_SERVER_HOME=/opt/seafile
 
 
 # -------------------------------------------
@@ -1023,10 +1015,10 @@ read dummy
 # Other addresses in seahub_settings.py and ccnet.conf
 # -------------------------------------------
 echo Applying changes
-sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
-sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
-sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_DIR}/seahub_settings.py
-sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_DIR}/seahub_settings.py
+sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
+sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
+sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
+sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_SERVER_HOME}/seahub_settings.py
 sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf
 
 
@@ -1066,7 +1058,7 @@ chmod 500 /usr/local/sbin/seafile-server-change-address
 # -------------------------------------------
 print-system-infos
 
-cat ${SEAFILE_DIR}/$(basename ${0})_report.log
+cat ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
 
 # -------------------------------------------
