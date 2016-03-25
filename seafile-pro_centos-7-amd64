@@ -87,6 +87,16 @@ echo -----------------------------------------------------------------
 echo ${PACKAGE_ARCH}
 echo
 echo
+echo CPU info
+echo -----------------------------------------------------------------
+cat /proc/cpuinfo
+echo
+echo
+echo Memory info
+echo -----------------------------------------------------------------
+cat /proc/memoryinfo
+echo
+echo
 echo Active Kernel
 echo -----------------------------------------------------------------
 uname -a
