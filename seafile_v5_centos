@@ -27,6 +27,29 @@
 set -e
 
 
+# Determine which Seafile version to install
+cat <<EOF
+
+  Possible options:
+  1 = Seafile Community Edition (CE)
+  2 = Seafile Professional (PRO)
+
+EOF
+PS3="Which Seafile version would you like to install? "
+select SEAFILE_SERVER_VERSION in CE PRO ABORT
+do
+case "${SEAFILE_SERVER_VERSION}" in
+ABORT) echo "Aborting" ; break ;;
+"") echo "$REPLY: Wrong value. Select 1 or 2." ;;
+*)
+if [ ${SEAFILE_SERVER_VERSION} = "CE" ]
+then
+SEAFILE_SERVER_PROFESSIONAL=disabled
+else
+SEAFILE_SERVER_PROFESSIONAL=enabled
+fi
+
+
 # Vars
 SERVER_NAME=$(hostname -s | cut -c -16)
 while test "${#SERVER_NAME}" -lt 2; do SERVER_NAME="${SERVER_NAME}_"; done
@@ -49,8 +72,12 @@ if [ $(getconf LONG_BIT) = "64" ]
 fi
 PACKAGE_ARCH=$(yum version | grep "^Inst:" | awk '{ print $2 }' | awk -F'/' '{ print $2 }')
 
-SEAFILE_SERVER_SOURCE=$(find /usr/src/seafile/seafile-pro-server_*_x86-64.tar.gz | sort -r | head -1)
-SEAFILE_SERVER_VERSION=$(echo ${SEAFILE_SERVER_SOURCE} | awk -F '_' '{ print $2}')
+if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+  then
+    # Seafile Professional
+    SEAFILE_SERVER_SOURCE=$(find /usr/src/seafile/seafile-pro-server_*_x86-64.tar.gz | sort -r | head -1)
+    SEAFILE_SERVER_VERSION=$(echo ${SEAFILE_SERVER_SOURCE} | awk -F '_' '{ print $2}')
+fi
 
 
 
@@ -261,9 +288,15 @@ sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
 }
 
 
-function install-seafile-server-requirments {
-yum install java-1.7.0-openjdk poppler-utils python-devel python-setuptools python-imaging \
-MySQL-python memcached python-memcached libreoffice libreoffice-headless libreoffice-pyuno -y
+function install-seafile-server-requirements {
+yum install sudo python-setuptools python-simplejson python-pillow MySQL-python memcached python-memcached curl openssl -y
+
+# Seafile Professional requirements
+if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+ then
+   yum install java-1.7.0-openjdk poppler-utils libreoffice libreoffice-headless libreoffice-pyuno \
+       libreoffice-pyuno wqy-microhei-fonts wqy-zenhei-fonts wqy-unibit-fonts -y
+fi
 }
 
 
@@ -544,10 +577,23 @@ mkdir -p ${SEAFILE_SERVER_HOME}/installed
 
 function get-seafile-sources {
 cd ${SEAFILE_SERVER_HOME}
-cp ${SEAFILE_SERVER_SOURCE} ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-tar xzf ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
+if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+  then
+    cp ${SEAFILE_SERVER_SOURCE} ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+    tar xzf ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+    mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+    SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
+  else
+    # Download latest CE version
+    curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+    tountar="seafile-server_latest_${ARCH}.tar.gz"
+
+    tar xzf $tountar
+    SEAFILE_SERVER_VERSION=$(basename ${SEAFILE_SERVER_HOME}/seafile-server-* | awk -F'-' ' { print $3 }')
+    mv $tountar installed/seafile-server_${SEAFILE_SERVER_VERSION}_${ARCH}.tar.gz
+    SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-server-${SEAFILE_SERVER_VERSION}/
+fi
+
 }
 
 
@@ -644,8 +690,11 @@ mkdir -p ${LIBRARY_TEMPLATE_DIR}
 cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 
 # Setup professional features
-PRO_PY=${SEAFILE_SERVER_INSTALL_PATH}/pro/pro.py
-${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+  then
+    PRO_PY=${SEAFILE_SERVER_INSTALL_PATH}/pro/pro.py
+    ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+fi
 
 # Configuring ccnet.conf
 cat >> ${DEFAULT_CONF_DIR}/ccnet.conf <<EOF
@@ -753,7 +802,10 @@ mv ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup ${SEAFILE_SERVER_IN
 chown ${SEAFILE_SERVER_USER}:seafile -R ${SEAFILE_SERVER_HOME}
 
 # Enable office preview in Seahub
-sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
+if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+  then
+    sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
+fi
 }
 
 
