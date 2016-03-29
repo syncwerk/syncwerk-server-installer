@@ -288,7 +288,12 @@ sed -i 's/^apply_updates.*/apply_updates = yes/' /etc/yum/yum-cron.conf
 
 
 function install-seafile-server-requirements {
-yum install sudo python-setuptools python-simplejson python-pillow MySQL-python memcached python-memcached curl openssl -y
+# Take bundled ldap libraries out of library path (and use/install system's ones)
+cd ${SEAFILE_SERVER_HOME}/seafile-server-latest/seafile/lib
+mkdir disabled_libs_use_local_ones_instead
+mv libnssutil3.so disabled_libs_use_local_ones_instead/
+
+yum install python-setuptools python-simplejson python-pillow MySQL-python memcached python-memcached curl openssl nss-pam-ldapd -y
 
 # Seafile Professional requirements
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
