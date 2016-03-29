@@ -179,14 +179,13 @@ cat /etc/passwd
 
 
 function description {
-# Seafile Server Professional Edition on CentOS 7 (64bit)
 clear
 cat <<EOF
 
-  Install Seafile Server Professional Edition on CentOS 7.
-  Seafile Server Professional Edition is only available for 64bit.
+  Installing Seafile Server ${SEAFILE_SERVER_VERSION} on
+  ${OS_DESC} (${ARCH}).
 
-  - Seafile Professional, NGINX, MariaDB, Memcached -
+  Features: NGINX, MariaDB, Memcached, SeafDAV.
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
