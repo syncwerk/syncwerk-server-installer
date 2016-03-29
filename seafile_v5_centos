@@ -1,5 +1,5 @@
 #!/bin/bash
-(
+
 #
 # seafile-server-installer/seafile-pro_centos-7-amd64
 #
@@ -25,6 +25,14 @@
 
 # Stop on first error
 set -e
+
+# Use logfile
+# See <http://mywiki.wooledge.org/BashFAQ/106>
+CURRENT_DATETIME=$(date '+%Y%m%d-%Hh%Mm%S')
+INSTALLATION_LOGFILE=/root/${CURRENT_DATETIME}_$(basename ${0})_installation.log
+touch ${INSTALLATION_LOGFILE}
+chmod 600 ${INSTALLATION_LOGFILE}
+exec > >(tee ${INSTALLATION_LOGFILE}) 2>&1
 
 
 # Determine which Seafile version to install
@@ -1037,6 +1045,8 @@ installation-summary
 # Print installation summary
 cat ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
+echo
+echo
+echo
+
 exit 0
-) 2>&1 | tee /root/$(basename ${0})_installation.log
-chmod 600 /root/$(basename ${0})_installation.log
