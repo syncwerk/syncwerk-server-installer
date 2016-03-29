@@ -323,8 +323,13 @@ dpkg-reconfigure unattended-upgrades
 
 
 function install-seafile-server-requirements {
+# Take bundled ldap libraries out of library path (and use/install system's ones)
+cd ${SEAFILE_SERVER_HOME}/seafile-server-latest/seafile/lib
+mkdir disabled_libs_use_local_ones_instead
+mv liblber-2.4.so.2 libldap-2.4.so.2 libsasl2.so.2 libldap_r-2.4.so.2 disabled_libs_use_local_ones_instead/
+
 apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
-memcached python-memcache pwgen curl openssl -y
+memcached python-memcache pwgen curl openssl libldap -y
 
 # Seafile Professional requierments
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
