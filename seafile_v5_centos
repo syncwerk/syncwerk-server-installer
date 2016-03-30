@@ -26,6 +26,14 @@
 # Stop on first error
 set -e
 
+function are-we-root-abort-if-not {
+if [[ $EUID -ne 0 ]]; then
+  echo "Aborting because you are not root" ; exit 1
+fi
+}
+
+are-we-root-abort-if-not
+
 # Use logfile
 # See <http://mywiki.wooledge.org/BashFAQ/106>
 CURRENT_DATETIME=$(date '+%Y%m%d-%Hh%Mm%S')
@@ -1049,4 +1057,6 @@ echo
 echo
 echo
 
+esac
+done
 exit 0
