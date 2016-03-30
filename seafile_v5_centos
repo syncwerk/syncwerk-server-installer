@@ -249,11 +249,14 @@ fi
 
 
 function abort-if-seafile-professional-source-is-missing {
-if [[ -f ${SEAFILE_SERVER_SOURCE} ]] ;
+if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
 then
-  echo "Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
-else
-  echo "Aborting because SEAFILE_SERVER_SOURCE environment variable is missing." ; exit 1
+  if [[ -f ${SEAFILE_SERVER_SOURCE} ]] ;
+  then
+    echo "Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
+  else
+    echo "Aborting because SEAFILE_SERVER_SOURCE environment variable is missing." ; exit 1
+  fi
 fi
 }
 
