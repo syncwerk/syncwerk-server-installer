@@ -77,7 +77,10 @@ SEAFILE_SERVER_HOME=/opt/seafile/
 SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
 
 # Don't touch the following variable, unless you know what you are doing
-OS=$(yum version | grep "^Inst" | awk '{ print $2 }' | awk -F'/' '{ print $1 }')
+OS=$(awk '{ print $1 }' /etc/redhat-release)
+OS_VERSION=$(awk '{ print $4 }' /etc/redhat-release)
+OS_MAJOR_VERSION=${OS_VERSION:0:1}
+
 
 # Get architecture
 if [ $(getconf LONG_BIT) = "64" ]
@@ -115,9 +118,9 @@ echo -----------------------------------------------------------------
 cat /etc/hosts
 echo
 echo
-echo OS Architecture
+echo OS, OS version and OS Architecture
 echo -----------------------------------------------------------------
-echo ${ARCH}
+echo ${OS}, ${OS_VERSION} and ${ARCH}
 echo
 echo
 echo Package Architecture
@@ -199,7 +202,7 @@ clear
 cat <<EOF
 
   Installing Seafile Server ${SEAFILE_SERVER_VERSION} on
-  ${OS_DESC} (${ARCH}).
+  ${OS} ${OS_VERSION} (${ARCH}).
 
   Features: NGINX, MariaDB, Memcached, SeafDAV.
   -----------------------------------------------------------------
@@ -221,12 +224,12 @@ read dummy
 clear
 }
 
-
-function are-we-root-abort-if-not {
-if [[ $EUID -ne 0 ]]; then
-  echo "Aborting because you are not root" ; exit 1
+function ensure-we-are-running-the-installer-on-a-supported-operating-system {
+if [[ ${OS} != CentOS || ${OS_MAJOR_VERSION} != 7 ]] ; then
+    echo "Aborting because ${OS} ${OS_VERSION} is not supported by this script" ; exit 1
 fi
 }
+
 
 
 function does-user-exist-and-abort-if-he-does {
@@ -1021,6 +1024,7 @@ chown -R ${SEAFILE_SERVER_USER}:seafile ${SEAFILE_SERVER_HOME}/$(basename ${0})_
 
 print-system-infos
 description
+ensure-we-are-running-the-installer-on-a-supported-operating-system
 are-we-root-abort-if-not
 does-user-exist-and-abort-if-he-does
 does-directory-exist-abort-if-it-does
