@@ -1040,7 +1040,7 @@ setup-ntpd
 setup-firewall
 install-postfix
 setup-unattended-upgrades
-install-seafile-server-requirments
+install-seafile-server-requirements
 install-setup-nginx
 create-self-signed-certificate-for-nginx
 restart-nginx
