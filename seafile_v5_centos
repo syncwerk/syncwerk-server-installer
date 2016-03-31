@@ -1051,13 +1051,6 @@ print-system-infos
 installation-summary
 
 
-# Print installation summary
-cat ${INSTALLATION_LOGFILE}
-
-echo
-echo
-echo
-
 esac
 done
 exit 0
