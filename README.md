@@ -27,11 +27,12 @@ Video: [Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu
 2. Ubuntu Trusty
 3. Ubuntu Trusty (Pi / ARM)
 4. Uberspace (Centos 6.x only)
+5. CentOS 7
 
 #### [Professional Edition](https://github.com/SeafileDE/seafile-server-installer/tree/master/professional-edition)
 1. Debian Wheezy & Jessie
 2. Ubuntu Trusty
-3. Centos 7
+3. CentOS 7
 4. SUSE Linux Enterprise Server 12
 
 ## Caution
@@ -94,6 +95,11 @@ For **Uberspace** run the following lines:
     wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/community-edition/seafile-ce_uberspace
     bash seafile-ce_uberspace
 
+For **CentOS 7 (64bit)**
+
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_v5_centos
+    bash seafile_v5_centos
 
 
 ### Seafile Server PRO
@@ -112,11 +118,11 @@ For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
     bash seafile_debian
 
 
-For **Centos 7 (64bit only)** run the following lines as root
+For **CentOS 7 (64bit)**
 
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_centos-7-amd64
-    bash seafile-pro_centos-7-amd64
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_v5_centos
+    bash seafile_v5_centos
 
 
 **BETA:** For **SUSE Enterprise Linux 12 (64bit only)** run the following lines as root
