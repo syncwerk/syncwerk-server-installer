@@ -1050,6 +1050,7 @@ setup-seafile-server-change-address-script
 print-system-infos
 installation-summary
 
+cat ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
 esac
 done
