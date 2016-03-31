@@ -55,15 +55,12 @@ PS3="Which Seafile version would you like to install? "
 select SEAFILE_SERVER_VERSION in CE PRO ABORT
 do
 case "${SEAFILE_SERVER_VERSION}" in
-ABORT) echo "Aborting" ; break ;;
-"") echo "$REPLY: Wrong value. Select 1 or 2." ;;
-*)
-if [ ${SEAFILE_SERVER_VERSION} = "CE" ]
-then
-SEAFILE_SERVER_PROFESSIONAL=disabled
-else
-SEAFILE_SERVER_PROFESSIONAL=enabled
-fi
+ABORT) echo "Aborting" ; exit 1 ; break ;;
+CE) SEAFILE_SERVER_PROFESSIONAL=disabled ; break ;;
+PRO) SEAFILE_SERVER_PROFESSIONAL=enabled ; break ;;
+*) echo "$REPLY: Wrong value. Select 1 or 2." ;;
+esac
+done
 
 
 # Vars
@@ -1052,6 +1049,4 @@ installation-summary
 
 cat ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
 
-esac
-done
 exit 0
