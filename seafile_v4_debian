@@ -1,7 +1,7 @@
 #!/bin/bash
 (
 #
-# seafile-server-installer/unified/seafile_debian
+# seafile-server-installer/seafile_v4_debian
 #
 # Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
 #
