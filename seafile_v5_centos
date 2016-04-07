@@ -830,6 +830,9 @@ function start-seafile-server {
 echo "Fix any ownership issues before starting"
 chown -R ${SEAFILE_SERVER_USER}:${SEAFILE_SERVER_USER} ${SEAFILE_SERVER_HOME}
 
+echo "(Re)start memcached"
+systemctl restart memcached
+
 echo "Starting productive Seafile server"
 seafile-server-restart
 }
