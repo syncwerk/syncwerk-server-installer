@@ -33,7 +33,6 @@ Video: [Ubuntu Trusty minimal installation](https://seafile.tv/2015/06/16/ubuntu
 1. Debian Wheezy & Jessie
 2. Ubuntu Trusty
 3. CentOS 7
-4. SUSE Linux Enterprise Server 12
 
 ## Caution
 Never run these scripts on a production server. They are more or less a one trick pony and could seriously damage production systems. Run it only once and
@@ -123,13 +122,6 @@ For **CentOS 7 (64bit)**
     cd /root
     wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_v5_centos
     bash seafile_v5_centos
-
-
-**BETA:** For **SUSE Enterprise Linux 12 (64bit only)** run the following lines as root
-
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/professional-edition/seafile-pro_sles-12-amd64
-    bash seafile-pro_sles-12-amd64
 
 
 ## FAQs
