@@ -558,6 +558,20 @@ EOF
 chmod 600 /root/.my.cnf
 }
 
+function setup-database-backup {
+  # install package
+  apt-get install automysqlbackup -y
+
+  # change destination directory
+  SEAFILE_SERVER_BACKUPDIR="/var/backups/seafile-server/database/"
+  eval "sed -i 's#/var/lib/automysqlbackup#$SEAFILE_SERVER_BACKUPDIR#' /etc/default/automysqlbackup"
+
+  # launch a backup now
+  /usr/sbin/automysqlbackup
+
+  echo "Automatic database backups are in ${SEAFILE_SERVER_BACKUPDIR}."
+}
+
 
 function setup-seafile-server-autostart {
 if [ ${OS} = "wheezy" ]
@@ -1130,6 +1144,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   4) Harden system with port knocking, fail2ban, etc.
 
   5) Implement a backup routine for your Seafile server.
+     (A a first step, databases are backed up in ${SEAFILE_SERVER_BACKUPDIR}.)
 
 
   Seafile support options
@@ -1188,6 +1203,7 @@ create-seafile-database
 import-seahub-database-structure
 setup-seafile-server
 setup-seafile-server-logrotate
+setup-database-backup
 start-seafile-server
 setup-seafile-server-change-address-script
 installation-summary
