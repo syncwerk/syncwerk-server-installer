@@ -330,7 +330,7 @@ memcached python-memcache pwgen curl openssl -y
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
     apt-get install libpython2.7 openjdk-7-jre libreoffice libreoffice-script-provider-python \
-    ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy poppler-utils -y
+    ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy poppler-utils python-urllib3 -y
 
     if [ ${OS} = "wheezy" ]
       then
