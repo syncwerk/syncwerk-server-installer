@@ -313,7 +313,7 @@ yum install python-setuptools python-simplejson python-pillow MySQL-python memca
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
  then
    yum install java-1.7.0-openjdk poppler-utils libreoffice libreoffice-headless libreoffice-pyuno \
-       libreoffice-pyuno wqy-microhei-fonts wqy-zenhei-fonts wqy-unibit-fonts -y
+       libreoffice-pyuno wqy-microhei-fonts wqy-zenhei-fonts wqy-unibit-fonts python-urllib3 -y
 fi
 }
 
