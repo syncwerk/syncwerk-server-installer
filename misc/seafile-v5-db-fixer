@@ -1,0 +1,104 @@
+
+#!/bin/bash
+#
+# seafile-server-installer/seafile-db-fixer
+#
+# Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Uncomment to run in verbose mode
+#set -x
+
+
+# -------------------------------------------
+# Vars
+# -------------------------------------------
+SEAFILE_LATEST=$(find / -type l -name seafile-server-latest)
+SEAFILE_PATH=$(dirname ${SEAFILE_LATEST})
+SEAFILE_SQLITE_DB=$(find ${SEAFILE_PATH} -type f -name seafile.db -print)
+SEAFILE_MYSQL_DB=seafile-db
+
+if [ -z "${SEAFILE_SQLITE_DB}" ]; then
+    echo "seafile.db not found. There is nothing to fix. Aborting..."
+else
+    # Shutdown Seafile Server
+    service seafile-server stop
+
+    # Change path to ${SEAFILE_PATH}
+    cd ${SEAFILE_PATH}
+
+    # Delete previous ${SEAFILE_MYSQL_DB}.sql
+    rm ${SEAFILE_MYSQL_DB}.sql
+
+    # Download converter sqlite2mysql python converter
+    wget https://gist.githubusercontent.com/alexanderjackson/8d09cf00e115b75ce5cd/raw/410f3bab04d2b9b2c6e19ae6e0b6c6ac68976860/sqlite2mysql.py
+
+    # Install sqlite3
+    apt-get install sqlite3 -y
+
+    # Convert seafile.db to sql
+    sqlite3 ${SEAFILE_PATH}/seafile-data/seafile.db .dump | python sqlite2mysql.py > ${SEAFILE_MYSQL_DB}.sql
+
+    # change owner_id in RepoOwner from TEXT to VARCHAR(255)
+    sed -i 's/owner_id TEXT/owner_id VARCHAR(255)/g' ${SEAFILE_MYSQL_DB}.sql
+
+    # change user_name in RepoGroup from TEXT to VARCHAR(255)
+    sed -i 's/user_name TEXT/user_name VARCHAR(255)/g' ${SEAFILE_MYSQL_DB}.sql
+
+    # add ENGIN=INNODB to create table statment
+    sed -i -r 's/(CREATE TABLE.*);/\1 ENGINE=INNODB;/g' ${SEAFILE_MYSQL_DB}.sql
+
+    # remove COLLATE NOCASE if possible
+    sed -i 's/COLLATE NOCASE//g' ${SEAFILE_MYSQL_DB}.sql
+
+    # Backup seafile.conf to seafile.conf.backup
+    cp ${SEAFILE_PATH}/conf/seafile.conf ${SEAFILE_PATH}/conf/seafile.conf.backup
+
+    # Get SQL Credentials
+    SEAFILESQLPW=$(grep "PASSWD =" ${SEAFILE_PATH}/conf/ccnet.conf | awk  {'print $3'})
+    SEAFILESQLUSER=$(grep "USER =" ${SEAFILE_PATH}/conf/ccnet.conf | awk  {'print $3'})
+
+cat >> ${SEAFILE_PATH}/conf/seafile.conf <<EOF
+
+[database]
+type = mysql
+host = 127.0.0.1
+port = 3306
+user = ${SEAFILESQLUSER}
+password = ${SEAFILESQLPW}
+db_name = ${SEAFILE_MYSQL_DB}
+connection_charset = utf8
+EOF
+
+cat <<EOF
+
+   If you feel luky import SQL-Dump with
+
+       mysql -u${SEAFILESQLUSER} -p${SEAFILESQLPW} ${SEAFILE_MYSQL_DB} < ${SEAFILE_PATH}/seafile-db.sql
+
+
+   and restart Seafile with
+
+       service seafile-server start
+
+
+   Delete ${SEAFILE_PATH}/seafile-db.sql and ${SEAFILE_SQLITE_DB} with
+
+       rm ${SEAFILE_PATH}/seafile-db.sql ${SEAFILE_SQLITE_DB}
+
+   if everything went well...
+
+EOF
+fi
