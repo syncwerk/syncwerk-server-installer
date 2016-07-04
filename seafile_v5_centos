@@ -528,9 +528,9 @@ chmod 600 /root/.my.cnf
 }
 
 function setup-database-backup {
-  # install SeafileDE script
+  # install Seafile script
   SEAFILE_SERVER_DB_BACKUP_SCRIPT=/usr/local/sbin/seafile-server-backup-database
-  curl -L https://raw.githubusercontent.com/SeafileDE/helper-scripts/master/seafile-server-backup-database -o ${SEAFILE_SERVER_DB_BACKUP_SCRIPT}
+  curl -L https://raw.githubusercontent.com/seafile/helper-scripts/master/seafile-server-backup-database -o ${SEAFILE_SERVER_DB_BACKUP_SCRIPT}
 
   # update user/password
   eval "sed -i 's#secret#$SQLROOTPW#' ${SEAFILE_SERVER_DB_BACKUP_SCRIPT}"
