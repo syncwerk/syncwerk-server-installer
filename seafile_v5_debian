@@ -681,6 +681,31 @@ done
 EOF
 
 chmod 700 /usr/local/sbin/seafile-server-restart
+
+# Seafile start script
+cat > /usr/local/sbin/seafile-server-start << 'EOF'
+#!/bin/bash
+for ACTION in start ; do
+    for SERVICE in seafile seahub ; do
+      systemctl ${ACTION} ${SERVICE}
+    done
+done
+EOF
+
+chmod 700 /usr/local/sbin/seafile-server-start
+
+# Seafile stop script
+cat > /usr/local/sbin/seafile-server-stop << 'EOF'
+#!/bin/bash
+for ACTION in stop ; do
+    for SERVICE in seafile seahub ; do
+      systemctl ${ACTION} ${SERVICE}
+    done
+done
+EOF
+
+chmod 700 /usr/local/sbin/seafile-server-stop
+
 fi
 }
 
