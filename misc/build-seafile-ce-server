@@ -1,0 +1,174 @@
+#!/bin/bash
+#
+# build-seafile-ce-server
+#
+# Copyright 2016, Alexander Jackson <alexander.jackson@seafile.de>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Uncomment to run in verbose mode
+#set -x
+
+
+# Update OS
+apt-get update
+apt-get upgrade -y
+
+
+# Install build requirements
+apt-get install build-essential libevent-dev libcurl4-openssl-dev libglib2.0-dev uuid-dev intltool libsqlite3-dev libmysqlclient-dev libarchive-dev libtool libtool-bin libjansson-dev valac libfuse-dev re2c flex python-setuptools cmake libssl-dev git -y
+
+
+# Install libevhtp
+cd /usr/src
+git clone https://www.github.com/haiwen/libevhtp.git
+cd libevhtp
+cmake -DEVHTP_DISABLE_SSL=ON -DEVHTP_BUILD_SHARED=ON .
+make
+make install
+
+
+# Install libzdb
+cd /usr/src
+git clone https://www.github.com/haiwen/libzdb.git
+cd libzdb
+chmod +x autogen.sh
+./autogen.sh
+./configure
+make
+make install
+
+
+# Update shared library cache
+ldconfig
+
+
+# Download third-party requirements
+mkdir -p ~/dev/seahub_thirdpart
+cd ~/dev/seahub_thirdpart
+wget https://pypi.python.org/packages/source/p/pytz/pytz-2016.1.tar.gz
+wget https://www.djangoproject.com/m/releases/1.8/Django-1.8.10.tar.gz
+wget https://pypi.python.org/packages/source/d/django-statici18n/django-statici18n-1.1.3.tar.gz
+wget https://pypi.python.org/packages/source/d/djangorestframework/djangorestframework-3.3.2.tar.gz
+wget https://pypi.python.org/packages/source/d/django_compressor/django_compressor-1.4.tar.gz
+wget https://pypi.python.org/packages/source/j/jsonfield/jsonfield-1.0.3.tar.gz
+wget https://pypi.python.org/packages/source/d/django-post_office/django-post_office-2.0.6.tar.gz
+wget http://pypi.python.org/packages/source/g/gunicorn/gunicorn-19.4.5.tar.gz
+wget http://pypi.python.org/packages/source/f/flup/flup-1.0.2.tar.gz
+wget https://pypi.python.org/packages/source/c/chardet/chardet-2.3.0.tar.gz
+wget https://labix.org/download/python-dateutil/python-dateutil-1.5.tar.gz
+wget https://pypi.python.org/packages/source/s/six/six-1.9.0.tar.gz
+wget https://pypi.python.org/packages/source/d/django-picklefield/django-picklefield-0.3.2.tar.gz
+wget https://github.com/haiwen/django-constance/archive/bde7f7c.zip -O django_constance.zip
+wget https://pypi.python.org/packages/source/j/jdcal/jdcal-1.2.tar.gz
+wget https://pypi.python.org/packages/source/e/et_xmlfile/et_xmlfile-1.0.1.tar.gz
+wget https://pypi.python.org/packages/source/o/openpyxl/openpyxl-2.3.0.tar.gz
+
+
+# Install third-party requirements in current directory with easy_install
+export PYTHONPATH=.
+easy_install -d . pytz-2016.1.tar.gz
+easy_install -d . Django-1.8.10.tar.gz
+easy_install -d . django-statici18n-1.1.3.tar.gz
+easy_install -d . djangorestframework-3.3.2.tar.gz
+easy_install -d . django_compressor-1.4.tar.gz
+easy_install -d . jsonfield-1.0.3.tar.gz
+easy_install -d . django-post_office-2.0.6.tar.gz
+easy_install -d . gunicorn-19.4.5.tar.gz
+easy_install -d . flup-1.0.2.tar.gz
+easy_install -d . chardet-2.3.0.tar.gz
+easy_install -d . python-dateutil-1.5.tar.gz
+easy_install -d . six-1.9.0.tar.gz
+easy_install -d . django-picklefield-0.3.2.tar.gz
+easy_install -d . django_constance.zip
+easy_install -d . jdcal-1.2.tar.gz
+easy_install -d . et_xmlfile-1.0.1.tar.gz
+easy_install -d . openpyxl-2.3.0.tar.gz
+
+
+# Export path vars
+export PKG_CONFIG_PATH=/root/dev/seafile/lib:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=/root/dev/libsearpc:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=/root/dev/ccnet:$PKG_CONFIG_PATH
+#export PATH=/root/dev/seahub_thirdpart:$PATH
+
+
+# Build libsearpc
+cd ~/dev
+git clone https://github.com/haiwen/libsearpc.git
+cd libsearpc
+git reset --hard v3.0.7
+./autogen.sh
+./configure
+make dist
+
+
+# Build ccnet
+cd ~/dev
+git clone https://github.com/haiwen/ccnet.git
+cd ccnet
+git reset --hard v5.1.4
+./autogen.sh
+./configure
+make dist
+
+
+# Build seafile
+cd ~/dev
+git clone https://github.com/haiwen/seafile.git
+cd seafile
+git reset --hard v5.1.4
+./autogen.sh
+./configure
+make dist
+
+
+# Build seahub
+cd ~/dev
+git clone https://github.com/haiwen/seahub.git
+cd seahub
+git reset --hard v5.1.4-server
+ln -s /root/dev/seahub_thirdpart/django-admin /usr/local/bin/django-admin
+./tools/gen-tarball.py --version=5.1.4 --branch=HEAD
+
+
+# Build seafobj
+cd ~/dev
+git clone https://github.com/haiwen/seafobj.git
+cd seafobj
+git reset --hard v5.1.4-server
+make dist
+
+
+# Build seafdav
+cd ~/dev
+git clone https://github.com/haiwen/seafdav.git
+cd seafdav
+git reset --hard v5.1.4-server
+make
+
+
+# Copy created binaries to seafile-sources directory
+mkdir -p ~/seafile-sources
+cp ~/dev/libsearpc/libsearpc-3.0.7.tar.gz ~/seafile-sources
+cp ~/dev/ccnet/ccnet-5.1.4.tar.gz ~/seafile-sources
+cp ~/dev/seafile/seafile-5.1.4.tar.gz ~/seafile-sources
+cp ~/dev/seahub/seahub-5.1.4.tar.gz ~/seafile-sources
+cp ~/dev/seafobj/seafobj.tar.gz ~/seafile-sources
+cp ~/dev/seafdav/seafdav.tar.gz ~/seafile-sources
+
+
+# Build seafile-ce install package
+mkdir ~/seafile-server-pkgs
+~/dev/seafile/scripts/build/build-server.py --libsearpc_version=3.0.7 --ccnet_version=5.1.4 --seafile_version=5.1.4 --version=5.1.4 --srcdir=  --thirdpartdir=/root/dev/seahub_thirdpart --srcdir=/root/seafile-sources --outputdir=/root/seafile-server-pkgs
