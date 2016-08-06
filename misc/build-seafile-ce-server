@@ -175,6 +175,10 @@ cp /usr/src/seafile-server-ce/dev/seafdav/seafdav.tar.gz /usr/src/seafile-server
 sed -i "s/--enable-ldap//" /usr/src/seafile-server-ce/dev/seafile/scripts/build/build-server.py
 
 
+# Create symlink for onigposix.h
+ln -s /usr/src/libevhtp/oniguruma/onigposix.h /usr/include/onigposix.h
+
+
 # Build seafile-ce install package
 mkdir /usr/src/seafile-server-ce/seafile-server-pkgs
 /usr/src/seafile-server-ce/dev/seafile/scripts/build/build-server.py --libsearpc_version=3.0.7 --ccnet_version=5.1.4 --seafile_version=5.1.4 --version=5.1.4 --srcdir=  --thirdpartdir=/usr/src/seafile-server-ce/dev/seahub_thirdpart --srcdir=/usr/src/seafile-server-ce/seafile-sources --outputdir=/usr/src/seafile-server-ce/seafile-server-pkgs
