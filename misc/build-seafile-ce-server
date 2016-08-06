@@ -141,7 +141,7 @@ cd /usr/src/seafile-server-ce/dev
 git clone https://github.com/haiwen/seahub.git
 cd seahub
 git reset --hard v5.1.4-server
-ln -s /usr/src/seafile-server-ce/dev/seahub_thirdpart/django-admin /usr/local/bin/django-admin
+ln -sf /usr/src/seafile-server-ce/dev/seahub_thirdpart/django-admin /usr/local/bin/django-admin
 ./tools/gen-tarball.py --version=5.1.4 --branch=HEAD
 
 
