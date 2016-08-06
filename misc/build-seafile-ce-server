@@ -31,7 +31,7 @@ apt-get upgrade -y
 
 
 # Install build requirements
-apt-get install build-essential libevent-dev libcurl4-openssl-dev libglib2.0-dev uuid-dev intltool libsqlite3-dev libmysqlclient-dev libarchive-dev libtool libtool-bin libjansson-dev valac libfuse-dev re2c flex python-setuptools cmake libssl-dev git -y
+apt-get install build-essential libevent-dev libcurl4-openssl-dev libglib2.0-dev uuid-dev intltool libsqlite3-dev libmysqlclient-dev libarchive-dev libtool libtool-bin libjansson-dev valac libfuse-dev re2c flex python-setuptools cmake libssl-dev git libldap2-dev -y
 
 
 # Install libevhtp
@@ -173,10 +173,6 @@ cp ${BUILD_DIR}/dev/seafile/seafile-5.1.4.tar.gz ${BUILD_DIR}/seafile-sources
 cp ${BUILD_DIR}/dev/seahub/seahub-5.1.4.tar.gz ${BUILD_DIR}/seafile-sources
 cp ${BUILD_DIR}/dev/seafobj/seafobj.tar.gz ${BUILD_DIR}/seafile-sources
 cp ${BUILD_DIR}/dev/seafdav/seafdav.tar.gz ${BUILD_DIR}/seafile-sources
-
-
-# FIXME - Remove LDAP since I haven't figured out yet, how to fullfill this build requirement
-sed -i "s/--enable-ldap//" ${BUILD_DIR}/dev/seafile/scripts/build/build-server.py
 
 
 # Create symlink for onigposix.h
