@@ -78,7 +78,7 @@ DEB_ARCH=$(dpkg --print-architecture)
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
     # Seafile Professional
-    SEAFILE_SERVER_SOURCE=$(find /usr/src/seafile/seafile-*-server_*_x86-64.tar.gz | sort -r | head -1)
+    SEAFILE_SERVER_SOURCE=$(find /usr/src/seafile/seafile-pro-server_*_x86-64.tar.gz | sort -r | head -1)
     SEAFILE_SERVER_VERSION=$(echo ${SEAFILE_SERVER_SOURCE} | awk -F '_' '{ print $2}')
 fi
 
@@ -724,10 +724,10 @@ function get-seafile-sources {
 cd ${SEAFILE_SERVER_HOME}
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    cp ${SEAFILE_SERVER_SOURCE} ${SEAFILE_SERVER_HOME}/seafile-*-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-    tar xzf ${SEAFILE_SERVER_HOME}/seafile-*-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-    mv ${SEAFILE_SERVER_HOME}/seafile-*-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-*-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-    SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-*-server-${SEAFILE_SERVER_VERSION}/
+    cp ${SEAFILE_SERVER_SOURCE} ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+    tar xzf ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+    mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
+    SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
   else
     
     # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok. 
