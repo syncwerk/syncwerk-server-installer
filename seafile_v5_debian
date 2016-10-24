@@ -736,7 +736,7 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
     if [ $(getconf LONG_BIT) = "64" ]
       then
 
-       wget $(wget "https://www.seafile.com/en/download/" -O- | grep -o https://bintray.com/artifact/download/seafile-org/seafile/seafile-server_.*x86-64.tar.gz | head -n1) -O seafile-server_latest_x86-64.tar.gz
+       wget https://download.seafile.de/server/community/linux/seafile-server_5.1.4_x86-64.tar.gz -O seafile-server_latest_x86-64.tar.gz
        tountar="seafile-server_latest_x86-64.tar.gz"
     else
        curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
