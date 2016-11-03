@@ -21,9 +21,9 @@ Just select the corresponding installer for your OS. All scripts are meant to ru
 2. Ubuntu Trusty
 3. CentOS 7
 
-#### [Professional Edition](https://github.com/haiwen/seafile-server-installer/tree/master/professional-edition)
+#### Professional Edition
 1. Debian Wheezy & Jessie
-2. Ubuntu Trusty
+2. Ubuntu 16.04
 3. CentOS 7
 
 ## Caution
@@ -95,8 +95,14 @@ For **Debian Wheezy and Jessie (64bit only)** run the following lines as root
 For **CentOS 7 (64bit)**
 
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_v5_centos
-    bash seafile_v5_centos
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
+    bash seafile_centos
+
+For **Ubuntu 16.04 (64bit)**, you will have to save Seafile Professional Server package to /opt/.
+
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
+    bash seafile_ubuntu 6.0.2
 
 
 ## FAQs
