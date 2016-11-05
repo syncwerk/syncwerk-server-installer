@@ -1164,7 +1164,6 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
   3) Setup NGINX with official SSL certificate and create safe DH primes...
-     (https://forum.seafile-server.org/t/kostenfreies-startssl-class-1-zertifikat-fur-nginx-und-seafile-beziehen/1642)
 
   4) Harden system with port knocking, fail2ban, etc.
 
@@ -1183,13 +1182,6 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   -----------------------------------------------------------------
   If the installation fails for any reason, review
   /root/$(basename ${0})_installation.log
-  or send us the log by mail to $(basename ${0})@seafile.de
-
-
-  Contribute
-  -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.de
-  for bugs or suggestions about this installer. Thank you!
 
 
   This report is also saved to ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
