@@ -1175,7 +1175,7 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile support options
   -----------------------------------------------------------------
 
-  For free community support visit:   https://forum.seafile-server.org
+  For free community support visit:   https://forum.seafile.com
   For paid commercial support visit:  https://seafile.de
 
 
