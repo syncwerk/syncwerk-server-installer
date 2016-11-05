@@ -45,10 +45,7 @@ As a precaution I have added a few simple checks to abort installation if any of
 4. MariaDB
 5. Memcached
 6. Seafile auto start
-7. Postfix
-8. Firewall
-9. Fail2ban
-10. Autoupdate OS
+7. Firewall
 
 
 ## Installation
@@ -61,8 +58,8 @@ For **Debian Wheezy and Jessie (32bit and 64bit)**:
 
     apt-get install lsb-release -y
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_v5_debian
-    bash seafile_v5_debian
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_debian
+    bash seafile_debian
 
 
 For **Ubuntu Trusty (64bit)**:
@@ -76,8 +73,8 @@ For **Ubuntu Trusty (64bit)**:
 For **CentOS 7 (64bit)**
 
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_v5_centos
-    bash seafile_v5_centos
+    wget --no-check-certificate https://raw.githubusercontent.com/SeafileDE/seafile-server-installer/master/seafile_centos
+    bash seafile_centos
 
 
 ### Seafile Server PRO
