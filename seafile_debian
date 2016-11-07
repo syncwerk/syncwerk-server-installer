@@ -201,7 +201,7 @@ cat <<EOF
   data!
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.de
+  support@seafile.com
 
   -----------------------------------------------------------------
 
@@ -1182,6 +1182,13 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   -----------------------------------------------------------------
   If the installation fails for any reason, review
   /root/$(basename ${0})_installation.log
+  or send us the log by mail to support@seafile.com
+
+
+  Contribute
+  -----------------------------------------------------------------
+  Please contact support@seafile.com
+  for bugs or suggestions about this installer. Thank you!
 
 
   This report is also saved to ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log

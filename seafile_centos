@@ -210,7 +210,7 @@ cat <<EOF
   data!
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.de
+  support@seafile.com
 
   -----------------------------------------------------------------
 
@@ -1037,20 +1037,20 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Seafile support options
   -----------------------------------------------------------------
 
-  For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.de
+  For free community support visit:   https://forum.seafile.com
+  For paid commercial support visit:  https://seafile.com
 
 
   Debug infos
   -----------------------------------------------------------------
   If the installation fails for any reason, review
   /root/$(basename ${0})_installation.log
-  or send us the log by mail to $(basename ${0})@seafile.de
+  or send us the log by mail to support@seafile.com
 
 
   Contribute
   -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.de
+  Please contact support@seafile.com
   for bugs or suggestions about this installer. Thank you!
 
 
