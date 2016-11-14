@@ -408,6 +408,9 @@ mkdir -p ${DEFAULT_CONF_DIR}
 
 ./setup-seafile-mysql.sh auto -u seafile -w ${SQLSEAFILEPW} -r ${SQLROOTPW}
 
+# Fix service url
+eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${IP_OR_DOMAIN}/' ${DEFAULT_CONF_DIR}/ccnet.conf"
+
 # -------------------------------------------
 # Configure Seafile WebDAV Server(SeafDAV)
 # -------------------------------------------
@@ -436,7 +439,7 @@ CACHES = {
 # SERVER_EMAIL                        = EMAIL_HOST_USER
 
 TIME_ZONE                           = '${TIME_ZONE}'
-SITE_BASE                           = 'http://${IP_OR_DOMAIN}'
+SITE_BASE                           = 'https://${IP_OR_DOMAIN}'
 SITE_NAME                           = 'Seafile Server'
 SITE_TITLE                          = 'Seafile Server'
 SITE_ROOT                           = '/'
@@ -450,7 +453,7 @@ SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
 SESSION_SAVE_EVERY_REQUEST          = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
 
-FILE_SERVER_ROOT                    = 'http://${IP_OR_DOMAIN}/seafhttp'
+FILE_SERVER_ROOT                    = 'https://${IP_OR_DOMAIN}/seafhttp'
 EOF
 
 
@@ -510,7 +513,7 @@ cat > ${TOPDIR}/aio_seafile-server.log<<EOF
   -----------------------------------------------------------------
 
   Server Name:         ${SERVER_NAME}
-  Server Address:      http://${IP_OR_DOMAIN}
+  Server Address:      https://${IP_OR_DOMAIN}
 
   Seafile Admin:       ${SEAFILE_ADMIN}
   Admin Password:      ${SEAFILE_ADMIN_PW}
