@@ -101,7 +101,7 @@ aptitude update && aptitude dist-upgrade -y
 # Additional requirements
 # -------------------------------------------
 aptitude install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
-memcached python-memcache pwgen curl openssl -y
+memcached python-memcache pwgen curl openssl bsdutils -y
 
 
 # -------------------------------------------
