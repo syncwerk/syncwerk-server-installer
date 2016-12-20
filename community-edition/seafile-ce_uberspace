@@ -50,7 +50,7 @@ cat <<EOF
   -----------------------------------------------------------------
   This installer is meant to run on a fresh Uberspace.
   If you run it on a production server things can and
-  probably will go terrible wrong and you will loose valuable
+  probably will go terribly wrong and you will lose valuable
   data!
   For questions or suggestions please contact me at
   alexander.jackson@seafile.de

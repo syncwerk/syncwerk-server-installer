@@ -58,7 +58,7 @@ SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
 export DEBIAN_FRONTEND=noninteractive
 
 if [ ! -f /usr/bin/lsb_release ]; then
-    echo You need to install lsb-release manually before proceeding. 
+    echo You need to install lsb-release manually before proceeding.
     echo On Debian run \"apt-get install lsb-release\" manually.
     exit
 fi
@@ -189,14 +189,14 @@ clear
 cat <<EOF
 
   Installing Seafile Server ${SEAFILE_SERVER_VERSION} on
-  ${OS_DESC} (${ARCH}). 
+  ${OS_DESC} (${ARCH}).
 
   Features: NGINX, MariaDB, Memcached, SeafDAV, logrotate
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
   only. If you run it on a production server things can and
-  probably will go terrible wrong and you will loose valuable
+  probably will go terribly wrong and you will lose valuable
   data!
 
   For questions or suggestions please contact me at
@@ -266,7 +266,7 @@ apt-get install apt-utils dialog mtr nload htop less mc -y
 }
 
 
-function setup-ntpd { 
+function setup-ntpd {
 apt-get install ntp -y
 ntpd -gq
 }
@@ -370,7 +370,7 @@ server {
   ssl on;
   ssl_certificate /etc/nginx/ssl/seafile.crt;
   ssl_certificate_key /etc/nginx/ssl/seafile.key;
-  
+
   proxy_set_header X-Forwarded-For $remote_addr;
 
   location / {
@@ -697,10 +697,10 @@ if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
     mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
     SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
   else
-    
-    # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok. 
+
+    # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok.
     #curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
-    
+
     if [ $(getconf LONG_BIT) = "64" ]
       then
        curl -L https://app.seafile.de/f/4ba97d34f3/?dl=1 -o seafile-server_latest_x86-64.tar.gz
