@@ -1,9 +1,9 @@
 #!/bin/bash
 (
 #
-# seafile-server-installer/seafile_v5_debian
+# syncwerk-server-installer/syncwerk_v5_debian
 #
-# Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
+# Copyright 2015, Alexander Jackson <alexander.jackson@syncwerk.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -22,38 +22,38 @@
 #set -x
 
 
-# Determine which Seafile version to install
+# Determine which Syncwerk version to install
 cat <<EOF
 
   Possible options:
-  1 = Seafile Community Edition (CE)
-  2 = Seafile Professional (PRO)
+  1 = Syncwerk Community Edition (CE)
+  2 = Syncwerk Professional (PRO)
 
 EOF
-PS3="Which Seafile version would you like to install? "
-select SEAFILE_SERVER_VERSION in CE PRO ABORT
+PS3="Which Syncwerk version would you like to install? "
+select SYNCWERK_SERVER_VERSION in CE PRO ABORT
 do
-case "${SEAFILE_SERVER_VERSION}" in
+case "${SYNCWERK_SERVER_VERSION}" in
 ABORT) echo "Aborting" ; break ;;
 "") echo "$REPLY: Wrong value. Select 1 or 2." ;;
 *)
-if [ ${SEAFILE_SERVER_VERSION} = "CE" ]
+if [ ${SYNCWERK_SERVER_VERSION} = "CE" ]
 then
-SEAFILE_SERVER_PROFESSIONAL=disabled
+SYNCWERK_SERVER_PROFESSIONAL=disabled
 else
-SEAFILE_SERVER_PROFESSIONAL=enabled
+SYNCWERK_SERVER_PROFESSIONAL=enabled
 fi
 
 # Vars
 SERVER_NAME=$(hostname -s | cut -c -16)
 while test "${#SERVER_NAME}" -lt 2; do SERVER_NAME="${SERVER_NAME}_"; done
 HOSTNAME=$(hostname -f)
-SEAFILE_SERVER_ADMIN=admin@${HOSTNAME}
-SEAFILE_SERVER_USER=seafile
-SEAFILE_SERVER_FILESERVER_PORT=8082
+SYNCWERK_SERVER_ADMIN=admin@${HOSTNAME}
+SYNCWERK_SERVER_USER=syncwerk
+SYNCWERK_SERVER_FILESERVER_PORT=8082
 # Without trailing slash
-SEAFILE_SERVER_HOME=/opt/seafile
-SEAFILE_SERVER_TIME_ZONE="Europe/Berlin"
+SYNCWERK_SERVER_HOME=/opt/syncwerk
+SYNCWERK_SERVER_TIME_ZONE="Europe/Berlin"
 
 # Don't touch the following variable, unless you know what you are doing
 export DEBIAN_FRONTEND=noninteractive
@@ -75,11 +75,11 @@ if [ $(getconf LONG_BIT) = "64" ]
 fi
 DEB_ARCH=$(dpkg --print-architecture)
 
-if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    # Seafile Professional
-    SEAFILE_SERVER_SOURCE=$(find /usr/src/seafile/seafile-pro-server_*_x86-64.tar.gz | sort -r | head -1)
-    SEAFILE_SERVER_VERSION=$(echo ${SEAFILE_SERVER_SOURCE} | awk -F '_' '{ print $2}')
+    # Syncwerk Professional
+    SYNCWERK_SERVER_SOURCE=$(find /usr/src/syncwerk/syncwerk-pro-server_*_x86-64.tar.gz | sort -r | head -1)
+    SYNCWERK_SERVER_VERSION=$(echo ${SYNCWERK_SERVER_SOURCE} | awk -F '_' '{ print $2}')
 fi
 
 
@@ -189,7 +189,7 @@ function description {
 clear
 cat <<EOF
 
-  Installing Seafile Server ${SEAFILE_SERVER_VERSION} on
+  Installing Syncwerk Server ${SYNCWERK_SERVER_VERSION} on
   ${OS_DESC} (${ARCH}). 
 
   Features: NGINX, MariaDB, Memcached, SeafDAV, logrotate
@@ -201,7 +201,7 @@ cat <<EOF
   data!
 
   For questions or suggestions please contact me at
-  alexander.jackson@seafile.de
+  alexander.jackson@syncwerk.com
 
   -----------------------------------------------------------------
 
@@ -228,29 +228,29 @@ fi
 
 
 function does-user-exist-and-abort-if-he-does {
-if getent passwd ${SEAFILE_SERVER_USER} > /dev/null 2>&1 ;
+if getent passwd ${SYNCWERK_SERVER_USER} > /dev/null 2>&1 ;
 then
-  echo "Aborting because user ${SEAFILE_SERVER_USER} already exist" ; exit 1
+  echo "Aborting because user ${SYNCWERK_SERVER_USER} already exist" ; exit 1
 fi
 }
 
 
 function does-directory-exist-abort-if-it-does {
-if [[ -d "${SEAFILE_SERVER_HOME}" ]] ;
+if [[ -d "${SYNCWERK_SERVER_HOME}" ]] ;
 then
-  echo "Aborting because directory ${SEAFILE_SERVER_HOME} already exist" ; exit 1
+  echo "Aborting because directory ${SYNCWERK_SERVER_HOME} already exist" ; exit 1
 fi
 }
 
 
-function abort-if-seafile-professional-source-is-missing {
-if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+function abort-if-syncwerk-professional-source-is-missing {
+if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    if [[ -f ${SEAFILE_SERVER_SOURCE} ]] ;
+    if [[ -f ${SYNCWERK_SERVER_SOURCE} ]] ;
     then
-      echo "Found ${SEAFILE_SERVER_SOURCE}. Proceeding with installation..."
+      echo "Found ${SYNCWERK_SERVER_SOURCE}. Proceeding with installation..."
     else
-      echo "Aborting because ${SEAFILE_SERVER_SOURCE} is missing" ; exit 1
+      echo "Aborting because ${SYNCWERK_SERVER_SOURCE} is missing" ; exit 1
     fi
   fi
 }
@@ -322,12 +322,12 @@ dpkg-reconfigure unattended-upgrades
 }
 
 
-function install-seafile-server-requirements {
+function install-syncwerk-server-requirements {
 apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 memcached python-memcache pwgen curl openssl -y
 
-# Seafile Professional requierments
-if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+# Syncwerk Professional requierments
+if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
     apt-get install libpython2.7 openjdk-7-jre libreoffice libreoffice-script-provider-python \
     ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy poppler-utils python-urllib3 -y
@@ -344,7 +344,7 @@ fi
 function setup-nginx {
 apt-get install nginx -y
 rm /etc/nginx/conf.d/*
-cat > /etc/nginx/conf.d/seafile.conf <<'EOF'
+cat > /etc/nginx/conf.d/syncwerk.conf <<'EOF'
 server {
   listen [::]:80 ipv6only=off;
   server_name  "";
@@ -356,8 +356,8 @@ server {
   server_name  "";
 
   ssl on;
-  ssl_certificate /etc/nginx/ssl/seafile.crt;
-  ssl_certificate_key /etc/nginx/ssl/seafile.key;
+  ssl_certificate /etc/nginx/ssl/syncwerk.crt;
+  ssl_certificate_key /etc/nginx/ssl/syncwerk.key;
   
   proxy_set_header X-Forwarded-For $remote_addr;
 
@@ -390,7 +390,7 @@ server {
   }
 
   location /media {
-    root /opt/seafile/seafile-server-latest/seahub;
+    root /opt/syncwerk/syncwerk-server-latest/seahub;
   }
 
   location /seafdav {
@@ -492,8 +492,8 @@ eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.
 
 function create-self-signed-certificate-for-nginx {
 mkdir /etc/nginx/ssl
-openssl genrsa -out /etc/nginx/ssl/seafile.key 4096
-cat > /etc/nginx/ssl/seafile.cnf << EOF
+openssl genrsa -out /etc/nginx/ssl/syncwerk.key 4096
+cat > /etc/nginx/ssl/syncwerk.cnf << EOF
 [req]
 distinguished_name = req_distinguished_name
 x509_extensions = v3_ca
@@ -503,10 +503,10 @@ prompt = no
 countryName = DE
 stateOrProvinceName = Bayern
 localityName = Wiesentheid
-organizationName = Seafile
+organizationName = Syncwerk
 organizationalUnitName = Seahub
 emailAddress = postmaster@$(hostname -d)
-# Must be last for Seafile client to validate...
+# Must be last for Syncwerk client to validate...
 commonName = $(hostname -f)
 
 [v3_ca]
@@ -522,7 +522,7 @@ DNS.3 = $(hostname -s)
 IP.1 = 127.0.0.1
 IP.2 = $(hostname -i)
 EOF
-openssl req -new -x509 -key /etc/nginx/ssl/seafile.key -out /etc/nginx/ssl/seafile.crt -days 10950 -config /etc/nginx/ssl/seafile.cnf -sha256
+openssl req -new -x509 -key /etc/nginx/ssl/syncwerk.key -out /etc/nginx/ssl/syncwerk.crt -days 10950 -config /etc/nginx/ssl/syncwerk.cnf -sha256
 }
 
 
@@ -563,40 +563,40 @@ function setup-database-backup {
   apt-get install automysqlbackup -y
 
   # change destination directory
-  SEAFILE_SERVER_BACKUPDIR="/var/backups/seafile-server/database/"
-  eval "sed -i 's#/var/lib/automysqlbackup#$SEAFILE_SERVER_BACKUPDIR#' /etc/default/automysqlbackup"
+  SYNCWERK_SERVER_BACKUPDIR="/var/backups/syncwerk-server/database/"
+  eval "sed -i 's#/var/lib/automysqlbackup#$SYNCWERK_SERVER_BACKUPDIR#' /etc/default/automysqlbackup"
 
   # launch a backup now
   /usr/sbin/automysqlbackup
 
-  echo "Automatic database backups are in ${SEAFILE_SERVER_BACKUPDIR}."
+  echo "Automatic database backups are in ${SYNCWERK_SERVER_BACKUPDIR}."
 }
 
 
-function setup-seafile-server-autostart {
+function setup-syncwerk-server-autostart {
 if [ ${OS} = "wheezy" ]
 then
-cat > /etc/init.d/seafile-server <<'EOF'
+cat > /etc/init.d/syncwerk-server <<'EOF'
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          seafile-server
+# Provides:          syncwerk-server
 # Required-Start:    $remote_fs $syslog mysql
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Seafile server
-# Description:       Start Seafile server
+# Short-Description: Syncwerk server
+# Description:       Start Syncwerk server
 ### END INIT INFO
 
-# Author: Alexander Jackson <alexander.jackson@seafile.de>
+# Author: Alexander Jackson <alexander.jackson@syncwerk.com>
 #
 
 # Change the value of "user" to your linux user name
-user=seafile
+user=syncwerk
 
-script_path=/opt/seafile/seafile-server-latest
-seafile_init_log=/opt/seafile/logs/seafile.init.log
-seahub_init_log=/opt/seafile/logs/seahub.init.log
+script_path=/opt/syncwerk/syncwerk-server-latest
+syncwerk_init_log=/opt/syncwerk/logs/syncwerk.init.log
+seahub_init_log=/opt/syncwerk/logs/seahub.init.log
 
 # Change the value of fastcgi to true if fastcgi is to be used
 fastcgi=true
@@ -605,7 +605,7 @@ fastcgi_port=8000
 
 case "$1" in
   start)
-    sudo -u ${user} ${script_path}/seafile.sh start >> ${seafile_init_log}
+    sudo -u ${user} ${script_path}/syncwerk.sh start >> ${syncwerk_init_log}
     if [  $fastcgi = true ];
       then
         sudo -u ${user} ${script_path}/seahub.sh start-fastcgi ${fastcgi_port} >> ${seahub_init_log}
@@ -614,7 +614,7 @@ case "$1" in
       fi
     ;;
   restart)
-    sudo -u ${user} ${script_path}/seafile.sh restart >> ${seafile_init_log}
+    sudo -u ${user} ${script_path}/syncwerk.sh restart >> ${syncwerk_init_log}
     if [  $fastcgi = true ];
       then
         sudo -u ${user} ${script_path}/seahub.sh restart-fastcgi ${fastcgi_port} >> ${seahub_init_log}
@@ -623,44 +623,44 @@ case "$1" in
       fi
     ;;
   stop)
-    sudo -u ${user} ${script_path}/seafile.sh $1 >> ${seafile_init_log}
+    sudo -u ${user} ${script_path}/syncwerk.sh $1 >> ${syncwerk_init_log}
     sudo -u ${user} ${script_path}/seahub.sh $1 >> ${seahub_init_log}
     ;;
   *)
-    echo "Usage: /etc/init.d/seafile-server {start|stop|restart}"
+    echo "Usage: /etc/init.d/syncwerk-server {start|stop|restart}"
     exit 1
     ;;
 esac
 EOF
-chmod +x /etc/init.d/seafile-server
-update-rc.d seafile-server defaults
+chmod +x /etc/init.d/syncwerk-server
+update-rc.d syncwerk-server defaults
 else
-cat > /etc/systemd/system/seafile.service <<'EOF'
+cat > /etc/systemd/system/syncwerk.service <<'EOF'
 [Unit]
-Description=Seafile Server
+Description=Syncwerk Server
 After=network.target mysql.service
 
 [Service]
 Type=oneshot
-ExecStart=/opt/seafile/seafile-server-latest/seafile.sh start
-ExecStop=/opt/seafile/seafile-server-latest/seafile.sh stop
+ExecStart=/opt/syncwerk/syncwerk-server-latest/syncwerk.sh start
+ExecStop=/opt/syncwerk/syncwerk-server-latest/syncwerk.sh stop
 RemainAfterExit=yes
-User=seafile
+User=syncwerk
 Group=nogroup
 
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl enable seafile
+systemctl enable syncwerk
 cat > /etc/systemd/system/seahub.service <<'EOF'
 [Unit]
-Description=Seafile Seahub
-After=network.target seafile.service
+Description=Syncwerk Seahub
+After=network.target syncwerk.service
 
 [Service]
-ExecStart=/opt/seafile/seafile-server-latest/seahub.sh start-fastcgi 8000
-ExecStop=/opt/seafile/seafile-server-latest/seahub.sh stop
-User=seafile
+ExecStart=/opt/syncwerk/syncwerk-server-latest/seahub.sh start-fastcgi 8000
+ExecStop=/opt/syncwerk/syncwerk-server-latest/seahub.sh stop
+User=syncwerk
 Group=nogroup
 Type=oneshot
 RemainAfterExit=yes
@@ -670,146 +670,146 @@ WantedBy=multi-user.target
 EOF
 systemctl enable seahub
 
-# Seafile restart script
-cat > /usr/local/sbin/seafile-server-restart << 'EOF'
+# Syncwerk restart script
+cat > /usr/local/sbin/syncwerk-server-restart << 'EOF'
 #!/bin/bash
 for ACTION in stop start ; do
-    for SERVICE in seafile seahub ; do
+    for SERVICE in syncwerk seahub ; do
       systemctl ${ACTION} ${SERVICE}
     done
 done
 EOF
 
-chmod 700 /usr/local/sbin/seafile-server-restart
+chmod 700 /usr/local/sbin/syncwerk-server-restart
 
-# Seafile start script
-cat > /usr/local/sbin/seafile-server-start << 'EOF'
+# Syncwerk start script
+cat > /usr/local/sbin/syncwerk-server-start << 'EOF'
 #!/bin/bash
 for ACTION in start ; do
-    for SERVICE in seafile seahub ; do
+    for SERVICE in syncwerk seahub ; do
       systemctl ${ACTION} ${SERVICE}
     done
 done
 EOF
 
-chmod 700 /usr/local/sbin/seafile-server-start
+chmod 700 /usr/local/sbin/syncwerk-server-start
 
-# Seafile stop script
-cat > /usr/local/sbin/seafile-server-stop << 'EOF'
+# Syncwerk stop script
+cat > /usr/local/sbin/syncwerk-server-stop << 'EOF'
 #!/bin/bash
 for ACTION in stop ; do
-    for SERVICE in seafile seahub ; do
+    for SERVICE in syncwerk seahub ; do
       systemctl ${ACTION} ${SERVICE}
     done
 done
 EOF
 
-chmod 700 /usr/local/sbin/seafile-server-stop
+chmod 700 /usr/local/sbin/syncwerk-server-stop
 
 fi
 }
 
 
 function add-system-user {
-adduser --system --gecos "${SEAFILE_SERVER_USER}" ${SEAFILE_SERVER_USER} --home ${SEAFILE_SERVER_HOME}
+adduser --system --gecos "${SYNCWERK_SERVER_USER}" ${SYNCWERK_SERVER_USER} --home ${SYNCWERK_SERVER_HOME}
 }
 
 
-function create-seafile-server-directory {
-mkdir -p ${SEAFILE_SERVER_HOME}/installed
+function create-syncwerk-server-directory {
+mkdir -p ${SYNCWERK_SERVER_HOME}/installed
 }
 
 
-function get-seafile-sources {
-cd ${SEAFILE_SERVER_HOME}
-if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+function get-syncwerk-sources {
+cd ${SYNCWERK_SERVER_HOME}
+if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    cp ${SEAFILE_SERVER_SOURCE} ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-    tar xzf ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-    mv ${SEAFILE_SERVER_HOME}/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz ${SEAFILE_SERVER_HOME}/installed/seafile-pro-server_${SEAFILE_SERVER_VERSION}_x86-64.tar.gz
-    SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-pro-server-${SEAFILE_SERVER_VERSION}/
+    cp ${SYNCWERK_SERVER_SOURCE} ${SYNCWERK_SERVER_HOME}/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz
+    tar xzf ${SYNCWERK_SERVER_HOME}/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz
+    mv ${SYNCWERK_SERVER_HOME}/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz ${SYNCWERK_SERVER_HOME}/installed/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz
+    SYNCWERK_SERVER_INSTALL_PATH=${SYNCWERK_SERVER_HOME}/syncwerk-pro-server-${SYNCWERK_SERVER_VERSION}/
   else
     
     # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok. 
-    #curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
+    #curl -OL https://download.syncwerk.com/syncwerk-server_latest_${ARCH}.tar.gz
     
     if [ $(getconf LONG_BIT) = "64" ]
       then
 
-       wget https://download.seafile.de/server/community/linux/seafile-server_5.1.4_x86-64.tar.gz -O seafile-server_latest_x86-64.tar.gz
-       tountar="seafile-server_latest_x86-64.tar.gz"
+       wget https://download.syncwerk.com/server/community/linux/syncwerk-server_5.1.4_x86-64.tar.gz -O syncwerk-server_latest_x86-64.tar.gz
+       tountar="syncwerk-server_latest_x86-64.tar.gz"
     else
-       curl -OL https://download.seafile.de/seafile-server_latest_${ARCH}.tar.gz
-       tountar="seafile-server_latest_${ARCH}.tar.gz"
+       curl -OL https://download.syncwerk.com/syncwerk-server_latest_${ARCH}.tar.gz
+       tountar="syncwerk-server_latest_${ARCH}.tar.gz"
     fi
 
     tar xzf $tountar
-    SEAFILE_SERVER_VERSION=$(basename ${SEAFILE_SERVER_HOME}/seafile-server-* | awk -F'-' ' { print $3 }')
-    mv $tountar installed/seafile-server_${SEAFILE_SERVER_VERSION}_${ARCH}.tar.gz
-    SEAFILE_SERVER_INSTALL_PATH=${SEAFILE_SERVER_HOME}/seafile-server-${SEAFILE_SERVER_VERSION}/
+    SYNCWERK_SERVER_VERSION=$(basename ${SYNCWERK_SERVER_HOME}/syncwerk-server-* | awk -F'-' ' { print $3 }')
+    mv $tountar installed/syncwerk-server_${SYNCWERK_SERVER_VERSION}_${ARCH}.tar.gz
+    SYNCWERK_SERVER_INSTALL_PATH=${SYNCWERK_SERVER_HOME}/syncwerk-server-${SYNCWERK_SERVER_VERSION}/
 fi
 }
 
 
-function create-seafile-database {
-SEAFILE_DB_PW=$(pwgen 14 1)
-cat > ${SEAFILE_SERVER_HOME}/.my.cnf <<EOF
+function create-syncwerk-database {
+SYNCWERK_DB_PW=$(pwgen 14 1)
+cat > ${SYNCWERK_SERVER_HOME}/.my.cnf <<EOF
 [client]
-user=seafile
-password=${SEAFILE_DB_PW}
+user=syncwerk
+password=${SYNCWERK_DB_PW}
 EOF
-chmod 600 ${SEAFILE_SERVER_HOME}/.my.cnf
-chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}
+chmod 600 ${SYNCWERK_SERVER_HOME}/.my.cnf
+chown -R ${SYNCWERK_SERVER_USER}.nogroup ${SYNCWERK_SERVER_HOME}
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
-mysql -e "CREATE DATABASE IF NOT EXISTS \`seafile-db\` character set = 'utf8';"
+mysql -e "CREATE DATABASE IF NOT EXISTS \`syncwerk-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
-mysql -e "CREATE USER 'seafile'@'localhost' IDENTIFIED BY '${SEAFILE_DB_PW}';"
-mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'seafile'@'localhost';"
-mysql -e "GRANT ALL PRIVILEGES ON  \`seafile-db\` . * TO  'seafile'@'localhost';"
-mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'seafile'@'localhost';"
+mysql -e "CREATE USER 'syncwerk'@'localhost' IDENTIFIED BY '${SYNCWERK_DB_PW}';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'syncwerk'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`syncwerk-db\` . * TO  'syncwerk'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'syncwerk'@'localhost';"
 }
 
 
 function import-seahub-database-structure {
-mysql seahub-db < ${SEAFILE_SERVER_INSTALL_PATH}/seahub/sql/mysql.sql
+mysql seahub-db < ${SYNCWERK_SERVER_INSTALL_PATH}/seahub/sql/mysql.sql
 }
 
 
-function setup-seafile-server {
-cd ${SEAFILE_SERVER_INSTALL_PATH}
+function setup-syncwerk-server {
+cd ${SYNCWERK_SERVER_INSTALL_PATH}
 
 # Vars - Don't touch these unless you really know what you are doing!
-SRC_DOCS_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seafile/docs/
-SEAHUB_SECRET_KEYGEN=${SEAFILE_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
-DEFAULT_CCNET_CONF_DIR=${SEAFILE_SERVER_HOME}/ccnet
-DEFAULT_CONF_DIR=${SEAFILE_SERVER_HOME}/conf
-SEAFILE_SERVER_DATA_DIR=${SEAFILE_SERVER_HOME}/seafile-data
-LIBRARY_TEMPLATE_DIR=${SEAFILE_SERVER_DATA_DIR}/library-template
-DEST_SETTINGS_PY=${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
-CCNET_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/ccnet-init
-SEAF_SERVER_INIT=${SEAFILE_SERVER_INSTALL_PATH}/seafile/bin/seaf-server-init
-MEDIA_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seahub/media
-ORIG_AVATAR_DIR=${SEAFILE_SERVER_INSTALL_PATH}/seahub/media/avatars
-DEST_AVATAR_DIR=${SEAFILE_SERVER_HOME}/seahub-data/avatars
-SEAFILE_SERVER_SYMLINK=${SEAFILE_SERVER_HOME}/seafile-server-latest
+SRC_DOCS_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/docs/
+SEAHUB_SECRET_KEYGEN=${SYNCWERK_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
+DEFAULT_CCNET_CONF_DIR=${SYNCWERK_SERVER_HOME}/ccnet
+DEFAULT_CONF_DIR=${SYNCWERK_SERVER_HOME}/conf
+SYNCWERK_SERVER_DATA_DIR=${SYNCWERK_SERVER_HOME}/syncwerk-data
+LIBRARY_TEMPLATE_DIR=${SYNCWERK_SERVER_DATA_DIR}/library-template
+DEST_SETTINGS_PY=${SYNCWERK_SERVER_HOME}/conf/seahub_settings.py
+CCNET_INIT=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/bin/ccnet-init
+SEAF_SERVER_INIT=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/bin/seaf-server-init
+MEDIA_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/seahub/media
+ORIG_AVATAR_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/seahub/media/avatars
+DEST_AVATAR_DIR=${SYNCWERK_SERVER_HOME}/seahub-data/avatars
+SYNCWERK_SERVER_SYMLINK=${SYNCWERK_SERVER_HOME}/syncwerk-server-latest
 
 # Create ccnet conf
-export SEAFILE_LD_LIBRARY_PATH=${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib/:${SEAFILE_SERVER_INSTALL_PATH}/seafile/lib64:${LD_LIBRARY_PATH}
-LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
+export SYNCWERK_LD_LIBRARY_PATH=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/lib/:${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/lib64:${LD_LIBRARY_PATH}
+LD_LIBRARY_PATH=$SYNCWERK_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
   --name "${SERVER_NAME}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
 
 # Fix service url
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CONF_DIR}/ccnet.conf"
 
-# Create seafile conf
-LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_SERVER_DATA_DIR}" \
-  --fileserver-port ${SEAFILE_SERVER_FILESERVER_PORT} -F "${DEFAULT_CONF_DIR}"
+# Create syncwerk conf
+LD_LIBRARY_PATH=$SYNCWERK_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --syncwerk-dir "${SYNCWERK_SERVER_DATA_DIR}" \
+  --fileserver-port ${SYNCWERK_SERVER_FILESERVER_PORT} -F "${DEFAULT_CONF_DIR}"
 
 
-# Write seafile.ini
-echo "${SEAFILE_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
+# Write syncwerk.ini
+echo "${SYNCWERK_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/syncwerk.ini"
 
-# Configure Seafile WebDAV Server(SeafDAV)
+# Configure Syncwerk WebDAV Server(SeafDAV)
 mkdir -p ${DEFAULT_CONF_DIR}
 cat > ${DEFAULT_CONF_DIR}/seafdav.conf <<EOF
 [WEBDAV]
@@ -824,29 +824,29 @@ key=$(python "${SEAHUB_SECRET_KEYGEN}")
 echo "SECRET_KEY = \"${key}\"" > "${DEST_SETTINGS_PY}"
 
 # prepare avatar directory
-mkdir -p "${SEAFILE_SERVER_HOME}/seahub-data"
+mkdir -p "${SYNCWERK_SERVER_HOME}/seahub-data"
 mv "${ORIG_AVATAR_DIR}" "${DEST_AVATAR_DIR}"
 ln -s ../../../seahub-data/avatars ${MEDIA_DIR}
 
 # create logs directory
-mkdir -p "${SEAFILE_SERVER_HOME}/logs"
+mkdir -p "${SYNCWERK_SERVER_HOME}/logs"
 
 # Create symlink for current server version
-ln -s $(basename ${SEAFILE_SERVER_INSTALL_PATH}) ${SEAFILE_SERVER_SYMLINK}
+ln -s $(basename ${SYNCWERK_SERVER_INSTALL_PATH}) ${SYNCWERK_SERVER_SYMLINK}
 
 # Fix permissions
 chmod 0600 ${DEST_SETTINGS_PY}
-chmod 0700 ${DEFAULT_CCNET_CONF_DIR} ${SEAFILE_SERVER_DATA_DIR} ${DEFAULT_CONF_DIR}
+chmod 0700 ${DEFAULT_CCNET_CONF_DIR} ${SYNCWERK_SERVER_DATA_DIR} ${DEFAULT_CONF_DIR}
 
 # copy user manuals to library template
 mkdir -p ${LIBRARY_TEMPLATE_DIR}
 cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 
 # Setup professional features
-if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    PRO_PY=${SEAFILE_SERVER_INSTALL_PATH}/pro/pro.py
-    $PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SEAFILE_DB_PW} --mysql_db=seahub-db
+    PRO_PY=${SYNCWERK_SERVER_INSTALL_PATH}/pro/pro.py
+    $PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=syncwerk --mysql_password=${SYNCWERK_DB_PW} --mysql_db=seahub-db
 fi
 
 # Configuring ccnet.conf
@@ -856,22 +856,22 @@ cat >> ${DEFAULT_CONF_DIR}/ccnet.conf <<EOF
 ENGINE = mysql
 HOST = 127.0.0.1
 PORT = 3306
-USER = seafile
-PASSWD = ${SEAFILE_DB_PW}
+USER = syncwerk
+PASSWD = ${SYNCWERK_DB_PW}
 DB = ccnet-db
 CONNECTION_CHARSET = utf8
 EOF
 
-# Configuring seafile.conf
-cat >> ${DEFAULT_CONF_DIR}/seafile.conf <<EOF
+# Configuring syncwerk.conf
+cat >> ${DEFAULT_CONF_DIR}/syncwerk.conf <<EOF
 
 [database]
 type = mysql
 host = 127.0.0.1
 port = 3306
-user = seafile
-password = ${SEAFILE_DB_PW}
-db_name = seafile-db
+user = syncwerk
+password = ${SYNCWERK_DB_PW}
+db_name = syncwerk-db
 connection_charset = utf8
 EOF
 
@@ -882,8 +882,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'seahub-db',
-        'USER': 'seafile',
-        'PASSWORD': '${SEAFILE_DB_PW}',
+        'USER': 'syncwerk',
+        'PASSWORD': '${SYNCWERK_DB_PW}',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
@@ -906,10 +906,10 @@ EMAIL_HOST_PASSWORD                 = ''
 EMAIL_PORT                          = '25'
 DEFAULT_FROM_EMAIL                  = 'noreply@${HOSTNAME}'
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
-TIME_ZONE                           = '${SEAFILE_SERVER_TIME_ZONE}'
+TIME_ZONE                           = '${SYNCWERK_SERVER_TIME_ZONE}'
 SITE_BASE                           = 'https://${HOSTNAME}'
-SITE_NAME                           = 'Seafile Server'
-SITE_TITLE                          = 'Seafile Server'
+SITE_NAME                           = 'Syncwerk Server'
+SITE_TITLE                          = 'Syncwerk Server'
 ENABLE_SIGNUP                       = False
 ACTIVATE_AFTER_REGISTRATION         = False
 SEND_EMAIL_ON_ADDING_SYSTEM_MEMBER  = True
@@ -926,7 +926,7 @@ USER_PASSWORD_STRENGTH_LEVEL        = 3
 USER_STRONG_PASSWORD_REQUIRED       = True
 ENABLE_MAKE_GROUP_PUBLIC            = False
 ENABLE_THUMBNAIL                    = True
-THUMBNAIL_ROOT                      = '${SEAFILE_SERVER_HOME}/seahub-data/thumbnail/thumb/'
+THUMBNAIL_ROOT                      = '${SYNCWERK_SERVER_HOME}/seahub-data/thumbnail/thumb/'
 REPO_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_MIN_LENGTH            = 8
 USER_PASSWORD_STRENGTH_LEVEL        = 3
@@ -934,38 +934,38 @@ USER_STRONG_PASSWORD_REQUIRED       = True
 EOF
 
 # Backup check_init_admin.py befor applying changes
-cp ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup
+cp ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py.backup
 
 # Set admin credentials in check_init_admin.py
-SEAFILE_SERVER_ADMIN_PASSWORD=$(pwgen 14 1)
-eval "sed -i 's/= ask_admin_email()/= \"${SEAFILE_SERVER_ADMIN}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
-eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_SERVER_ADMIN_PASSWORD}\"/' ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py"
+SYNCWERK_SERVER_ADMIN_PASSWORD=$(pwgen 14 1)
+eval "sed -i 's/= ask_admin_email()/= \"${SYNCWERK_SERVER_ADMIN}\"/' ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py"
+eval "sed -i 's/= ask_admin_password()/= \"${SYNCWERK_SERVER_ADMIN_PASSWORD}\"/' ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py"
 
-# Start and stop Seafile eco system. This generates the initial admin user.
-${SEAFILE_SERVER_INSTALL_PATH}/seafile.sh start
-${SEAFILE_SERVER_INSTALL_PATH}/seahub.sh start
-${SEAFILE_SERVER_INSTALL_PATH}/seahub.sh stop
-${SEAFILE_SERVER_INSTALL_PATH}/seafile.sh stop
+# Start and stop Syncwerk eco system. This generates the initial admin user.
+${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk.sh start
+${SYNCWERK_SERVER_INSTALL_PATH}/seahub.sh start
+${SYNCWERK_SERVER_INSTALL_PATH}/seahub.sh stop
+${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk.sh stop
 
 
 # Restore original check_init_admin.py
-mv ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py.backup ${SEAFILE_SERVER_INSTALL_PATH}/check_init_admin.py
+mv ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py.backup ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py
 
 # Fix permissions
-chown ${SEAFILE_SERVER_USER}.nogroup -R ${SEAFILE_SERVER_HOME}
+chown ${SYNCWERK_SERVER_USER}.nogroup -R ${SYNCWERK_SERVER_HOME}
 
 # Enable office preview in Seahub
-if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
+if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
     sed -i 's/enabled = false/enabled = true/' ${DEFAULT_CONF_DIR}/seafevents.conf
 fi
 }
 
 
-function setup-seafile-server-logrotate {
+function setup-syncwerk-server-logrotate {
 apt-get install logrotate -y
-cat > /etc/logrotate.d/seafile <<EOF
-${SEAFILE_SERVER_HOME}/logs/seaf-server.log
+cat > /etc/logrotate.d/syncwerk <<EOF
+${SYNCWERK_SERVER_HOME}/logs/seaf-server.log
 {
   daily
   missingok
@@ -975,11 +975,11 @@ ${SEAFILE_SERVER_HOME}/logs/seaf-server.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}/pids/seaf-server.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}/pids/seaf-server.pid}
+    [ ! -f ${SYNCWERK_SERVER_HOME}/pids/seaf-server.pid ] || kill -USR1 \${cat ${SYNCWERK_SERVER_HOME}/pids/seaf-server.pid}
   endscript
 }
 
-${SEAFILE_SERVER_HOME}/logs/ccnet.log
+${SYNCWERK_SERVER_HOME}/logs/ccnet.log
 {
   daily
   missingok
@@ -989,38 +989,38 @@ ${SEAFILE_SERVER_HOME}/logs/ccnet.log
   notifempty
   sharedscripts
   postrotate
-    [ ! -f ${SEAFILE_SERVER_HOME}/pids/ccnet.pid ] || kill -USR1 \${cat ${SEAFILE_SERVER_HOME}/pids/ccnet.pid}
+    [ ! -f ${SYNCWERK_SERVER_HOME}/pids/ccnet.pid ] || kill -USR1 \${cat ${SYNCWERK_SERVER_HOME}/pids/ccnet.pid}
   endscript
 }
 EOF
 }
 
 
-function start-seafile-server {
+function start-syncwerk-server {
 echo "Fix any ownership issues before starting"
-chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}
+chown -R ${SYNCWERK_SERVER_USER}.nogroup ${SYNCWERK_SERVER_HOME}
 
-echo "Starting productive Seafile server"
+echo "Starting productive Syncwerk server"
 if [ ${OS} = "wheezy" ]
   then
-    service seafile-server start
+    service syncwerk-server start
   else
-    /usr/local/sbin/seafile-server-restart
+    /usr/local/sbin/syncwerk-server-restart
 fi
 }
 
 
-function setup-seafile-server-change-address-script {
-cat > /usr/local/sbin/seafile-server-change-address <<'ENDOFILE'
+function setup-syncwerk-server-change-address-script {
+cat > /usr/local/sbin/syncwerk-server-change-address <<'ENDOFILE'
 #/bin/bash
 #set -x
 
-# Save at /usr/local/sbin/seafile-server-change-address and set permissions with
-# chmod 500 /usr/local/sbin/seafile-server-change-address
+# Save at /usr/local/sbin/syncwerk-server-change-address and set permissions with
+# chmod 500 /usr/local/sbin/syncwerk-server-change-address
 
 # Vars
 HOSTNAME=$(hostname -f)
-SEAFILE_SERVER_HOME=/opt/seafile
+SYNCWERK_SERVER_HOME=/opt/syncwerk
 OS=$(lsb_release -c | awk '{ print $2 }')
 
 # Intro
@@ -1030,10 +1030,10 @@ cat <<EOF
   Deutsch
   -------------------------------------------
   Mit diesem Skript können Sie die Adresse Ihres
-  Seafile Serves ändern. Das ist zum Beispiel nötig wenn
+  Syncwerk Serves ändern. Das ist zum Beispiel nötig wenn
   sich Ihre Domain- oder IP-Adresse geändert hat.
 
-  Wird Seafile mit der falschen Adresse betrieben,
+  Wird Syncwerk mit der falschen Adresse betrieben,
   funktioniert der Up- und Download von Dateien nicht.
 
   Soll der Server mittes Portweiterleitung erreichbar
@@ -1049,7 +1049,7 @@ cat <<EOF
   English
   -------------------------------------------
   With this script you can change the address of your
-  Seafile server. For example this is necessary if
+  Syncwerk server. For example this is necessary if
   your DNS or IP address has changed.
 
   If the wrong address is set, up- and downloads will not work.
@@ -1083,20 +1083,20 @@ read dummy
 
 # Aendere Adressen in seahub_settings.py und ccnet.conf
 echo Applying changes
-sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
-sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
-sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
-sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SEAFILE_SERVER_HOME}/conf/seahub_settings.py
-sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SEAFILE_SERVER_HOME}/conf/ccnet.conf
+sed -i "s/^SITE_BASE.*/SITE_BASE = \'${URL}\'/g" ${SYNCWERK_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^SITE_NAME.*/SITE_NAME = \'${URL}\'/g" ${SYNCWERK_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^SITE_TITLE.*/SITE_TITLE = \'${URL}\'/g" ${SYNCWERK_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^FILE_SERVER_ROOT.*/FILE_SERVER_ROOT = '\https:\/\/${URL}\/seafhttp\'/g" ${SYNCWERK_SERVER_HOME}/conf/seahub_settings.py
+sed -i "s/^SERVICE_URL.*/SERVICE_URL = https:\/\/${URL}/g" ${SYNCWERK_SERVER_HOME}/conf/ccnet.conf
 
-# Starte Seafile neu
-echo restarting Seafile server
+# Starte Syncwerk neu
+echo restarting Syncwerk server
 
 if [ ${OS} = "wheezy" ]
   then
-    service seafile-server start
+    service syncwerk-server start
   else
-    systemctl restart seafile-server
+    systemctl restart syncwerk-server
 fi
 
 # Outro
@@ -1105,42 +1105,42 @@ cat <<EOF
 
   Deutsch
   -------------------------------------------
-  Fertig! Der Seafile Server wurde neu gestartet.
+  Fertig! Der Syncwerk Server wurde neu gestartet.
 
   Seahub sollte nun über https://${HOSTNAME} erreichbar sein.
 
 
   English
   -------------------------------------------
-  Done! Your Seafile Server has been restarted.
+  Done! Your Syncwerk Server has been restarted.
 
   Seahub should be reachable at https://${HOSTNAME}.
 
 EOF
 ENDOFILE
-chmod 500 /usr/local/sbin/seafile-server-change-address
+chmod 500 /usr/local/sbin/syncwerk-server-change-address
 }
 
 
 function installation-summary {
-cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
+cat > ${SYNCWERK_SERVER_HOME}/$(basename ${0})_report.log<<EOF
 
-  Your Seafile server
+  Your Syncwerk server
   -----------------------------------------------------------------
 
   Server Name:         ${SERVER_NAME}
   Server Address:      https://${HOSTNAME}
 
-  Seafile Admin:       ${SEAFILE_SERVER_ADMIN}
-  Admin Password:      ${SEAFILE_SERVER_ADMIN_PASSWORD}
+  Syncwerk Admin:       ${SYNCWERK_SERVER_ADMIN}
+  Admin Password:      ${SYNCWERK_SERVER_ADMIN_PASSWORD}
 
-  Seafile Home Dir:    ${SEAFILE_SERVER_HOME}
-  Seafile Data Dir:    ${SEAFILE_SERVER_DATA_DIR}
+  Syncwerk Home Dir:    ${SYNCWERK_SERVER_HOME}
+  Syncwerk Data Dir:    ${SYNCWERK_SERVER_DATA_DIR}
 
-  Seafile DB Credentials:  Check ${SEAFILE_SERVER_HOME}/.my.cnf
+  Syncwerk DB Credentials:  Check ${SYNCWERK_SERVER_HOME}/.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
 
-  Switch to Seafile system account with: su - ${SEAFILE_SERVER_USER} -s /bin/bash
+  Switch to Syncwerk system account with: su - ${SYNCWERK_SERVER_USER} -s /bin/bash
 
 
   Next you should manually complete the following steps
@@ -1158,56 +1158,56 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Optional steps
   -----------------------------------------------------------------
 
-  1) Run seafile-server-change-address to change your Seafile servers DNS name.
+  1) Run syncwerk-server-change-address to change your Syncwerk servers DNS name.
 
   2) Check seahub_settings.py and customize it to fit your needs. Consult
-     http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
+     http://manual.syncwerk.com/config/seahub_settings_py.html for possible switches.
 
   3) Setup NGINX with official SSL certificate and create safe DH primes...
-     (https://forum.seafile-server.org/t/kostenfreies-startssl-class-1-zertifikat-fur-nginx-und-seafile-beziehen/1642)
+     (https://forum.syncwerk-server.org/t/kostenfreies-startssl-class-1-zertifikat-fur-nginx-und-syncwerk-beziehen/1642)
 
   4) Harden system with port knocking, fail2ban, etc.
 
-  5) Implement a backup routine for your Seafile server.
-     (A a first step, databases are backed up in ${SEAFILE_SERVER_BACKUPDIR}.)
+  5) Implement a backup routine for your Syncwerk server.
+     (A a first step, databases are backed up in ${SYNCWERK_SERVER_BACKUPDIR}.)
 
 
-  Seafile support options
+  Syncwerk support options
   -----------------------------------------------------------------
 
-  For free community support visit:   https://forum.seafile-server.org
-  For paid commercial support visit:  https://seafile.de
+  For free community support visit:   https://forum.syncwerk-server.org
+  For paid commercial support visit:  https://syncwerk.com
 
 
   Debug infos
   -----------------------------------------------------------------
   If the installation fails for any reason, review
   /root/$(basename ${0})_installation.log
-  or send us the log by mail to $(basename ${0})@seafile.de
+  or send us the log by mail to $(basename ${0})@syncwerk.com
 
 
   Contribute
   -----------------------------------------------------------------
-  Please contact alexander.jackson@seafile.de
+  Please contact alexander.jackson@syncwerk.com
   for bugs or suggestions about this installer. Thank you!
 
 
-  This report is also saved to ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
+  This report is also saved to ${SYNCWERK_SERVER_HOME}/$(basename ${0})_report.log
 
 EOF
-chmod 600 ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
-chown -R ${SEAFILE_SERVER_USER}.nogroup ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
+chmod 600 ${SYNCWERK_SERVER_HOME}/$(basename ${0})_report.log
+chown -R ${SYNCWERK_SERVER_USER}.nogroup ${SYNCWERK_SERVER_HOME}/$(basename ${0})_report.log
 }
 
 
-# Install Seafile server
+# Install Syncwerk server
 print-system-infos
 description
 ensure-we-are-running-the-installer-on-a-supported-operating-system
 are-we-root-abort-if-not
 does-user-exist-and-abort-if-he-does
 does-directory-exist-abort-if-it-does
-abort-if-seafile-professional-source-is-missing
+abort-if-syncwerk-professional-source-is-missing
 update-operating-system
 install-system-utils
 setup-ntpd
@@ -1215,27 +1215,27 @@ setup-ufw-firewall
 setup-fail2ban
 setup-postfix
 setup-unattended-upgrades
-install-seafile-server-requirements
+install-syncwerk-server-requirements
 setup-nginx
 create-self-signed-certificate-for-nginx
 restart-nginx
 setup-mariadb
-setup-seafile-server-autostart
+setup-syncwerk-server-autostart
 add-system-user
-create-seafile-server-directory
-get-seafile-sources
-create-seafile-database
+create-syncwerk-server-directory
+get-syncwerk-sources
+create-syncwerk-database
 import-seahub-database-structure
-setup-seafile-server
-setup-seafile-server-logrotate
+setup-syncwerk-server
+setup-syncwerk-server-logrotate
 setup-database-backup
-start-seafile-server
-setup-seafile-server-change-address-script
+start-syncwerk-server
+setup-syncwerk-server-change-address-script
 installation-summary
 print-system-infos
 
 # Print installation summary
-cat ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log
+cat ${SYNCWERK_SERVER_HOME}/$(basename ${0})_report.log
 
 exit
 esac
