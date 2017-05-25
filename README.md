@@ -61,7 +61,7 @@ You will have to download the Syncwerk Professional Server package prior to the 
 * [English: Syncwerk Professional (existing registration required)](https://download.syncwerk.com/)
 * [Deutsch: Syncwerk Professional (bestehendes Konto erforderlich)](https://download.syncwerk.com/)
 
-**FYI:** To donwload  Syncwerk Professional you need an account on our download portal. Only pre-existing customers of Syncwerk GmbH (former Seafile GmbH) will receive access to these restricted sources. Contact us at support@syncwerk.com if you have lost your login details.
+**FYI:** To download Syncwerk Professional you need an account on our [download portal](https://download.syncwerk.com/). Only pre-existing customers of Syncwerk GmbH (former Seafile GmbH) will receive access to these restricted sources. Contact us at support@syncwerk.com if you have lost your login details.
 
 
 ## FAQs
