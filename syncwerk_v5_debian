@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Uncomment to run in verbose mode
-#set -x
+set -ex
 
 
 # Determine which Syncwerk version to install
@@ -192,7 +192,7 @@ cat <<EOF
   Installing Syncwerk Server ${SYNCWERK_SERVER_VERSION} on
   ${OS_DESC} (${ARCH}). 
 
-  Features: NGINX, MariaDB, Memcached, SeafDAV, logrotate
+  Features: NGINX, MariaDB, Memcached, WebDAV, logrotate
   -----------------------------------------------------------------
 
   This installer is meant to run on a freshly installed machine
@@ -343,7 +343,8 @@ fi
 
 function setup-nginx {
 apt-get install nginx -y
-rm /etc/nginx/conf.d/*
+rm -rf /etc/nginx/conf.d/*
+mkdir -p /etc/nginx/conf.d/
 cat > /etc/nginx/conf.d/syncwerk.conf <<'EOF'
 server {
   listen [::]:80 ipv6only=off;
@@ -393,7 +394,7 @@ server {
     root /opt/syncwerk/syncwerk-server-latest/seahub;
   }
 
-  location /seafdav {
+  location /webdav {
     fastcgi_pass    127.0.0.1:8080;
     fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
     fastcgi_param   PATH_INFO           $fastcgi_script_name;
@@ -408,21 +409,21 @@ server {
     fastcgi_param   REMOTE_ADDR         $remote_addr;
     fastcgi_param   HTTPS               on;
     client_max_body_size 0;
-    access_log      /var/log/nginx/seafdav.access.log;
-    error_log       /var/log/nginx/seafdav.error.log;
+    access_log      /var/log/nginx/webdav.access.log;
+    error_log       /var/log/nginx/webdav.error.log;
   }
 }
 EOF
 
 # Create optimized nginx.conf
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-NGINX_USER=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f2 | cut -d";" -f1) 
-NGINX_GROUP=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f3 | cut -d";" -f1) 
-if [ ${#NGINX_GROUP} -lt 2 ]; then
-    NGINX_GROUP="${NGINX_USER}";
-fi
+#NGINX_USER=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f2 | cut -d";" -f1) 
+#NGINX_GROUP=$(cat /etc/nginx/nginx.conf.backup | grep user | cut -d" " -f3 | cut -d";" -f1) 
+#if [ ${#NGINX_GROUP} -lt 2 ]; then
+#    NGINX_GROUP="${NGINX_USER}";
+#fi
 cat > /etc/nginx/nginx.conf <<ENDOFFILE
-user $NGINX_USER $NGINX_GROUP;
+#user $NGINX_USER $NGINX_GROUP;
 worker_processes 4;
 
 events {
@@ -491,7 +492,7 @@ eval "sed -i 's/worker_processes.*/worker_processes  $CPUS;/g' /etc/nginx/nginx.
 
 
 function create-self-signed-certificate-for-nginx {
-mkdir /etc/nginx/ssl
+mkdir -p /etc/nginx/ssl
 openssl genrsa -out /etc/nginx/ssl/syncwerk.key 4096
 cat > /etc/nginx/ssl/syncwerk.cnf << EOF
 [req]
@@ -503,9 +504,9 @@ prompt = no
 countryName = DE
 stateOrProvinceName = Bayern
 localityName = Wiesentheid
-organizationName = Syncwerk
+organizationName = Syncwerk GmbH
 organizationalUnitName = Seahub
-emailAddress = postmaster@$(hostname -d)
+emailAddress = support@syncwerk.com
 # Must be last for Syncwerk client to validate...
 commonName = $(hostname -f)
 
@@ -531,7 +532,7 @@ if [ ${OS} = "wheezy" ]
   then
     service nginx restart
   else
-    systemctl restart nginx
+    if [[ $(cat /proc/1/environ) == *container* ]]; then service nginx restart ; else systemctl restart nginx ; fi
 fi
 }
 
@@ -573,9 +574,8 @@ function setup-database-backup {
 }
 
 
-function setup-syncwerk-server-autostart {
-if [ ${OS} = "wheezy" ]
-then
+
+function sysv-autostart {
 cat > /etc/init.d/syncwerk-server <<'EOF'
 #!/bin/bash
 ### BEGIN INIT INFO
@@ -605,7 +605,7 @@ fastcgi_port=8000
 
 case "$1" in
   start)
-    sudo -u ${user} ${script_path}/syncwerk.sh start >> ${syncwerk_init_log}
+    sudo -u ${user} ${script_path}/seafile.sh start >> ${syncwerk_init_log}
     if [  $fastcgi = true ];
       then
         sudo -u ${user} ${script_path}/seahub.sh start-fastcgi ${fastcgi_port} >> ${seahub_init_log}
@@ -614,7 +614,7 @@ case "$1" in
       fi
     ;;
   restart)
-    sudo -u ${user} ${script_path}/syncwerk.sh restart >> ${syncwerk_init_log}
+    sudo -u ${user} ${script_path}/seafile.sh restart >> ${syncwerk_init_log}
     if [  $fastcgi = true ];
       then
         sudo -u ${user} ${script_path}/seahub.sh restart-fastcgi ${fastcgi_port} >> ${seahub_init_log}
@@ -623,7 +623,7 @@ case "$1" in
       fi
     ;;
   stop)
-    sudo -u ${user} ${script_path}/syncwerk.sh $1 >> ${syncwerk_init_log}
+    sudo -u ${user} ${script_path}/seafile.sh $1 >> ${syncwerk_init_log}
     sudo -u ${user} ${script_path}/seahub.sh $1 >> ${seahub_init_log}
     ;;
   *)
@@ -634,7 +634,9 @@ esac
 EOF
 chmod +x /etc/init.d/syncwerk-server
 update-rc.d syncwerk-server defaults
-else
+}
+
+function systemd-autostart {
 cat > /etc/systemd/system/syncwerk.service <<'EOF'
 [Unit]
 Description=Syncwerk Server
@@ -642,8 +644,8 @@ After=network.target mysql.service
 
 [Service]
 Type=oneshot
-ExecStart=/opt/syncwerk/syncwerk-server-latest/syncwerk.sh start
-ExecStop=/opt/syncwerk/syncwerk-server-latest/syncwerk.sh stop
+ExecStart=/opt/syncwerk/syncwerk-server-latest/seafile.sh start
+ExecStop=/opt/syncwerk/syncwerk-server-latest/seafile.sh stop
 RemainAfterExit=yes
 User=syncwerk
 Group=nogroup
@@ -654,7 +656,7 @@ EOF
 systemctl enable syncwerk
 cat > /etc/systemd/system/seahub.service <<'EOF'
 [Unit]
-Description=Syncwerk Seahub
+Description=Seafile Seahub
 After=network.target syncwerk.service
 
 [Service]
@@ -705,7 +707,15 @@ done
 EOF
 
 chmod 700 /usr/local/sbin/syncwerk-server-stop
+}
 
+
+function setup-syncwerk-server-autostart {
+if [ ${OS} = "wheezy" ]
+then
+sysv-autostart
+else
+    if [[ $(cat /proc/1/environ) == *container* ]]; then sysv-autostart ; else systemd-autostart ; fi
 fi
 }
 
@@ -727,7 +737,7 @@ if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
     cp ${SYNCWERK_SERVER_SOURCE} ${SYNCWERK_SERVER_HOME}/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz
     tar xzf ${SYNCWERK_SERVER_HOME}/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz
     mv ${SYNCWERK_SERVER_HOME}/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz ${SYNCWERK_SERVER_HOME}/installed/syncwerk-pro-server_${SYNCWERK_SERVER_VERSION}_x86-64.tar.gz
-    SYNCWERK_SERVER_INSTALL_PATH=${SYNCWERK_SERVER_HOME}/syncwerk-pro-server-${SYNCWERK_SERVER_VERSION}/
+    SYNCWERK_SERVER_INSTALL_PATH=${SYNCWERK_SERVER_HOME}/syncwerk-pro-server-${SYNCWERK_SERVER_VERSION}
   else
     
     # Disabled on 2015-11-13 due to issues with the Bintray repository. x86-64 is broke, i386 seems to be ok. 
@@ -746,7 +756,7 @@ if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
     tar xzf $tountar
     SYNCWERK_SERVER_VERSION=$(basename ${SYNCWERK_SERVER_HOME}/syncwerk-server-* | awk -F'-' ' { print $3 }')
     mv $tountar installed/syncwerk-server_${SYNCWERK_SERVER_VERSION}_${ARCH}.tar.gz
-    SYNCWERK_SERVER_INSTALL_PATH=${SYNCWERK_SERVER_HOME}/syncwerk-server-${SYNCWERK_SERVER_VERSION}/
+    SYNCWERK_SERVER_INSTALL_PATH=${SYNCWERK_SERVER_HOME}/syncwerk-server-${SYNCWERK_SERVER_VERSION}
 fi
 }
 
@@ -762,16 +772,16 @@ chmod 600 ${SYNCWERK_SERVER_HOME}/.my.cnf
 chown -R ${SYNCWERK_SERVER_USER}.nogroup ${SYNCWERK_SERVER_HOME}
 mysql -e "CREATE DATABASE IF NOT EXISTS \`ccnet-db\` character set = 'utf8';"
 mysql -e "CREATE DATABASE IF NOT EXISTS \`syncwerk-db\` character set = 'utf8';"
-mysql -e "CREATE DATABASE IF NOT EXISTS \`seahub-db\` character set = 'utf8';"
+mysql -e "CREATE DATABASE IF NOT EXISTS \`webapp-db\` character set = 'utf8';"
 mysql -e "CREATE USER 'syncwerk'@'localhost' IDENTIFIED BY '${SYNCWERK_DB_PW}';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`ccnet-db\` . * TO  'syncwerk'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON  \`syncwerk-db\` . * TO  'syncwerk'@'localhost';"
-mysql -e "GRANT ALL PRIVILEGES ON  \`seahub-db\` . * TO  'syncwerk'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON  \`webapp-db\` . * TO  'syncwerk'@'localhost';"
 }
 
 
 function import-seahub-database-structure {
-mysql seahub-db < ${SYNCWERK_SERVER_INSTALL_PATH}/seahub/sql/mysql.sql
+mysql webapp-db < ${SYNCWERK_SERVER_INSTALL_PATH}/seahub/sql/mysql.sql
 }
 
 
@@ -779,22 +789,22 @@ function setup-syncwerk-server {
 cd ${SYNCWERK_SERVER_INSTALL_PATH}
 
 # Vars - Don't touch these unless you really know what you are doing!
-SRC_DOCS_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/docs/
+SRC_DOCS_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/seafile/docs/
 SEAHUB_SECRET_KEYGEN=${SYNCWERK_SERVER_INSTALL_PATH}/seahub/tools/secret_key_generator.py
 DEFAULT_CCNET_CONF_DIR=${SYNCWERK_SERVER_HOME}/ccnet
 DEFAULT_CONF_DIR=${SYNCWERK_SERVER_HOME}/conf
 SYNCWERK_SERVER_DATA_DIR=${SYNCWERK_SERVER_HOME}/syncwerk-data
 LIBRARY_TEMPLATE_DIR=${SYNCWERK_SERVER_DATA_DIR}/library-template
 DEST_SETTINGS_PY=${SYNCWERK_SERVER_HOME}/conf/seahub_settings.py
-CCNET_INIT=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/bin/ccnet-init
-SEAF_SERVER_INIT=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/bin/seaf-server-init
+CCNET_INIT=${SYNCWERK_SERVER_INSTALL_PATH}/seafile/bin/ccnet-init
+SEAF_SERVER_INIT=${SYNCWERK_SERVER_INSTALL_PATH}/seafile/bin/seaf-server-init
 MEDIA_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/seahub/media
 ORIG_AVATAR_DIR=${SYNCWERK_SERVER_INSTALL_PATH}/seahub/media/avatars
 DEST_AVATAR_DIR=${SYNCWERK_SERVER_HOME}/seahub-data/avatars
 SYNCWERK_SERVER_SYMLINK=${SYNCWERK_SERVER_HOME}/syncwerk-server-latest
 
 # Create ccnet conf
-export SYNCWERK_LD_LIBRARY_PATH=${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/lib/:${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk/lib64:${LD_LIBRARY_PATH}
+export SYNCWERK_LD_LIBRARY_PATH=${SYNCWERK_SERVER_INSTALL_PATH}/seafile/lib/:${SYNCWERK_SERVER_INSTALL_PATH}/seafile/lib64:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=$SYNCWERK_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
   --name "${SERVER_NAME}" --host "${HOSTNAME}" -F "${DEFAULT_CONF_DIR}"
 
@@ -802,21 +812,21 @@ LD_LIBRARY_PATH=$SYNCWERK_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CO
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${HOSTNAME}/' ${DEFAULT_CONF_DIR}/ccnet.conf"
 
 # Create syncwerk conf
-LD_LIBRARY_PATH=$SYNCWERK_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --syncwerk-dir "${SYNCWERK_SERVER_DATA_DIR}" \
+LD_LIBRARY_PATH=$SYNCWERK_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SYNCWERK_SERVER_DATA_DIR}" \
   --fileserver-port ${SYNCWERK_SERVER_FILESERVER_PORT} -F "${DEFAULT_CONF_DIR}"
 
 
-# Write syncwerk.ini
-echo "${SYNCWERK_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/syncwerk.ini"
+# Write seafile.ini
+echo "${SYNCWERK_SERVER_DATA_DIR}" > "${DEFAULT_CCNET_CONF_DIR}/seafile.ini"
 
-# Configure Syncwerk WebDAV Server(SeafDAV)
+# Configure Syncwerk WebDAV Server
 mkdir -p ${DEFAULT_CONF_DIR}
 cat > ${DEFAULT_CONF_DIR}/seafdav.conf <<EOF
 [WEBDAV]
 enabled = true
 port = 8080
 fastcgi = true
-share_name = /seafdav
+share_name = /webdav
 EOF
 
 # generate seahub_settings.py
@@ -846,7 +856,7 @@ cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
     PRO_PY=${SYNCWERK_SERVER_INSTALL_PATH}/pro/pro.py
-    $PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=syncwerk --mysql_password=${SYNCWERK_DB_PW} --mysql_db=seahub-db
+    $PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=syncwerk --mysql_password=${SYNCWERK_DB_PW} --mysql_db=webapp-db
 fi
 
 # Configuring ccnet.conf
@@ -881,7 +891,7 @@ cat >> ${DEST_SETTINGS_PY} <<EOF
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'seahub-db',
+        'NAME': 'webapp-db',
         'USER': 'syncwerk',
         'PASSWORD': '${SYNCWERK_DB_PW}',
         'HOST': '127.0.0.1',
@@ -942,10 +952,10 @@ eval "sed -i 's/= ask_admin_email()/= \"${SYNCWERK_SERVER_ADMIN}\"/' ${SYNCWERK_
 eval "sed -i 's/= ask_admin_password()/= \"${SYNCWERK_SERVER_ADMIN_PASSWORD}\"/' ${SYNCWERK_SERVER_INSTALL_PATH}/check_init_admin.py"
 
 # Start and stop Syncwerk eco system. This generates the initial admin user.
-${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk.sh start
+${SYNCWERK_SERVER_INSTALL_PATH}/seafile.sh start
 ${SYNCWERK_SERVER_INSTALL_PATH}/seahub.sh start
 ${SYNCWERK_SERVER_INSTALL_PATH}/seahub.sh stop
-${SYNCWERK_SERVER_INSTALL_PATH}/syncwerk.sh stop
+${SYNCWERK_SERVER_INSTALL_PATH}/seafile.sh stop
 
 
 # Restore original check_init_admin.py
@@ -1005,7 +1015,7 @@ if [ ${OS} = "wheezy" ]
   then
     service syncwerk-server start
   else
-    /usr/local/sbin/syncwerk-server-restart
+    if [[ $(cat /proc/1/environ) == *container* ]]; then service syncwerk-server start ; else /usr/local/sbin/syncwerk-server-start ; fi
 fi
 }
 
@@ -1094,9 +1104,9 @@ echo restarting Syncwerk server
 
 if [ ${OS} = "wheezy" ]
   then
-    service syncwerk-server start
+    service syncwerk-server restart
   else
-    systemctl restart syncwerk-server
+    if [[ $(cat /proc/1/environ) == *container* ]]; then service syncwerk-server restart ; else /usr/local/sbin/syncwerk-server-restart ; fi
 fi
 
 # Outro
@@ -1210,7 +1220,7 @@ does-directory-exist-abort-if-it-does
 abort-if-syncwerk-professional-source-is-missing
 update-operating-system
 install-system-utils
-setup-ntpd
+if [[ $(cat /proc/1/environ) == *container* ]]; then echo "Skipping NTPD setup on containers" ; else setup-ntpd ; fi
 setup-ufw-firewall
 setup-fail2ban
 setup-postfix
