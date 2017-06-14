@@ -849,8 +849,8 @@ chmod 0600 ${DEST_SETTINGS_PY}
 chmod 0700 ${DEFAULT_CCNET_CONF_DIR} ${SYNCWERK_SERVER_DATA_DIR} ${DEFAULT_CONF_DIR}
 
 # copy user manuals to library template
-mkdir -p ${LIBRARY_TEMPLATE_DIR}
-cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
+#mkdir -p ${LIBRARY_TEMPLATE_DIR}
+#cp -f ${SRC_DOCS_DIR}/*.doc ${LIBRARY_TEMPLATE_DIR}
 
 # Setup professional features
 if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
@@ -1220,7 +1220,8 @@ does-directory-exist-abort-if-it-does
 abort-if-syncwerk-professional-source-is-missing
 update-operating-system
 install-system-utils
-if [[ $(cat /proc/1/environ) == *container* ]]; then echo "Skipping NTPD setup on containers" ; else setup-ntpd ; fi
+# Disabled due to errors on some systems
+#if [[ $(cat /proc/1/environ) == *container* ]]; then echo "Skipping NTPD setup on containers" ; else setup-ntpd ; fi
 setup-ufw-firewall
 setup-fail2ban
 setup-postfix
