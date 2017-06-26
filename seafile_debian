@@ -214,7 +214,7 @@ clear
 
 
 function ensure-we-are-running-the-installer-on-a-supported-operating-system {
-if [[ ${OS} != jessie && ${OS} != wheezy ]] ; then
+if [[ ${OS} != stretch && ${OS} != jessie && ${OS} != wheezy ]] ; then
     echo "Aborting because OS not supported" ; exit 1
 fi
 }
