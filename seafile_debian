@@ -323,10 +323,8 @@ dpkg-reconfigure unattended-upgrades
 
 
 function install-seafile-server-requirements {
-apt-get install sudo python-setuptools python-simplejson python-pip python-mysqldb \
+apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 memcached python-memcache pwgen curl openssl -y
-
-pip install --upgrade Pillow
 
 # Seafile Professional requierments
 if [ ${SEAFILE_SERVER_PROFESSIONAL} = "enabled" ]
