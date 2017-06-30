@@ -117,7 +117,7 @@ if is_pro; then
     INSTALLPATH=/opt/seafile/seafile-pro-server-${SEAFILE_VERSION}/
 else
     SEAFILE_SERVER_PACKAGE=seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz
-    SEAFILE_SERVER_PACKAGE_URL=https://bintray.com/artifact/download/seafile-org/seafile/${SEAFILE_SERVER_PACKAGE}
+    SEAFILE_SERVER_PACKAGE_URL=https://download.seadrive.org/${SEAFILE_SERVER_PACKAGE}
     INSTALLPATH=/opt/seafile/seafile-server-${SEAFILE_VERSION}/
 fi
 
