@@ -361,7 +361,8 @@ server {
   ssl_certificate_key /etc/nginx/ssl/syncwerk.key;
   
   proxy_set_header X-Forwarded-For $remote_addr;
-
+  proxy_max_temp_file_size 0;
+  
   location / {
     fastcgi_pass    127.0.0.1:8000;
     fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
@@ -377,8 +378,8 @@ server {
     fastcgi_param   REMOTE_ADDR         $remote_addr;
     fastcgi_param   HTTPS               on;
     fastcgi_param   HTTP_SCHEME         https;
-    access_log      /var/log/nginx/seahub.access.log;
-    error_log       /var/log/nginx/seahub.error.log;
+    access_log      /var/log/nginx/syncwerk-webapp.access.log;
+    error_log       /var/log/nginx/syncwerk-webapp.error.log;
   }
 
   location /seafhttp {
@@ -409,8 +410,8 @@ server {
     fastcgi_param   REMOTE_ADDR         $remote_addr;
     fastcgi_param   HTTPS               on;
     client_max_body_size 0;
-    access_log      /var/log/nginx/webdav.access.log;
-    error_log       /var/log/nginx/webdav.error.log;
+    access_log      /var/log/nginx/syncwerk-webdav.access.log;
+    error_log       /var/log/nginx/syncwerk-webdav.error.log;
   }
 }
 EOF
@@ -872,8 +873,8 @@ DB = ccnet-db
 CONNECTION_CHARSET = utf8
 EOF
 
-# Configuring syncwerk.conf
-cat >> ${DEFAULT_CONF_DIR}/syncwerk.conf <<EOF
+# Configuring seafile.conf
+cat >> ${DEFAULT_CONF_DIR}/seafile.conf <<EOF
 
 [database]
 type = mysql
@@ -887,6 +888,12 @@ EOF
 
 # Configuring seahub_settings.py
 cat >> ${DEST_SETTINGS_PY} <<EOF
+
+#ADMINS = (
+#    ('admin1', 'admin1@example.com'),
+#    ('admin2', 'admin2@example.com'),
+#    ('admin3', 'admin3@example.com'),
+#)
 
 DATABASES = {
     'default': {
@@ -906,41 +913,54 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
     'LOCATION': '127.0.0.1:11211',
+#    'LOCATION': '127.0.0.2:11211',
+#    'LOCATION': '127.0.0.3:11211',
     }
 }
 
-EMAIL_USE_TLS                       = False
-EMAIL_HOST                          = 'localhost'
-EMAIL_HOST_USER                     = ''
-EMAIL_HOST_PASSWORD                 = ''
-EMAIL_PORT                          = '25'
+#AVATAR_FILE_STORAGE = 'seahub.base.database_storage.DatabaseStorage'
+#COMPRESS_CACHE_BACKEND = 'django.core.cache.backends.locmem.LocMemCache'
+
+ACTIVATE_AFTER_REGISTRATION         = False
+ADD_REPLY_TO_HEADER                 = False
+#BRANDING_CSS                        = 'custom/custom.css'
+CLOUD_MODE                          = False
 DEFAULT_FROM_EMAIL                  = 'noreply@${HOSTNAME}'
+EMAIL_HOST                          = 'localhost'
+EMAIL_HOST_PASSWORD                 = ''
+EMAIL_HOST_USER                     = ''
+EMAIL_PORT                          = '25'
+EMAIL_USE_TLS                       = False
+ENABLE_GLOBAL_ADDRESSBOOK           = True
+ENABLE_MAKE_GROUP_PUBLIC            = False
+ENABLE_REPO_HISTORY_SETTING         = True
+ENABLE_SETTINGS_VIA_WEB             = True
+ENABLE_SIGNUP                       = False
+ENABLE_SYS_ADMIN_VIEW_REPO          = True
+ENABLE_THUMBNAIL                    = True
+ENABLE_UPLOAD_FOLDER                = True
+FILE_ENCODING_LIST                  = ['auto', 'utf-8', 'gbk', 'ISO-8859-1', 'ISO-8859-5', 'Shift_JIS']
+FILE_PREVIEW_MAX_SIZE               = 30 * 1024 * 1024
+FILE_SERVER_ROOT                    = 'https://${HOSTNAME}/seafhttp'
+#LOGO_HEIGHT                         = 32
+#LOGO_WIDTH                          = 149
+#OFFICE_CONVERTOR_ROOT               = 'http://127.0.0.1'
+REPLACE_FROM_EMAIL                  = False
+#REPO_PASSWORD_MIN_LENGTH            = 8
+SEND_EMAIL_ON_ADDING_SYSTEM_MEMBER  = True
+SEND_EMAIL_ON_RESETTING_USER_PASSWD = True
 SERVER_EMAIL                        = 'EMAIL_HOST_USER'
-TIME_ZONE                           = '${SYNCWERK_SERVER_TIME_ZONE}'
+SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
+SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
+SESSION_SAVE_EVERY_REQUEST          = False
 SITE_BASE                           = 'https://${HOSTNAME}'
 SITE_NAME                           = 'Syncwerk Server'
 SITE_TITLE                          = 'Syncwerk Server'
-ENABLE_SIGNUP                       = False
-ACTIVATE_AFTER_REGISTRATION         = False
-SEND_EMAIL_ON_ADDING_SYSTEM_MEMBER  = True
-SEND_EMAIL_ON_RESETTING_USER_PASSWD = True
-CLOUD_MODE                          = False
-FILE_PREVIEW_MAX_SIZE               = 30 * 1024 * 1024
-SESSION_COOKIE_AGE                  = 60 * 60 * 24 * 7 * 2
-SESSION_SAVE_EVERY_REQUEST          = False
-SESSION_EXPIRE_AT_BROWSER_CLOSE     = False
-FILE_SERVER_ROOT                    = 'https://${HOSTNAME}/seafhttp'
-REPO_PASSWORD_MIN_LENGTH            = 8
-USER_PASSWORD_MIN_LENGTH            = 6
-USER_PASSWORD_STRENGTH_LEVEL        = 3
-USER_STRONG_PASSWORD_REQUIRED       = True
-ENABLE_MAKE_GROUP_PUBLIC            = False
-ENABLE_THUMBNAIL                    = True
 THUMBNAIL_ROOT                      = '${SYNCWERK_SERVER_HOME}/seahub-data/thumbnail/thumb/'
-REPO_PASSWORD_MIN_LENGTH            = 8
-USER_PASSWORD_MIN_LENGTH            = 8
-USER_PASSWORD_STRENGTH_LEVEL        = 3
-USER_STRONG_PASSWORD_REQUIRED       = True
+TIME_ZONE                           = '${SYNCWERK_SERVER_TIME_ZONE}'
+#USER_PASSWORD_MIN_LENGTH            = 8
+#USER_PASSWORD_STRENGTH_LEVEL        = 3
+#USER_STRONG_PASSWORD_REQUIRED       = True
 EOF
 
 # Backup check_init_admin.py befor applying changes
