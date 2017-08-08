@@ -11,7 +11,7 @@ Install the [Syncwerk Server](http://www.syncwerk.com) in a standard and more se
 
 ## Supported OS
 
-### Debian Wheezy & Jessie
+### Debian Wheezy, Jessie & Stretch
 
 Just select the corresponding installer for your OS. All scripts are meant to run with the bare minimum OS setup. We strongly suggest not installing Syncwerk server beside desktop environments or hosting panels like Plesk, ISPConfig, etc. 
 Professional installations which don't follow our setup suggestions, don't qualify for official support. Please keep this in mind.
@@ -47,9 +47,9 @@ As a precaution I have added a few simple checks to abort installation if any of
 **All installers need to be executed as root**. Running them with sudo will not work! Login as root or switch to root with `sudo
 su` before installing with these installers. Make sure your OS package repository (e.g. /etc/apt/sources.list) is configured correctly before proceeding.
 
-For **Debian Wheezy and Jessie (64bit)**:
+For **Debian Wheezy, Jessie or Stretch (64bit)**:
 
-    apt-get git lsb-release ca-certificates -y
+    apt-get git lsb-release ca-certificates net-tools -y
     cd /root
     wget https://raw.githubusercontent.com/syncwerk/syncwerk-server-installer/master/syncwerk_v5_debian
     bash syncwerk_v5_debian
