@@ -58,11 +58,10 @@ SYNCWERK_SERVER_TIME_ZONE="Europe/Berlin"
 # Don't touch the following variable, unless you know what you are doing
 export DEBIAN_FRONTEND=noninteractive
 
-if [ ! -f /usr/bin/lsb_release ]; then
-    echo You need to install lsb-release manually before proceeding. 
-    echo On Debian run \"apt-get install lsb-release\" manually.
-    exit
-fi
+# Install installer prerequisites
+apt-get update
+apt-get install net-tools lsb-release ca-certificates -y
+
 OS=$(lsb_release -c | awk '{ print $2 }')
 OS_DESC=$(lsb_release -d | awk -F':' '{ print $2}')
 
@@ -214,7 +213,7 @@ clear
 
 
 function ensure-we-are-running-the-installer-on-a-supported-operating-system {
-if [[ ${OS} != jessie && ${OS} != wheezy ]] ; then
+if [[ ${OS} != stretch && ${OS} != jessie && ${OS} != wheezy ]] ; then
     echo "Aborting because OS not supported" ; exit 1
 fi
 }
@@ -326,20 +325,24 @@ function install-syncwerk-server-requirements {
 apt-get install sudo python-setuptools python-simplejson python-imaging python-mysqldb \
 memcached python-memcache pwgen curl openssl -y
 
-# Syncwerk Professional requierments
+# Syncwerk Professional requirements
 if [ ${SYNCWERK_SERVER_PROFESSIONAL} = "enabled" ]
   then
-    apt-get install libpython2.7 openjdk-7-jre libreoffice libreoffice-script-provider-python \
+    apt-get install libpython2.7 libreoffice libreoffice-script-provider-python \
     ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy poppler-utils python-urllib3 -y
 
-    if [ ${OS} = "wheezy" ]
+    if [ ${OS} = "stretch" ]
       then
-        apt-get install python-uno -y
-      else
-        apt-get install python3-uno -y
+        apt-get install openjdk-8-jre python3-uno -y
+    elif [ ${OS} = "jessie" ]
+      then
+        apt-get install openjdk-7-jre python3-uno -y
+    else
+      apt-get install openjdk-7-jre python-uno -y
     fi
 fi
 }
+
 
 function setup-nginx {
 apt-get install nginx -y
@@ -934,7 +937,7 @@ EMAIL_USE_TLS                       = False
 ENABLE_GLOBAL_ADDRESSBOOK           = True
 ENABLE_MAKE_GROUP_PUBLIC            = False
 ENABLE_REPO_HISTORY_SETTING         = True
-ENABLE_SETTINGS_VIA_WEB             = True
+ENABLE_SETTINGS_VIA_WEB             = False
 ENABLE_SIGNUP                       = False
 ENABLE_SYS_ADMIN_VIEW_REPO          = True
 ENABLE_THUMBNAIL                    = True
