@@ -1,0 +1,134 @@
+#!/bin/bash
+(
+#
+# setup-letsencrypt-for-syncwerk-on-debian.sh
+#
+# Copyright 2017, Alexander Jackson <alexander.jackson@syncwerk.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Uncomment to run in verbose mode
+set -ex
+
+OS=$(lsb_release -c | awk '{ print $2 }')
+
+function ensure-we-are-running-the-installer-on-a-supported-operating-system {
+if [[ ${OS} != stretch && ${OS} != jessie && ${OS} != wheezy ]] ; then
+    echo "Aborting because OS not supported" ; exit 1
+fi
+}
+
+
+function are-we-root-abort-if-not {
+if [[ ${EUID} -ne 0 ]] ; then
+  echo "Aborting because you are not root" ; exit 1
+fi
+}
+
+function restart-nginx {
+if [ ${OS} = "wheezy" ]
+  then
+    nginx -t && service nginx restart
+  else
+    if [[ $(cat /proc/1/environ) == *container* ]]; then nginx -t && service nginx restart ; else nginx -t && systemctl restart nginx ; fi
+fi
+}
+
+
+function setup-cronjob {
+if [ ${OS} = "stretch" ]
+  then
+    (crontab -l ; echo "30 1   *   *   *    /usr/bin/dehydrated -c  && /bin/systemctl reload nginx") | crontab -
+elif [ ${OS} = "jessie" ]
+  then
+    if [[ $(cat /proc/1/environ) == *container* ]]; then (crontab -l ; echo "30 1   *   *   *    /opt/dehydrated/dehydrated -c  && /bin/systemctl reload nginx") | crontab - ; else (crontab -l ; echo "30 1   *   *   *    /opt/dehydrated/dehydrated -c  && /bin/systemctl reload nginx") | crontab - ; fi
+else
+    (crontab -l ; echo "30 1   *   *   *    /opt/dehydrated/dehydrated -c  && /bin/systemctl reload nginx") | crontab -
+fi
+}
+
+
+function install-requirements {
+apt-get update
+apt-get install curl ca-certificates -y
+}
+
+
+function setup-letsencrypt {
+
+if [ ${OS} = "stretch" ]
+  then
+    apt-get install dehydrated -y
+    echo $(hostname -f) | tee /etc/dehydrated/domains.txt
+grep acme-challenge /etc/nginx/conf.d/syncwerk.conf || sed -i '/.*location \/ {/i \
+  location \/.well-known\/acme-challenge {\
+      alias /var/lib/dehydrated/acme-challenges;\
+  }\
+  ' /etc/nginx/conf.d/syncwerk.conf
+else
+  cd /opt
+  wget https://github.com/syncwerk/dehydrated/archive/v0.3.1.tar.gz -O dehydrated.tar.gz
+  tar xzf dehydrated.tar.gz
+  rm dehydrated.tar.gz
+  ln -sf dehydrated-0.3.1 dehydrated
+  echo $(hostname -f) | tee /opt/dehydrated/domains.txt
+  mkdir -p /var/www/dehydrated
+grep acme-challenge /etc/nginx/conf.d/syncwerk.conf || sed -i '/.*location \/ {/i \
+  location \/.well-known\/acme-challenge {\
+      alias /var/www/dehydrated;\
+  }\
+  ' /etc/nginx/conf.d/syncwerk.conf
+fi
+}
+
+
+
+
+function retrieve-certificate-and-reconfigure-nginx {
+if [ ${OS} = "stretch" ]
+  then
+    /usr/bin/dehydrated -c
+else
+  /opt/dehydrated/dehydrated -c
+fi
+
+sed -i '/.*ssl_certificate.*/ s/^#*/#/' /etc/nginx/conf.d/syncwerk.conf
+
+if [ ${OS} = "stretch" ]
+  then
+grep "dehydrated/certs" /etc/nginx/conf.d/syncwerk.conf || eval "sed -i '/.*  ssl on;/a \ \
+  ssl_certificate \/var\/lib\/dehydrated\/certs\/$(hostname -f)\/fullchain.pem;\n \
+  ssl_certificate_key \/var\/lib\/dehydrated\/certs\/$(hostname -f)\/privkey.pem;\
+  ' /etc/nginx/conf.d/syncwerk.conf"
+else
+grep "dehydrated/certs" /etc/nginx/conf.d/syncwerk.conf || eval "sed -i '/.*  ssl on;/a \ \
+  ssl_certificate \/opt\/dehydrated\/certs\/$(hostname -f)\/fullchain.pem;\n \
+  ssl_certificate_key \/opt\/dehydrated\/certs\/$(hostname -f)\/privkey.pem;\
+  ' /etc/nginx/conf.d/syncwerk.conf"
+fi
+}
+
+ensure-we-are-running-the-installer-on-a-supported-operating-system
+are-we-root-abort-if-not
+install-requirements
+setup-letsencrypt
+restart-nginx
+retrieve-certificate-and-reconfigure-nginx
+restart-nginx
+setup-cronjob
+
+echo "Done!"
+
+) 2>&1 | tee /root/$(basename ${0})_installation.log
+chmod 600 /root/$(basename ${0})_installation.log
