@@ -49,13 +49,13 @@ For **CentOS 7 (64bit)**
 
     cd /root
     wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
-    bash seafile_centos 6.0.2
+    bash seafile_centos 6.1.2
 
 For **Ubuntu 16.04 (64bit)**
 
     cd /root
     wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
-    bash seafile_ubuntu 6.0.2
+    bash seafile_ubuntu 6.1.2
 
 
 ## FAQs
