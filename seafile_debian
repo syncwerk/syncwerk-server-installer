@@ -1127,13 +1127,18 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   Next you should manually complete the following steps
   -----------------------------------------------------------------
 
-  1) If this server is behind a firewall, you need to ensure that
+  1) Log in to Seafile and configure your server domain via the system
+     admin area if applicable.
+
+  2) If this server is behind a firewall, you need to ensure that
      tcp port 443 for the NGINX reverse proxy is open. Optionally
      you may also open tcp port 80 which redirects all unencrypted
      http traffic to the encrypted https port.
 
-  2) Seahub tries to send emails via the local Postfix mail server.
-     Make sure Postfix is setup correctly for your environment.
+  3) Seahub tries to send emails via the local server. Install and
+     configure Postfix for this to work or
+     check https://manual.seafile.com/config/sending_email.html
+     for instructions on how to use an existing email account via SMTP.
 
 
   Optional steps
