@@ -356,6 +356,7 @@ systemctl restart nginx
 if [[ -f "/root/.my.cnf" ]] ;
 then
     echo "MariaDB installed before, skip this part"
+    SQLROOTPW=`sed -n 's/password=//p' /root/.my.cnf`
 else
     yum install mariadb-server -y
     systemctl start mariadb
@@ -443,15 +444,21 @@ mv ${SEAFILE_SERVER_PACKAGE} installed
 # -------------------------------------------
 # Seafile DB
 # -------------------------------------------
-SQLSEAFILEPW=$(pwgen)
+if [[ -f "/opt/seafile.my.cnf" ]] ;
+then
+  echo "MariaDB installed before, skip this part"
+  SQLSEAFILEPW=`sed -n 's/password=//p' /opt/seafile.my.cnf`
+else
+  SQLSEAFILEPW=$(pwgen)
 
-cat > /opt/seafile/.my.cnf <<EOF
+  cat > /opt/seafile.my.cnf <<EOF
 [client]
 user=seafile
 password=$SQLSEAFILEPW
 EOF
 
-chmod 600 /opt/seafile/.my.cnf
+  chmod 600 /opt/seafile.my.cnf
+fi
 
 # -------------------------------------------
 # Add seafile user
@@ -588,7 +595,7 @@ cat > ${TOPDIR}/aio_seafile-server.log<<EOF
 
   Seafile Data Dir:    ${SEAFILE_DATA_DIR}
 
-  Seafile DB Credentials:  Check /opt/seafile/.my.cnf
+  Seafile DB Credentials:  Check /opt/seafile.my.cnf
   Root DB Credentials:     Check /root/.my.cnf
 
   Switch to Seafile system account with: su - ${SEAFILE_SERVER_USER} -s /bin/bash
