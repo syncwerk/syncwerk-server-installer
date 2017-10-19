@@ -1149,7 +1149,8 @@ cat > ${SEAFILE_SERVER_HOME}/$(basename ${0})_report.log<<EOF
   2) Check seahub_settings.py and customize it to fit your needs. Consult
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
-  3) Setup NGINX with official SSL certificate and create safe DH primes...
+  3) Setup NGINX with official SSL certificate, we suggest you use Let’s Encrypt. Check
+     https://manual.seafile.com/deploy/https_with_nginx.html
 
   4) Harden system with port knocking, fail2ban, etc.
 

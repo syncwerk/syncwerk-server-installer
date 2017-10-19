@@ -494,7 +494,8 @@ cat > ${TOPDIR}/aio_seafile-server.log<<EOF
   1) Check seahub_settings.py and customize it to fit your needs. Consult
      http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
 
-  2) Setup NGINX with official SSL certificate.
+  2) Setup NGINX with official SSL certificate, we suggest you use Let’s Encrypt. Check
+     https://manual.seafile.com/deploy/https_with_nginx.html
 
   3) Secure server with iptables based firewall. For instance: UFW or shorewall
 
