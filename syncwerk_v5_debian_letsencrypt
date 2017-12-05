@@ -78,10 +78,10 @@ grep acme-challenge /etc/nginx/conf.d/syncwerk.conf || sed -i '/.*location \/ {/
   ' /etc/nginx/conf.d/syncwerk.conf
 else
   cd /opt
-  wget https://github.com/syncwerk/dehydrated/archive/v0.3.1.tar.gz -O dehydrated.tar.gz
-  tar xzf dehydrated.tar.gz
-  rm dehydrated.tar.gz
-  ln -sf dehydrated-0.3.1 dehydrated
+  wget https://github.com/syncwerk/dehydrated/archive/master.tar.gz -O dehydrated-master.tar.gz
+  tar xzf dehydrated-master.tar.gz
+  rm dehydrated-master.tar.gz
+  ln -sf dehydrated-master dehydrated
   echo $(hostname -f) | tee /opt/dehydrated/domains.txt
   mkdir -p /var/www/dehydrated
 grep acme-challenge /etc/nginx/conf.d/syncwerk.conf || sed -i '/.*location \/ {/i \
@@ -93,6 +93,14 @@ fi
 }
 
 
+function accept-letsencrypt-terms {
+if [ ${OS} = "stretch" ]
+  then
+    /usr/bin/dehydrated --register --accept-terms
+else
+  /opt/dehydrated/dehydrated --register --accept-terms
+fi
+}
 
 
 function retrieve-certificate-and-reconfigure-nginx {
@@ -124,6 +132,7 @@ are-we-root-abort-if-not
 install-requirements
 setup-letsencrypt
 restart-nginx
+accept-letsencrypt-terms
 retrieve-certificate-and-reconfigure-nginx
 restart-nginx
 setup-cronjob
