@@ -31,9 +31,8 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 
 ## Feature overview
-1. HTTPS-Proxy
-2. Redirect all HTTP to HTTPS
-2. Seahub with FastCGI
+1. HTTP-Proxy
+2. Seahub with WSGI
 3. [Seafile WebDAV (aka. SeafDAV)](http://manual.seafile.com/extension/webdav.html) with FastCGI
 4. MariaDB
 5. Memcached
@@ -47,27 +46,25 @@ For Seafile Professional Server, you will have to download the package prior to 
 
 For **CentOS 7 (64bit)**
 
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
-    bash seafile_centos 6.1.2
+```bash
+cd /root
+wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
+bash seafile_centos 6.1.2
+```
 
 For **Ubuntu 16.04 (64bit)**
 
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
-    bash seafile_ubuntu 6.1.2
+```bash
+cd /root
+wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
+bash seafile_ubuntu 6.1.2
+```
 
 
 ## FAQs
 
-***Where do I find the full installation log?***
-At `/opt/seafile/[installer_name]_installation.log`
-
-***What's the unprivileged Seafile users name***
+***What's the unprivileged Seafile users name?***
 seafile
-
-***How can I change the domain name of the Seafile server?***
-Run the `seafile-server-change-address` script on the shell
 
 ***How can I login as the unprivileged Seafile user?***
 Run `su - seafile -s /bin/bash` with root privileges on the shell
@@ -83,15 +80,11 @@ BTW: Ideas on how to automate upgrades are very welcome!
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if you run it again.
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation.
 
-## Troubleshooting
-If your installation did not finish successfully, check `/opt/seafile/[installer_name]_installation.log` for errors.
-
-
 ## License
 
 Copyright (c) 2016, Seafile Ltd.
 
-Copyright 2015, Alexander Jackson <alexander.jackson@seafile.de>
+Copyright 2015, Alexander Jackson
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the [GNU Affero General Public License](http://www.gnu.org/licenses/agpl-3.0.html) as published by
