@@ -3,7 +3,6 @@
 These installers offer a quick and easy way to set up a production ready Seafile Server using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
 \* Community Edition
-
 ** Professional Edition
 
 ## What's it for?
@@ -65,17 +64,17 @@ bash seafile_ubuntu 6.1.2
 ## FAQs
 
 ***What's the unprivileged Seafile users name?***
-  seafile
+seafile
 
 ***How can I login as the unprivileged Seafile user?***
-  Run `su - seafile -s /bin/bash` with root privileges on the shell
+Run `su - seafile -s /bin/bash` with root privileges on the shell
 
 ***How do I update Seafile?***
-  You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile.
+You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile.
 
-  To login as the Seafile users run `su - seafile -s /bin/bash` and then proceed with the update procedure as usual.
+To login as the Seafile users run `su - seafile -s /bin/bash` and then proceed with the update procedure as usual.
 
-  BTW: Ideas on how to automate upgrades are very welcome!
+BTW: Ideas on how to automate upgrades are very welcome!
 
 ***What do I have to do after the installer has finished?***
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if you run it again.
