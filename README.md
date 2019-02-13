@@ -16,7 +16,7 @@ Just select the corresponding installer for your OS. All scripts are meant to ru
 
 ### Minimal installations only!
 
-1. Ubuntu 16.04
+1. Ubuntu 16.04/18.04
 2. CentOS 7
 
 ## Caution
@@ -52,7 +52,7 @@ wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-ser
 bash seafile_centos 6.1.2
 ```
 
-For **Ubuntu 16.04 (64bit)**
+For **Ubuntu 16.04/18.04 (64bit)**
 
 ```bash
 cd /root
