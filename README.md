@@ -17,7 +17,7 @@ Just select the corresponding installer for your OS. All scripts are meant to ru
 ### Minimal installations only!
 
 1. Ubuntu 16.04/18.04
-2. CentOS 7
+2. CentOS 7/8
 
 ## Caution
 Never run these scripts on a production server. They are more or less a one trick pony and could seriously damage production systems. Run it only once and
@@ -33,7 +33,7 @@ As a precaution I have added a few simple checks to abort installation if any of
 ## Feature overview
 1. HTTP-Proxy
 2. Seahub with WSGI
-3. [Seafile WebDAV (aka. SeafDAV)](http://manual.seafile.com/extension/webdav.html) with FastCGI
+3. [Seafile WebDAV (aka. SeafDAV)](https://download.seafile.com/published/seafile-manual/extension/webdav.md) with FastCGI
 4. MariaDB
 5. Memcached
 6. Seafile auto start
@@ -44,21 +44,37 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 For Seafile Professional Server, you will have to download the package prior to the installation and save it to /opt/.
 
-For **CentOS 7 (64bit)**
+- For Seafile 7.1.x
 
-```bash
-cd /root
-wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
-bash seafile_centos 6.1.2
-```
+    For **CentOS 8 (64bit)**
+    ```bash
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-7.1_centos
+    bash seafile-7.1_centos 7.1.0
+    ```
+    
+    For **Ubuntu 18.04 (64bit)**
+    ```bash
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-7.1_ubuntu
+    bash seafile-7.1_ubuntu 7.1.0
+    ```
 
-For **Ubuntu 16.04/18.04 (64bit)**
+- For Seafile 6.x.x/7.0.x
 
-```bash
-cd /root
-wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
-bash seafile_ubuntu 6.1.2
-```
+    For **CentOS 7 (64bit)**
+    ```bash
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
+    bash seafile_centos 7.0.5
+    ```
+    
+    For **Ubuntu 16.04/18.04 (64bit)**
+    ```bash
+    cd /root
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
+    bash seafile_ubuntu 7.0.5
+    ```
 
 
 ## FAQs
