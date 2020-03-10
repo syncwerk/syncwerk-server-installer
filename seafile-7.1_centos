@@ -30,7 +30,7 @@ fi
 set -e
 
 if [[ "$#" -ne 1 ]]; then
-    echo "You must specif Seafile version to install"
+    echo "You must specify Seafile version to install"
     echo "Like: $0 7.1.0"
     exit 1
 fi
@@ -174,7 +174,7 @@ systemctl status firewalld &> /dev/null \
 yum install epel-release -y
 
 yum install python3 python3-setuptools python3-pip python3-ldap memcached java-1.8.0-openjdk \
-    libmemcached libreoffice-headless libreoffice-pyuno libffi-devel pwgen curl -y
+    libmemcached libreoffice-headless libreoffice-pyuno libffi-devel pwgen curl tar -y
 
 pip3 install --timeout=3600 Pillow pylibmc captcha jinja2 sqlalchemy psd-tools \
     django-pylibmc django-simple-captcha
