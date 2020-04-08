@@ -501,12 +501,15 @@ eval "sed -i 's/= ask_admin_password()/= \"${SEAFILE_ADMIN_PW}\"/' ${INSTALLPATH
 # -------------------------------------------
 # Start and stop Seafile eco system. This generates the initial admin user.
 # -------------------------------------------
-${INSTALLPATH}/seafile.sh start
-${INSTALLPATH}/seahub.sh start
-wait				# wait for a while, otherwise seahub will not be stopped
-${INSTALLPATH}/seahub.sh stop
+chown ${SEAFILE_SERVER_USER}:${SEAFILE_SERVER_USER} -R ${SEAFILE_SERVER_HOME}
+
+su - seafile -c "${INSTALLPATH}/seafile.sh start"
+su - seafile -c "${INSTALLPATH}/seahub.sh start"
+wait					# sleep for a while, otherwise seahub will not be stopped
+su - seafile -c "${INSTALLPATH}/seahub.sh stop"
 sleep 1
-${INSTALLPATH}/seafile.sh stop
+su - seafile -c "${INSTALLPATH}/seafile.sh stop"
+sleep 1
 
 
 # -------------------------------------------
@@ -519,6 +522,12 @@ if is_pro; then
     $PYTHON ${PRO_PY} setup --mysql --mysql_host=127.0.0.1 --mysql_port=3306 --mysql_user=seafile --mysql_password=${SQLSEAFILEPW} --mysql_db=seahub_db
 fi
 
+# kill all process
+sleep 1
+pkill -9 -u seafile
+sleep 1
+
+
 # -------------------------------------------
 # Fix permissions
 # -------------------------------------------
@@ -530,6 +539,7 @@ fi
 # -------------------------------------------
 # Restart seafile server
 # -------------------------------------------
+echo "Starting productive Seafile server"
 /usr/local/sbin/seafile-server-restart
 
 # -------------------------------------------
