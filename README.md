@@ -44,7 +44,7 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 For Seafile Professional Server, you will have to download the package prior to the installation and save it to /opt/.
 
-- For Seafile 7.1.x
+- For Seafile 7.1.x or newer versions
 
     For **CentOS 8 (64bit)**
     ```bash
@@ -59,6 +59,8 @@ For Seafile Professional Server, you will have to download the package prior to 
     wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-7.1_ubuntu
     bash seafile-7.1_ubuntu 7.1.0
     ```
+
+    Replace the version number to the version number you use if you're using newer versions.
 
 - For Seafile 6.x.x/7.0.x
 
