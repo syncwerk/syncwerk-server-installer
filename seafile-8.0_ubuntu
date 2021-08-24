@@ -38,7 +38,7 @@ fi
 clear
 cat <<EOF
 
-  This script installs the community edition of the Seafile Server on a Ubuntu 16.04 (Xenial) 64bit
+  This script installs the community/professional edition of the Seafile Server on a Ubuntu 18.04 (Bionic) 64bit
   - Newest Seafile server version, MariaDB, Memcached, NGINX -
   -----------------------------------------------------------------
 
@@ -191,7 +191,7 @@ server {
          access_log      /var/log/nginx/seahub.access.log seafileformat;
          error_log       /var/log/nginx/seahub.error.log;
     }
-    
+
     location /seafhttp {
          rewrite ^/seafhttp(.*)$ \$1 break;
          proxy_pass http://127.0.0.1:8082;
@@ -503,10 +503,8 @@ cat > ${TOPDIR}/aio_seafile-server.log<<EOF
   2) If this server is behind a firewall, you need to ensure that
      tcp port 80 is open.
 
-  3) Seahub tries to send emails via the local server. Install and
-     configure Postfix for this to work or
-     check https://manual.seafile.com/config/sending_email.html
-     for instructions on how to use an existing email account via SMTP.
+  3) Check https://manual.seafile.com/config/sending_email/
+     for instructions on how to use an existing email account to send email via SMTP.
 
 
 
@@ -515,10 +513,10 @@ cat > ${TOPDIR}/aio_seafile-server.log<<EOF
   -----------------------------------------------------------------
 
   1) Check seahub_settings.py and customize it to fit your needs. Consult
-     http://manual.seafile.com/config/seahub_settings_py.html for possible switches.
+     https://manual.seafile.com/config/seahub_settings_py/ for possible switches.
 
   2) Setup NGINX with official SSL certificate, we suggest you use Let’s Encrypt. Check
-     https://manual.seafile.com/deploy/https_with_nginx.html
+     https://manual.seafile.com/deploy/https_with_nginx/
 
   3) Secure server with iptables based firewall. For instance: UFW or shorewall
 
