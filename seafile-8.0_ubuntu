@@ -38,7 +38,7 @@ fi
 clear
 cat <<EOF
 
-  This script installs the community/professional edition of the Seafile Server on a Ubuntu 18.04 (Bionic) 64bit
+  This script installs the community/professional edition of the Seafile Server on a Ubuntu 18.04/20.04 64bit
   - Newest Seafile server version, MariaDB, Memcached, NGINX -
   -----------------------------------------------------------------
 
@@ -365,7 +365,6 @@ mkdir -p ${DEFAULT_CONF_DIR}
 # Configure Seafile WebDAV Server(SeafDAV)
 # -------------------------------------------
 sed -i 's/enabled = .*/enabled = true/' ${DEFAULT_CONF_DIR}/seafdav.conf
-sed -i 's/fastcgi = .*/fastcgi = true/' ${DEFAULT_CONF_DIR}/seafdav.conf
 sed -i 's/share_name = .*/share_name = \/seafdav/' ${DEFAULT_CONF_DIR}/seafdav.conf
 
 # -------------------------------------------
@@ -520,14 +519,7 @@ cat > ${TOPDIR}/aio_seafile-server.log<<EOF
 
   3) Secure server with iptables based firewall. For instance: UFW or shorewall
 
-  4) Harden system with port knocking, fail2ban, etc.
-
-  5) Enable unattended installation of security updates. Check
-     https://wiki.Ubuntu.org/UnattendedUpgrades for details.
-
-  6) Implement a backup routine for your Seafile server.
-
-  7) Update NGINX worker processes to reflect the number of CPU cores.
+  4) Implement a backup routine for your Seafile server.
 
 
 

@@ -2,24 +2,24 @@
 
 These installers offer a quick and easy way to set up a production ready Seafile Server using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
-\* Community Edition
-** Professional Edition
 
 ## What's it for?
 
-Install the [Seafile Server](http://seafile.com/en/home/) in a standard and more secure manner then our current out of the box setup scripts offer.
+Install the [Seafile Server](https://seafile.com/en/home/) in a standard and more secure manner then our current out of the box setup scripts offer.
 
 
 ## Supported OS
 
 Just select the corresponding installer for your OS. All scripts are meant to run with the bare minimum OS setup. We strongly suggest not installing Seafile server besides desktop environment or hosting panels like Plesk, ISPConfig, etc. Professional installations which don't follow our setup suggestions, don't qualify for official support. Keep this in mind.
 
+
 ### Minimal installations only!
 
-1. Ubuntu 16.04/18.04
-2. CentOS 7/8
+1. Ubuntu 18.04/20.04
+
 
 ## Caution
+
 Never run these scripts on a production server. They are more or less a one trick pony and could seriously damage production systems. Run it only once and
 delete it afterwards. If something goes wrong, restart with a fresh machine.
 
@@ -31,9 +31,10 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 
 ## Feature overview
+
 1. HTTP-Proxy
 2. Seahub with WSGI
-3. [Seafile WebDAV (aka. SeafDAV)](https://download.seafile.com/published/seafile-manual/extension/webdav.md) with FastCGI
+3. [Seafile WebDAV (aka. SeafDAV)](https://download.seafile.com/published/seafile-manual/extension/webdav.md) with  WSGI
 4. MariaDB
 5. Memcached
 6. Seafile auto start
@@ -44,39 +45,14 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 For Seafile Professional Server, you will have to download the package prior to the installation and save it to /opt/.
 
-- For Seafile 7.1.x or newer versions
-
-    For **CentOS 8 (64bit)**
+- For Seafile 7.1.x or newer versions on **Ubuntu 18.04/20.04 (64bit)** server
     ```bash
     cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-7.1_centos
-    bash seafile-7.1_centos 7.1.0
-    ```
-    
-    For **Ubuntu 18.04 (64bit)**
-    ```bash
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-7.1_ubuntu
-    bash seafile-7.1_ubuntu 7.1.0
+    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-8.0_ubuntu
+    bash seafile-8.0_ubuntu 8.0.0
     ```
 
     Replace the version number to the version number you use if you're using newer versions.
-
-- For Seafile 6.x.x/7.0.x
-
-    For **CentOS 7 (64bit)**
-    ```bash
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_centos
-    bash seafile_centos 7.0.5
-    ```
-    
-    For **Ubuntu 16.04/18.04 (64bit)**
-    ```bash
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile_ubuntu
-    bash seafile_ubuntu 7.0.5
-    ```
 
 
 ## FAQs
@@ -97,6 +73,7 @@ BTW: Ideas on how to automate upgrades are very welcome!
 ***What do I have to do after the installer has finished?***
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if you run it again.
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation.
+
 
 ## License
 
