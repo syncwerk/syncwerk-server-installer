@@ -1,29 +1,15 @@
-# Auto install Seafile Server CE* and PRO**
+# Auto install Seafile Server
 
 These installers offer a quick and easy way to set up a production ready Seafile Server using MariaDB, Memcached and NGINX as a reverse proxy in under 5 minutes.
 
-
-## What's it for?
-
-Install the [Seafile Server](https://seafile.com/en/home/) in a standard and more secure manner then our current out of the box setup scripts offer.
-
-
-## Supported OS
-
-Just select the corresponding installer for your OS. All scripts are meant to run with the bare minimum OS setup. We strongly suggest not installing Seafile server besides desktop environment or hosting panels like Plesk, ISPConfig, etc. Professional installations which don't follow our setup suggestions, don't qualify for official support. Keep this in mind.
-
-
-### Minimal installations only!
-
-1. Ubuntu 18.04/20.04
+Ubuntu 18.04/20.04 are supported now.
 
 
 ## Caution
 
-Never run these scripts on a production server. They are more or less a one trick pony and could seriously damage production systems. Run it only once and
-delete it afterwards. If something goes wrong, restart with a fresh machine.
+Do not run these scripts on a production server that you have already a Seafile running. 
 
-As a precaution I have added a few simple checks to abort installation if any of these fails:
+As a precaution, a few simple checks to abort installation if any of these fails:
 
 1. Check if you're running this script as root. If not, abort.
 2. Check if the user "seafile" exists. If yes, abort.
@@ -45,32 +31,35 @@ As a precaution I have added a few simple checks to abort installation if any of
 
 For Seafile Professional Server, you will have to download the package prior to the installation and save it to /opt/.
 
-- For Seafile 7.1.x or newer versions on **Ubuntu 18.04/20.04 (64bit)** server
-    ```bash
-    cd /root
-    wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-8.0_ubuntu
-    bash seafile-8.0_ubuntu 8.0.0
-    ```
+For Seafile 8.0.x or newer versions on **Ubuntu 18.04/20.04 (64bit)** server
 
-    Replace the version number to the version number you use if you're using newer versions.
+```bash
+cd /root
+wget --no-check-certificate https://raw.githubusercontent.com/haiwen/seafile-server-installer/master/seafile-8.0_ubuntu
+bash seafile-8.0_ubuntu 8.0.0
+```
+
+Replace the version number to the version number you use if you're using newer versions.
 
 
 ## FAQs
 
 ***What's the unprivileged Seafile users name?***
+
 seafile
 
 ***How can I login as the unprivileged Seafile user?***
+
 Run `su - seafile -s /bin/bash` with root privileges on the shell
 
 ***How do I update Seafile?***
+
 You will have to handle Seafile updates/upgrades manually after the initial installation. Consult http://manual.seafile.com/deploy/upgrade.html on how to upgrade Seafile.
 
 To login as the Seafile users run `su - seafile -s /bin/bash` and then proceed with the update procedure as usual.
 
-BTW: Ideas on how to automate upgrades are very welcome!
-
 ***What do I have to do after the installer has finished?***
+
 1. Delete installer script. You wont need it anymore and might even seriously damage your system if you run it again.
 2. Follow the suggested steps at the end of the installation to finalize your Seafile server installation.
 
